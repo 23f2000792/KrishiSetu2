@@ -12,6 +12,7 @@ import { useFirebase } from "@/firebase/provider";
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { Post } from "@/lib/types";
 import { useMemoFirebase } from "@/firebase";
+import { WisdomWebCard } from "./components/wisdom-web-card";
 
 export default function CommunityPage() {
     const [open, setOpen] = useState(false);
@@ -55,6 +56,8 @@ export default function CommunityPage() {
                     </Dialog>
                 </div>
             </PageHeader>
+            
+            <WisdomWebCard />
 
             {isLoading && (
                 <div className="flex justify-center items-center h-64">
