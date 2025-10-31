@@ -63,19 +63,20 @@ export default function ScannerPage() {
         <div className="pb-16 md:pb-0">
              {isCameraOpen && <CameraView onCapture={handleScan} onClose={() => setIsCameraOpen(false)} />}
             <div className="grid lg:grid-cols-3 gap-8 items-start h-full">
-                <div className="lg:col-span-2 flex flex-col gap-8 h-full">
+                <div className="lg:col-span-2 flex flex-col items-center gap-8 h-full">
                     <PageHeader
                         title={t('scanner.title')}
                         description={t('scanner.description')}
+                        className="w-full"
                     />
-                    <div className="flex-grow animate-fade-in-up">
+                    <div className="flex-grow animate-fade-in-up w-full">
                         {loading ? (
-                             <Card>
-                                <CardHeader>
+                             <Card className="w-full max-w-2xl mx-auto">
+                                <CardHeader className="items-center">
                                   <Skeleton className="h-8 w-1/2" />
                                   <Skeleton className="h-4 w-3/4" />
                                 </CardHeader>
-                                <CardContent className="grid md:grid-cols-2 gap-8">
+                                <CardContent className="space-y-6">
                                   <Skeleton className="aspect-video w-full rounded-xl" />
                                   <div className="space-y-6">
                                       <div className="space-y-2">
@@ -95,7 +96,7 @@ export default function ScannerPage() {
                             <FileUploader onFileUpload={handleScan} onCameraOpen={() => setIsCameraOpen(true)} />
                         )}
                         {error && (
-                            <Alert variant="destructive" className="mt-4">
+                            <Alert variant="destructive" className="mt-4 max-w-2xl mx-auto">
                                 <AlertCircle className="h-4 w-4" />
                                 <AlertTitle>Error</AlertTitle>
                                 <AlertDescription>{error}</AlertDescription>

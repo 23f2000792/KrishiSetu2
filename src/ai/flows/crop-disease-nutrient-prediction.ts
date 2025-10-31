@@ -24,9 +24,9 @@ export type CropDiseaseNutrientPredictionInput = z.infer<
 >;
 
 const CropDiseaseNutrientPredictionOutputSchema = z.object({
-  prediction: z.string().describe('The predicted disease or nutrient deficiency.'),
+  prediction: z.string().describe('A short, clear title of the predicted disease, nutrient deficiency, or "Healthy". Max 3 words.'),
   confidence: z.number().describe('The confidence level of the prediction (0-1).'),
-  recommendedSteps: z.string().describe('Recommended steps to address the issue.'),
+  recommendedSteps: z.string().describe('A concise, actionable paragraph of recommended steps to address the issue. Start with the most important action.'),
 });
 
 export type CropDiseaseNutrientPredictionOutput = z.infer<
@@ -43,10 +43,12 @@ const cropDiseaseNutrientPredictionPrompt = ai.definePrompt({
   name: 'cropDiseaseNutrientPredictionPrompt',
   input: {schema: CropDiseaseNutrientPredictionInputSchema},
   output: {schema: CropDiseaseNutrientPredictionOutputSchema},
-  prompt: `You are an expert in plant pathology and nutrient deficiencies.
+  prompt: `You are an expert in plant pathology and nutrient deficiencies for Indian agriculture.
 
   Analyze the provided image of a crop and provide a prediction of potential diseases or nutrient deficiencies.
-  Also, provide a confidence level for your prediction (0-1) and recommended steps to address the issue.
+  Your prediction should be a short, clear title (max 3 words), like "Wheat Leaf Rust" or "Nitrogen Deficiency". If the plant is healthy, predict "Healthy Crop".
+  Provide a confidence level for your prediction (from 0.0 to 1.0).
+  Also, provide a concise, actionable paragraph of recommended steps to address the issue. Start with the most important action. The recommendations should be practical for a small to medium-scale farmer in India.
 
   Image: {{media url=photoDataUri}}
   `,
