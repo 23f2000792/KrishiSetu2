@@ -8,11 +8,11 @@ import { CheckCircle, Save, AlertTriangle, Scan, Bot, Share2, Loader2 } from 'lu
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/language-context';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 
 type ScanResultCardProps = {
   result: ScanResult;
