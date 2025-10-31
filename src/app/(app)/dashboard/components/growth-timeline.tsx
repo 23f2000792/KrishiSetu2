@@ -1,11 +1,14 @@
+
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, CalendarRange, ShieldCheck, Target, Droplets, Wind, Thermometer, Bug, Sprout } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuth } from '@/contexts/auth-context';
 import { simulateCropGrowth, CropGrowthSimulationOutput } from '@/ai/flows/crop-growth-simulation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserCollection } from '@/firebase/firestore/use-user-collection';
+import type { SoilReport } from '@/lib/types';
 
 const stageIcons: { [key: string]: React.ElementType } = {
     default: Sprout,
@@ -42,23 +45,31 @@ function getIconFor(type: 'stage' | 'risk', text: string): React.ElementType {
 }
 
 export function GrowthTimeline() {
-    const { t, locale } = useLanguage();
+    const { locale } = useLanguage();
     const { user } = useAuth();
     const [simulation, setSimulation] = useState<CropGrowthSimulationOutput | null>(null);
     const [loading, setLoading] = useState(true);
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
 
+    const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
+
+    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports');
+    
+    const latestSoilReport = useMemo(() => {
+        if (!soilReports || soilReports.length === 0) return null;
+        return [...soilReports].sort((a, b) => b.uploadedAt.toDate().getTime() - a.uploadedAt.toDate().getTime())[0];
+    }, [soilReports]);
+
     useEffect(() => {
         const runSimulation = async () => {
-            if (!user) return;
+            if (!user || soilReportsLoading) return;
             setLoading(true);
             try {
                 const result = await simulateCropGrowth({
-                    crop: 'Wheat', // This would be dynamic in a real app
+                    crop: primaryCrop,
                     region: user.region,
                     language: languageMap[locale],
-                    // In a real app, you'd fetch the latest soil report here
-                    soilReport: { pH: 6.8, N: "Medium", P: "High", K: "Medium", OC: 0.6 },
+                    soilReport: latestSoilReport?.aiSummary,
                 });
                 setSimulation(result);
             } catch (error) {
@@ -68,7 +79,7 @@ export function GrowthTimeline() {
             }
         };
         runSimulation();
-    }, [user, locale]);
+    }, [user, locale, primaryCrop, soilReportsLoading, latestSoilReport]);
 
     if (loading) {
         return (
@@ -99,7 +110,7 @@ export function GrowthTimeline() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>30-Day Growth Forecast: Wheat</CardTitle>
+                <CardTitle>30-Day Growth Forecast: {primaryCrop}</CardTitle>
                 <CardDescription>An AI-powered simulation of your crop's journey for the next month.</CardDescription>
             </CardHeader>
             <CardContent>

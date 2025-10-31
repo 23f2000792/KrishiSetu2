@@ -36,7 +36,7 @@ export default function DashboardPage() {
     const latestSoilReport = useMemo(() => {
         if (!soilReports || soilReports.length === 0) return null;
         // Sort on the client-side to find the most recent report
-        return soilReports.sort((a, b) => b.uploadedAt.toMillis() - a.uploadedAt.toMillis())[0];
+        return [...soilReports].sort((a, b) => b.uploadedAt.toDate().getTime() - a.uploadedAt.toDate().getTime())[0];
     }, [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
