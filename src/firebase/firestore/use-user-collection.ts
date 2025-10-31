@@ -1,20 +1,17 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemoFirebase } from '@/firebase/provider';
 import {
   collection,
   query as firestoreQuery,
   where,
-  type CollectionReference,
   type Query,
   type DocumentData,
   type QueryConstraint,
-  type Unsubscribe,
   type OrderByDirection,
 } from 'firebase/firestore';
 import { useCollection, type UseCollectionResult } from './use-collection';
 import { useAuth } from '@/contexts/auth-context';
 import { useFirebase } from '../provider';
-import type { WithId } from './use-collection';
 
 type QueryFn = typeof firestoreQuery;
 type OrderByFn = (fieldPath: string, directionStr?: OrderByDirection) => QueryConstraint;
@@ -46,7 +43,7 @@ export function useUserCollection<T>(
   const { user } = useAuth();
   const { firestore } = useFirebase();
 
-  const userQuery = useMemo(() => {
+  const userQuery = useMemoFirebase(() => {
     if (!user || !firestore) {
       return null;
     }
