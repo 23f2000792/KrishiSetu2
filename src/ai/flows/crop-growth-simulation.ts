@@ -10,6 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { SoilReport } from '@/lib/types';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const CropGrowthSimulationInputSchema = z.object({
   crop: z.string().describe('The type of crop being grown (e.g., "Wheat").'),
@@ -39,6 +40,7 @@ export async function simulateCropGrowth(input: CropGrowthSimulationInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'cropGrowthSimulationPrompt',
+  model: googleAI.model('gemini-pro'),
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
