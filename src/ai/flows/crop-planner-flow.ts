@@ -88,12 +88,13 @@ const getFarmerHistoryTool = ai.defineTool(
     }),
     outputSchema: z.object({
       soilReports: z.array(z.any()).optional(),
+      scans: z.array(z.any()).optional(),
     }),
   },
   async ({ userId }) => {
     const { firestore } = getInitializedFirebaseAdmin();
     const data = await getFarmerKnowledgeGraph(firestore, userId);
-    return { soilReports: data.soilReports };
+    return data;
   }
 );
 
