@@ -6,6 +6,7 @@ import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
+import { GrowthTimeline } from "./components/growth-timeline";
 
 export default function DashboardPage() {
     const { t } = useLanguage();
@@ -34,12 +35,15 @@ export default function DashboardPage() {
                 ))}
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
-                <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                    <MarketChart />
+            <div className="grid gap-8 lg:grid-cols-5">
+                <div className="lg:col-span-3 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+                    <GrowthTimeline />
                 </div>
-                <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-                    <QuickActions />
+                <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+                     <div className="space-y-8">
+                        <MarketChart />
+                        <QuickActions />
+                    </div>
                 </div>
             </div>
         </div>

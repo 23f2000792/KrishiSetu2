@@ -48,7 +48,7 @@ export function MarketChart() {
         <CardDescription>{t('dashboard.marketChartDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-80 w-full">
+        <ChartContainer config={chartConfig} className="h-60 w-full">
             <AreaChart 
                 data={chartData} 
                 margin={{ top: 5, right: 10, left: -10, bottom: 0 }}
