@@ -98,6 +98,61 @@
         "upvotes",
         "createdAt"
       ]
+    },
+    "SoilReport": {
+      "title": "Soil Report",
+      "type": "object",
+      "description": "Represents an analyzed soil test report.",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who uploaded the report."
+        },
+        "uploadedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the report was uploaded."
+        },
+        "fileUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL of the uploaded soil card file in storage."
+        },
+        "extractedData": {
+          "type": "object",
+          "properties": {
+            "pH": { "type": "number" },
+            "N": { "type": "string" },
+            "P": { "type": "string" },
+            "K": { "type": "string" },
+            "OC": { "type": "number" },
+            "micronutrients": {
+              "type": "object",
+              "properties": {
+                "Zn": { "type": "number" },
+                "Fe": { "type": "number" },
+                "Mn": { "type": "number" },
+                "Cu": { "type": "number" },
+                "B": { "type": "number" }
+              }
+            },
+            "EC": { "type": "number" }
+          }
+        },
+        "aiSummary": {
+          "type": "object",
+          "properties": {
+            "fertilityIndex": { "type": "number" },
+            "soilType": { "type": "string" },
+            "recommendedCrops": { "type": "array", "items": { "type": "string" } },
+            "fertilizerPlan": { "type": "string" },
+            "warnings": { "type": "array", "items": { "type": "string" } },
+            "organicAdvice": { "type": "string" },
+            "explanation": { "type": "string" }
+          }
+        }
+      },
+      "required": ["userId", "uploadedAt", "aiSummary"]
     }
   },
   "auth": {
@@ -152,6 +207,22 @@
             {
               "name": "userId",
               "description": "The unique identifier of the user, used to check admin role existence."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/soil_reports/{reportId}",
+        "definition": {
+          "entityName": "SoilReport",
+          "schema": {
+            "$ref": "#/backend/entities/SoilReport"
+          },
+          "description": "Stores user-uploaded soil card analysis results.",
+          "params": [
+            {
+              "name": "reportId",
+              "description": "The unique identifier for the soil report."
             }
           ]
         }

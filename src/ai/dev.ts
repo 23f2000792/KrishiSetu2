@@ -4,3 +4,4 @@ config();
 import '@/ai/flows/crop-disease-nutrient-prediction.ts';
 import '@/ai/flows/suggest-quick-prompts.ts';
 import '@/ai/flows/ai-copilot-agri-advisory.ts';
+import '@/ai/flows/soil-card-analyzer.ts';

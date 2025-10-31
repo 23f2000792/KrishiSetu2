@@ -36,6 +36,11 @@ service cloud.firestore {
         allow update, delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
     }
 
+    match /soil_reports/{reportId} {
+        allow get, list, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+        allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
     /**
      * @description: Manages admin roles using document existence checks. If a document exists under /roles_admin/{userId}, the user is considered an admin.
      * @path: /roles_admin/{userId}

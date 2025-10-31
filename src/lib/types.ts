@@ -50,3 +50,28 @@ export type ScanResult = {
   recommendedSteps: string;
   createdAt: string;
 };
+
+export type SoilReport = {
+  id: string;
+  userId: string;
+  uploadedAt: Timestamp;
+  fileUrl: string;
+  extractedData: {
+    pH: number;
+    N: string;
+    P: string;
+    K: string;
+    OC: number;
+    EC: number;
+  };
+  aiSummary: {
+    fertilityIndex: number;
+    fertilityStatus: string;
+    soilType: string;
+    recommendedCrops: string[];
+    fertilizerPlan: string;
+    organicAdvice: string;
+    warnings: string[];
+    explanation: string;
+  };
+}

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   Bot,
   LayoutDashboard,
+  Leaf,
   ScanLine,
   ShoppingBasket,
   Users,
@@ -22,7 +23,7 @@ export function MobileNav() {
     { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
     { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
     { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
-    { href: '/market', label: t('mobileNav.market'), icon: ShoppingBasket },
+    { href: '/soil-analyzer', label: t('mobileNav.soil'), icon: Leaf },
     { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
 
