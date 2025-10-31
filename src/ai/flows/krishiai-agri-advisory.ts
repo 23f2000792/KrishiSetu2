@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -118,7 +119,7 @@ const financeAgent = ai.defineTool({
 
 const prompt = ai.definePrompt({
   name: 'krishiAiAgriAdvisoryPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'gemini-1.5-flash',
   input: {schema: KrishiAiAgriAdvisoryInputSchema},
   output: {schema: KrishiAiAgriAdvisoryOutputSchema},
   tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, financeAgent],
