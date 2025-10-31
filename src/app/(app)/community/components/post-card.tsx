@@ -12,6 +12,8 @@ import { useFirebase } from "@/firebase";
 import { doc, updateDoc, increment } from "firebase/firestore";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 type PostCardProps = {
   post: Post;
@@ -50,6 +52,12 @@ export function PostCard({ post }: PostCardProps) {
       });
     } catch (error) {
       console.error("Error liking post:", error);
+      const permissionError = new FirestorePermissionError({
+          path: postRef.path,
+          operation: 'update',
+          requestResourceData: { upvotes: 'increment(1)' }
+      });
+      errorEmitter.emit('permission-error', permissionError);
       toast({
         variant: "destructive",
         title: "Error",
@@ -61,10 +69,7 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   const handleComment = () => {
-    toast({
-      title: "Coming Soon!",
-      description: "Commenting functionality is under development."
-    });
+    // Commenting functionality is not yet implemented
   };
 
   return (
