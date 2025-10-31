@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { useLanguage } from '@/contexts/language-context';
 import { Button } from '@/components/ui/button';
-import { File, Loader2 } from 'lucide-react';
+import { File, Loader2, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/auth-context';
@@ -180,6 +180,20 @@ export default function SoilAnalyzerPage() {
                         </CardContent>
                     </Card>
                 </div>
+
+                {analysisResult.efficiencyForecast && (
+                     <Card>
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <div className='p-2 bg-primary/10 rounded-md'>
+                                <TrendingUp className='h-6 w-6 text-primary'/>
+                            </div>
+                           <div>
+                                <h3 className="font-semibold text-base">Efficiency Forecast</h3>
+                                <p className="text-sm text-muted-foreground">{analysisResult.efficiencyForecast}</p>
+                           </div>
+                        </CardContent>
+                    </Card>
+                )}
                 
                  {analysisResult.warnings && analysisResult.warnings.length > 0 && (
                     <div>

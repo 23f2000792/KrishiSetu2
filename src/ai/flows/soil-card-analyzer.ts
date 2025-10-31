@@ -33,6 +33,7 @@ const SoilAnalysisOutputSchema = z.object({
   organicAdvice: z.string().describe('Actionable suggestions for improving soil health using organic methods. Formatted as Markdown.'),
   warnings: z.array(z.string()).describe('Any critical warnings or potential issues (e.g., "High salinity detected").'),
   explanation: z.string().describe('A clear, simple explanation of why these recommendations were made, based on the input data.'),
+  efficiencyForecast: z.string().describe("A 1-2 sentence prediction on how the recommended plan will impact soil health over a specific timeframe (e.g., 'Following this plan should increase Organic Carbon by 0.2% in the next 60-90 days.')."),
 });
 export type SoilAnalysisOutput = z.infer<typeof SoilAnalysisOutputSchema>;
 
@@ -73,6 +74,7 @@ const soilAnalysisPrompt = ai.definePrompt({
   6.  **Provide Organic Advice:** Suggest practical, organic methods to improve soil health, especially focusing on improving OC if it is low. Format this as a Markdown list.
   7.  **Identify Warnings:** Note any critical issues, such as very high/low pH, high EC (salinity), or severe nutrient deficiencies.
   8.  **Generate Explanation:** In simple terms, explain *why* you are making these recommendations. For example, "Your soil's pH is slightly acidic, which is why we recommend crops like potatoes. The low Nitrogen level is addressed by the Urea application in the fertilizer plan."
+  9.  **Efficiency Forecast:** Based on your recommendations (especially the organic advice), create a simple, tangible forecast. For example, "With consistent compost application as advised, your soil's Organic Carbon could increase by 0.1-0.2% over the next 3-4 months."
 
   Language for response: {{{language}}}
   `,
