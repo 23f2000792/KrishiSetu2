@@ -26,6 +26,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const REDIRECT_KEY = 'auth-redirect';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { auth, firestore, isUserLoading, user: authUser } = useFirebase();
   const [user, setUser] = useState<User | null>(null);
@@ -173,10 +175,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const isPublicPage = publicPages.includes(pathname);
       
       if (!isAuthenticated && !isAuthPage && !isPublicPage) {
+        sessionStorage.setItem(REDIRECT_KEY, pathname);
         router.push('/auth/login');
       }
       
       if (isAuthenticated) {
+        const savedRedirect = sessionStorage.getItem(REDIRECT_KEY);
+        if (savedRedirect) {
+          sessionStorage.removeItem(REDIRECT_KEY);
+          router.push(savedRedirect);
+          return;
+        }
+
         if (isAuthPage) {
           if (user.role === 'Admin') {
             router.push('/admin/dashboard');
