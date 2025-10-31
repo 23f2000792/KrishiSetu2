@@ -76,7 +76,6 @@ export default function ProfilePage() {
                 <div className='flex flex-col sm:flex-row items-center gap-6'>
                     <div className="relative">
                         <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-                            <AvatarImage src={user.avatar} alt={user.name} />
                             <AvatarFallback className="text-3xl">{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                     </div>

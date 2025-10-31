@@ -12,7 +12,7 @@ export type User = {
     push: boolean;
     voice: boolean;
   };
-  avatar: string;
+  avatar?: string;
 };
 
 export type MarketPrice = {
@@ -27,7 +27,7 @@ export type Post = {
   id: string;
   authorId: string;
   authorName: string;
-  authorAvatar: string;
+  authorAvatar?: string;
   content: string;
   image?: string;
   language: string;
@@ -35,7 +35,7 @@ export type Post = {
   comments: {
     id: string;
     authorName: string;
-    authorAvatar: string;
+    authorAvatar?: string;
     comment: string;
   }[];
   createdAt: string;

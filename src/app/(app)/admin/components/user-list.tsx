@@ -59,7 +59,6 @@ export function UserList({ users }: { users: User[] }) {
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <Avatar className="hidden sm:flex">
-                                            <AvatarImage src={user.avatar} alt={user.name} />
                                             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                                         </Avatar>
                                         <div className="font-medium">{user.name}</div>

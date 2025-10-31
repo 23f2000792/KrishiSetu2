@@ -180,7 +180,6 @@ export function ChatLayout() {
               </div>
               {message.isUser && user && (
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
               )}

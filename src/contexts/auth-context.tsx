@@ -9,7 +9,7 @@ import { signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import { useFirebase } from '@/firebase/provider';
 import type { User, UserRole } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
-import { users as mockUsers, demoCredentials } from '@/lib/data';
+import { demoCredentials } from '@/lib/data';
 
 interface AuthContextType {
   user: User | null;
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await signInWithEmailAndPassword(auth, creds.email, creds.password);
     } catch (error: any) {
          // If admin doesn't exist, create it
-        if (error.code === 'auth/user-not-found') {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password);
                 const firebaseUser = userCredential.user;
@@ -90,12 +90,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     languages: ['English'],
                     phone: '',
                     prefs: { push: true, voice: false },
-                    avatar: `https://i.pravatar.cc/150?u=${firebaseUser.uid}`,
                 };
                 await setDoc(doc(firestore, "users", firebaseUser.uid), adminUser);
+                // After creating, try signing in again.
+                await signInWithEmailAndPassword(auth, creds.email, creds.password);
             } catch (signupError: any) {
-                console.error("Admin creation error:", signupError);
-                toast({ variant: 'destructive', title: 'Admin Setup Failed', description: signupError.message });
+                 if (signupError.code === 'auth/email-already-in-use') {
+                    // This can happen if creation succeeded but sign-in failed before. Just sign in.
+                     await signInWithEmailAndPassword(auth, creds.email, creds.password);
+                 } else {
+                    console.error("Admin creation/login error:", signupError);
+                    toast({ variant: 'destructive', title: 'Admin Setup Failed', description: signupError.message });
+                 }
             }
         } else {
             console.error("Admin Login error:", error);
@@ -118,7 +124,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             languages: ['English'],
             phone,
             prefs: { push: true, voice: false },
-            avatar: `https://i.pravatar.cc/150?u=${firebaseUser.uid}`,
         };
 
         await setDoc(doc(firestore, "users", firebaseUser.uid), newUser);

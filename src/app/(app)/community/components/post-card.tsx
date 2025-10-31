@@ -23,7 +23,6 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarImage src={post.authorAvatar} alt={post.authorName} />
               <AvatarFallback>{getInitials(post.authorName)}</AvatarFallback>
             </Avatar>
             <div>
