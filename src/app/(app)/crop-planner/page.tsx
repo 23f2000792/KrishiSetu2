@@ -7,10 +7,9 @@ import { Loader2, Wand2, Lightbulb } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
 import { planCrop, CropPlannerOutput } from '@/ai/flows/crop-planner-flow';
+import { CROP_OPTIONS } from '../components/onboarding-form';
 
 function CropPlanResult({ result }: { result: CropPlannerOutput }) {
-    const { t } = useLanguage();
-
     // Simple markdown to HTML renderer
     const MarkdownRenderer = ({ content }: { content: string }) => {
         // Convert markdown bold to strong tags and newlines to br tags
@@ -66,7 +65,13 @@ export default function CropPlannerPage() {
         setError(null);
         try {
             const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
-            const plan = await planCrop({ userId: user.id, region: user.region, language: languageMap[locale] });
+            const potentialCrops = CROP_OPTIONS.map(c => c.value); // Use all available crops
+            const plan = await planCrop({ 
+                userId: user.id, 
+                region: user.region, 
+                language: languageMap[locale],
+                potentialCrops: potentialCrops
+            });
             setResult(plan);
         } catch (e) {
             console.error(e);

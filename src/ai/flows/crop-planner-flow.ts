@@ -10,13 +10,14 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { getFarmerKnowledgeGraph } from '@/services/knowledge-service';
-import { getMarketData } from '@/services/market-service';
+import { getMarketDataForCrops } from '@/services/market-service';
 import { getInitializedFirebaseAdmin } from '@/firebase/admin';
 
 const CropPlannerInputSchema = z.object({
   userId: z.string().describe('The unique ID of the farmer.'),
   region: z.string().describe('The geographical region of the farm.'),
   language: z.string().describe('The language for the response (e.g., "English", "Hindi").'),
+  potentialCrops: z.array(z.string()).describe('A list of potential crops to consider for the region.'),
 });
 export type CropPlannerInput = z.infer<typeof CropPlannerInputSchema>;
 
@@ -79,24 +80,19 @@ const cropPlannerFlow = ai.defineFlow(
     // Fetch farmer's history (soil reports, etc.)
     const farmerHistory = await getFarmerKnowledgeGraph(firestore, input.userId);
     const latestSoilReport = farmerHistory.soilReports?.[0] || null;
-
-    // Define potential crops based on region (mock for now, could be a service)
-    const potentialCrops = ['Wheat', 'Mustard', 'Soybean', 'Maize'];
     
     // Fetch market data for all potential crops
-    const marketDataPromises = potentialCrops.map(crop => getMarketData(crop, input.region));
-    const marketDataResults = await Promise.all(marketDataPromises);
-    const marketDataContext = potentialCrops.map((crop, i) => ({ crop, data: marketDataResults[i] }));
+    const marketDataResults = await getMarketDataForCrops(input.potentialCrops, input.region);
     
-    // Mock weather forecast
-    const weatherForecast = { rainfall: 'Normal', temperature: 'Warmer' };
+    // Mock weather forecast (in a real app, this would call a weather API)
+    const weatherForecast = { rainfall: 'Normal', temperature: 'Slightly Warmer' };
 
     // STEP 2: Call the AI with the complete data package.
     const { output } = await cropPlannerSystemPrompt({
         language: input.language,
         region: input.region,
         soilReportJson: JSON.stringify(latestSoilReport, null, 2),
-        marketDataJson: JSON.stringify(marketDataContext, null, 2),
+        marketDataJson: JSON.stringify(marketDataResults, null, 2),
         weatherForecastJson: JSON.stringify(weatherForecast, null, 2),
     });
     
