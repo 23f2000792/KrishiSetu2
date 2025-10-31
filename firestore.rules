@@ -19,40 +19,36 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
       
       // Allow a user to update a post if they are the author,
-      // OR if they are only changing the 'upvotes' field.
+      // OR if they are only changing the 'upvotes' or 'comments' field.
       allow update: if isSignedIn() && 
                       (resource.data.authorId == request.auth.uid ||
-                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes']));
+                       request.resource.data.diff(resource.data).affectedKeys().hasAny(['upvotes', 'comments']));
       
       allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
     }
 
     match /scans/{scanId} {
-      allow list: if isSignedIn();
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
     }
 
     match /soil_reports/{reportId} {
-      allow list: if isSignedIn();
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
     }
 
     match /yield_reports/{reportId} {
-      allow list: if isSignedIn();
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
     }
     
     match /profit_reports/{reportId} {
-      allow list: if isSignedIn();
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
     }
 
     match /roles_admin/{userId} {
