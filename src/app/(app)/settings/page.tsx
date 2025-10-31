@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { RefreshCw, Wifi, WifiOff } from 'lucide-radix';
+import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export default function SettingsPage() {
