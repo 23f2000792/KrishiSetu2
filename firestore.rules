@@ -30,14 +30,12 @@ service cloud.firestore {
     }
 
     // Any authenticated user can create posts. Posts are publicly readable.
-    // Authors can edit their post content.
-    // Any signed-in user can add a comment.
+    // Post content cannot be edited after creation.
+    // Any signed-in user can add a comment or upvote.
     match /posts/{postId} {
       allow read: if isSignedIn();
       allow create: if isOwner(request.resource.data.authorId);
-      allow update: if
-        (isOwner(resource.data.authorId) && request.resource.data.keys().hasAny(['content', 'image', 'upvotes'])) ||
-        (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments']));
+      allow update: if isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasAny(['comments', 'upvotes']);
       allow delete: if isOwner(resource.data.authorId);
     }
     
