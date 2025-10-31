@@ -48,6 +48,9 @@ export default function SoilAnalyzerPage() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
+      setAnalysisResult(null);
+      setExtractedData(null);
+      setError(null);
     }
   };
 
@@ -226,7 +229,7 @@ export default function SoilAnalyzerPage() {
                     <div>
                         <h3 className="font-semibold mb-2">{t('soil.warnings')}</h3>
                         <div className="bg-destructive/10 border-l-4 border-destructive text-destructive-foreground p-4 rounded-r-lg">
-                            {analysisResult.warnings.map((warn: string) => <p key={warn} className="text-destructive-foreground/90 font-medium flex items-center gap-2"><AlertTriangle size={16} />{warn}</p>)}
+                            {analysisResult.warnings.map((warn: string) => <p key={warn} className="text-destructive font-medium flex items-center gap-2"><AlertTriangle size={16} />{warn}</p>)}
                         </div>
                     </div>
                 )}
