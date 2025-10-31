@@ -91,7 +91,6 @@ const getWeatherForecastTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'diseaseOutbreakPredictorPrompt',
-  model: googleAI.model('gemini-pro'),
   input: { schema: DiseaseOutbreakPredictionInputSchema },
   output: { schema: DiseaseOutbreakPredictionOutputSchema },
   tools: [getRegionalScanDataTool, getWeatherForecastTool],
