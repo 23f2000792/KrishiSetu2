@@ -31,8 +31,8 @@ export default function DashboardPage() {
     const [loadingAI, setLoadingAI] = useState(true);
 
     // Realtime Data from Firestore
+    // This query now only filters by userId and limits to 1, avoiding the composite index issue.
     const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports', {
-        orderBy: ['uploadedAt', 'desc'],
         limit: 1,
     });
     
