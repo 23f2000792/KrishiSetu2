@@ -27,7 +27,7 @@ export function MobileNav() {
     { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
     { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
     { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
-    { href: '/crop-planner', label: t('mobileNav.planner'), icon: Book },
+    { href: '/market', label: t('mobileNav.market'), icon: ShoppingBasket },
     { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
 
