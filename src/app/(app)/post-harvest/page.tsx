@@ -56,7 +56,7 @@ export default function PostHarvestAnalyticsPage() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!user || !user.farmSize || !firestore) {
-            toast({ variant: 'destructive', title: 'Error', description: 'User data is incomplete.' });
+            toast({ variant: 'destructive', title: 'Error', description: 'User data is incomplete or database is not ready. Please try again.' });
             return;
         }
 
