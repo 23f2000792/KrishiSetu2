@@ -30,14 +30,11 @@ export default function DashboardPage() {
     const [loadingAI, setLoadingAI] = useState(true);
 
     // Realtime Data from Firestore
-    // const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports', {
-    //     orderBy: ['uploadedAt', 'desc'],
-    //     limit: 1,
-    // });
-    const soilReports: SoilReport[] = [];
-    const soilReportsLoading = false;
-
-
+    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports', {
+        orderBy: ['uploadedAt', 'desc'],
+        limit: 1,
+    });
+    
     const latestSoilReport = useMemo(() => (soilReports && soilReports.length > 0 ? soilReports[0] : null), [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };

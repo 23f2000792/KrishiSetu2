@@ -16,9 +16,9 @@ interface AuthContextType {
   user: User | null;
   authUser: AuthUser | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  signup: (name:string, email: string, password: string, role: UserRole, phone: string, region: string) => void;
+  signup: (name:string, email: string, password: string, role: UserRole, phone: string, region: string) => Promise<boolean>;
   updateUserProfile: (userId: string, data: Partial<User>) => Promise<void>;
   loading: boolean;
   handleDemoLogin: (role: 'Admin') => void;
@@ -77,14 +77,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [authUser, isUserLoading, fetchUserProfile]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Auth state change will be handled by the onAuthStateChanged listener in useFirebase
-      // which will then trigger the useEffect to fetch the user profile and redirect.
+      toast({ title: 'Login Successful', description: 'Welcome back!' });
+      return true;
     } catch (error: any) {
       console.error("Login error:", error);
       toast({ variant: 'destructive', title: 'Login Failed', description: error.message });
+      return false;
     }
   };
 
@@ -92,20 +93,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const creds = demoCredentials.admin;
     try {
         await signInWithEmailAndPassword(auth, creds.email, creds.password);
+        toast({ title: 'Admin Login Successful', description: 'Welcome, Admin!' });
     } catch (error: any) {
          // If admin doesn't exist, create it
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             try {
-                // Try to sign up the user. If it fails because the email is already in use, it means
-                // the account exists but with a different password, so we just try to sign in again.
-                // This handles race conditions or partially created accounts.
                 const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password).catch(
                     async (signupError) => {
                         if (signupError.code === 'auth/email-already-in-use') {
-                            // Account exists, so just sign in
                             return signInWithEmailAndPassword(auth, creds.email, creds.password);
                         }
-                        throw signupError; // Re-throw other signup errors
+                        throw signupError; 
                     }
                 );
                 
@@ -119,6 +117,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     prefs: { push: true, voice: false },
                 };
                 await setDoc(doc(firestore, "users", firebaseUser.uid), adminUser);
+                await setDoc(doc(firestore, "roles_admin", firebaseUser.uid), { role: 'Admin' });
+                toast({ title: 'Admin Account Created', description: 'Logging you in...' });
+
             } catch (e: any) {
                 console.error("Admin creation/login error:", e);
                 toast({ variant: 'destructive', title: 'Admin Login Failed', description: e.message });
@@ -131,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
 
-  const signup = async (name: string, email: string, password: string, role: UserRole, phone: string, region: string) => {
+  const signup = async (name: string, email: string, password: string, role: UserRole, phone: string, region: string): Promise<boolean> => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const firebaseUser = userCredential.user;
@@ -147,16 +148,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         await setDoc(doc(firestore, "users", firebaseUser.uid), newUser);
         
-        // setUser will be handled by the auth state listener
-        
         toast({
             title: "Account Created",
             description: "You have been successfully signed up.",
         });
+        return true;
 
     } catch (error: any) {
         console.error("Signup error:", error);
         toast({ variant: 'destructive', title: 'Signup Failed', description: error.message });
+        return false;
     }
   };
 
