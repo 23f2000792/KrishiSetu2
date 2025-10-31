@@ -8,13 +8,16 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from 'date-fns';
-import { useFirebase } from "@/firebase";
+import { useFirebase, useMemoFirebase } from "@/firebase";
 import { doc, updateDoc, increment, collection, query, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CommentThread } from "./comment-thread";
 import { useAuth } from "@/contexts/auth-context";
+import { errorEmitter, FirestorePermissionError } from "@/firebase";
+import { useCollection } from "@/firebase/firestore/use-collection";
+
 
 type PostCardProps = {
   post: Post;
@@ -26,20 +29,14 @@ export function PostCard({ post }: PostCardProps) {
   const { toast } = useToast();
   const [isLiking, setIsLiking] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const [commentCount, setCommentCount] = useState(post.comments?.length || 0);
-
-  // Fetch comment count on mount
-  useEffect(() => {
-    if (!firestore) return;
-    const getCommentCount = async () => {
-        const commentsRef = collection(firestore, 'posts', post.id, 'comments');
-        const q = query(commentsRef);
-        const querySnapshot = await getDocs(q);
-        setCommentCount(querySnapshot.size);
-    };
-    getCommentCount();
+  
+  const commentsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'posts', post.id, 'comments'));
   }, [firestore, post.id]);
 
+  const { data: comments, isLoading: commentsLoading } = useCollection(commentsQuery);
+  const commentCount = comments ? comments.length : 0;
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -66,20 +63,23 @@ export function PostCard({ post }: PostCardProps) {
     
     const updateData = { upvotes: increment(1) };
 
-    try {
-        await updateDoc(postRef, updateData);
-    }
-    catch (error) {
-        console.error("Error liking post:", error);
+    updateDoc(postRef, updateData)
+      .catch((error) => {
+        const permissionError = new FirestorePermissionError({
+          path: postRef.path,
+          operation: 'update',
+          requestResourceData: updateData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not like the post. Please try again."
         });
-    }
-    finally {
+      })
+      .finally(() => {
         setIsLiking(false);
-    }
+      });
   };
 
   return (

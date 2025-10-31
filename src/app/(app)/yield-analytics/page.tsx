@@ -146,7 +146,7 @@ export default function YieldAnalyticsPage() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" disabled={loading} className="w-full">
+                            <Button type="submit" disabled={loading} className="w-full text-lg py-6">
                                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Analyze My Yield
                             </Button>

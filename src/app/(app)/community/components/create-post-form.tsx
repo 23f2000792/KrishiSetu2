@@ -17,6 +17,7 @@ import { useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { errorEmitter, FirestorePermissionError } from '@/firebase';
 
 const formSchema = z.object({
   content: z.string().min(10, { message: 'Post must be at least 10 characters long.' }),
@@ -73,6 +74,8 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
 
         setIsSubmitting(true);
         let imageUrl: string | undefined = undefined;
+        
+        const postsColRef = collection(firestore, 'posts');
 
         try {
             if (imageFile) {
@@ -87,11 +90,11 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
                 image: imageUrl,
                 language: values.language,
                 upvotes: 0,
-                comments: [],
+                comments: [], // Kept for schema compatibility but not used for writing
                 createdAt: serverTimestamp(),
             };
 
-            await addDoc(collection(firestore, 'posts'), postData);
+            await addDoc(postsColRef, postData);
 
             toast({
                 title: t('community.postCreated'),
@@ -105,6 +108,12 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
             }
         } catch (error) {
             console.error('Error creating post:', error);
+            const permissionError = new FirestorePermissionError({
+                path: postsColRef.path,
+                operation: 'create',
+                requestResourceData: { content: values.content, language: values.language },
+            });
+            errorEmitter.emit('permission-error', permissionError);
             toast({
                 variant: 'destructive',
                 title: 'Error',
@@ -178,8 +187,8 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
                         </div>
                     )}
                 </CardContent>
-                <CardFooter className="flex justify-between items-center p-4 pt-0">
-                    <div className="flex gap-2">
+                <CardFooter className="flex flex-col sm:flex-row justify-between items-center p-4 pt-0 gap-2">
+                    <div className="flex gap-2 self-start sm:self-center">
                         <Button type="button" variant="ghost" size="icon" onClick={() => imageInputRef.current?.click()} disabled={isSubmitting}>
                             <Paperclip className="h-5 w-5 text-muted-foreground" />
                         </Button>
@@ -204,7 +213,7 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
                             )}
                         />
                     </div>
-                    <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                    <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full sm:w-auto">
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {t('community.postToCommunity')}
                     </Button>

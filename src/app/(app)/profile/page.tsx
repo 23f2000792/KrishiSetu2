@@ -33,7 +33,8 @@ const profileSchema = z.object({
     voice: z.boolean(),
   }),
 }).refine(data => {
-    return !!data.crop1 || !!data.crop2 || !!data.crop3 || !!data.crop4 || !!data.crop5;
+    const crops = [data.crop1, data.crop2, data.crop3, data.crop4, data.crop5].filter(Boolean);
+    return crops.length > 0;
 }, {
     message: 'Please select at least one crop.',
     path: ['crop1'],
@@ -218,9 +219,9 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
           
-          <div className="flex justify-between items-center">
-            <Button variant="destructive" onClick={logout}>{t('profile.logout')}</Button>
-            <Button type="submit">{t('profile.saveChanges')}</Button>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <Button variant="destructive" onClick={logout} className="w-full sm:w-auto">{t('profile.logout')}</Button>
+            <Button type="submit" className="w-full sm:w-auto">{t('profile.saveChanges')}</Button>
           </div>
         </form>
       </Form>

@@ -47,7 +47,9 @@ export type Post = {
   image?: string;
   language: string;
   upvotes: number;
-  comments: []; // This is now deprecated but kept for type safety with old data
+  // This is now managed in a subcollection, but kept for potential old data reads.
+  // We will no longer write to this field.
+  comments: []; 
   createdAt: Timestamp;
 };
 
