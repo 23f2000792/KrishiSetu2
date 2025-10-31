@@ -1,6 +1,5 @@
 import { initializeApp, getApps, getApp, App } from 'firebase-admin/app';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
-import { firebaseConfig } from './config';
 
 interface FirebaseAdminServices {
   app: App;
@@ -22,14 +21,9 @@ export function getInitializedFirebaseAdmin(): FirebaseAdminServices {
   }
 
   if (getApps().length === 0) {
-    // In a server environment, you can use service accounts or other auth strategies.
-    // For simplicity in this context, we'll rely on the client-side config,
-    // though this is not typical for admin SDK usage.
-    // In a real production server, you would use:
-    // initializeApp({ credential: admin.credential.applicationDefault() });
-    const app = initializeApp({
-      projectId: firebaseConfig.projectId,
-    });
+    // In a server environment like Cloud Run or Cloud Functions (which Genkit uses),
+    // initializeApp() can be called without arguments to use Application Default Credentials.
+    const app = initializeApp();
     const firestore = getFirestore(app);
     services = { app, firestore };
     return services;
