@@ -30,10 +30,14 @@ export default function DashboardPage() {
     const [loadingAI, setLoadingAI] = useState(true);
 
     const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>(
-        'soil_reports',
-        { orderBy: ['uploadedAt', 'desc'], limit: 1 }
+        'soil_reports'
     );
-    const latestSoilReport = useMemo(() => soilReports?.[0] || null, [soilReports]);
+
+    const latestSoilReport = useMemo(() => {
+        if (!soilReports || soilReports.length === 0) return null;
+        // Sort on the client-side to find the most recent report
+        return soilReports.sort((a, b) => b.uploadedAt.toMillis() - a.uploadedAt.toMillis())[0];
+    }, [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
     const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
