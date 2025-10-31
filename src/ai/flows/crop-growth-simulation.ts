@@ -10,13 +10,12 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import type { SoilReport } from '@/lib/types';
 import { googleAI } from '@genkit-ai/google-genai';
 
 const CropGrowthSimulationInputSchema = z.object({
   crop: z.string().describe('The type of crop being grown (e.g., "Wheat").'),
   region: z.string().describe('The geographical region of the farm (e.g., "Punjab").'),
-  soilReport: z.any().optional().describe('The most recent soil analysis report for context.'),
+  soilReport: z.any().optional().describe('The most recent soil analysis report for context. Can be null or empty.'),
   previousYield: z.number().optional().describe("The farmer's yield from the previous season for the same crop (in quintals/acre)."),
   language: z.string().describe('The language for the response (e.g., "English", "Hindi").'),
 });
@@ -52,15 +51,15 @@ const prompt = ai.definePrompt({
   output: { schema: CropGrowthSimulationOutputSchema },
   prompt: `You are an expert agronomist and crop modeling AI. Your task is to generate a plausible 30-day (4-week) growth simulation for a farmer's crop.
 
-  Use your knowledge of agriculture, weather patterns for the given region, and the provided soil data to create a predictive timeline.
+  Use your knowledge of agriculture, weather patterns for the given region, and the provided soil data to create a predictive timeline. If no soil data is available, provide a general forecast based on standard conditions for the region.
 
   **Your Task:**
-  1.  **Analyze Inputs:** Consider the crop type, region, and the provided soil report and previous yield data.
+  1.  **Analyze Inputs:** Consider the crop type, region, and any provided soil report or previous yield data.
   2.  **Simulate Week-by-Week:** For each of the 4 weeks, provide:
       *   **Growth Stage:** The expected physiological stage of the crop.
       *   **Predicted Risks:** Common risks for that stage and region (e.g., pests, diseases, weather stress). Be specific.
       *   **Recommended Actions:** Key actions the farmer should take (e.g., irrigation, fertilization, pest scouting).
-  3.  **Predict Final Yield:** Conclude with a realistic yield prediction if the farmer follows the plan. **Crucially, compare this prediction to the farmer's previous yield or a regional average.** Format it clearly, for example: "Expected: 18.2 quintals/acre vs. Previous: 16.9 quintals/acre."
+  3.  **Predict Final Yield:** Conclude with a realistic yield prediction if the farmer follows the plan. **Crucially, compare this prediction to the farmer's previous yield or a regional average.** Format it clearly, for example: "Expected: 18.2 quintals/acre vs. Regional Average: 16.9 quintals/acre."
   4.  **Language:** The entire response MUST be in the specified language.
 
   **Farmer's Data:**
@@ -85,6 +84,11 @@ const cropGrowthSimulationFlow = ai.defineFlow(
         ...input,
         soilReportJson: JSON.stringify(input.soilReport || {}, null, 2),
     });
-    return output!;
+    
+    if (!output) {
+      throw new Error("The AI model failed to return a valid simulation output.");
+    }
+
+    return output;
   }
 );

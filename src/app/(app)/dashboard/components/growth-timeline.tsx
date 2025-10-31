@@ -9,6 +9,7 @@ import { simulateCropGrowth, CropGrowthSimulationOutput } from '@/ai/flows/crop-
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserCollection } from '@/firebase/firestore/use-user-collection';
 import type { SoilReport } from '@/lib/types';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const stageIcons: { [key: string]: React.ElementType } = {
     default: Sprout,
@@ -49,6 +50,7 @@ export function GrowthTimeline() {
     const { user } = useAuth();
     const [simulation, setSimulation] = useState<CropGrowthSimulationOutput | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
 
     const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
@@ -64,6 +66,7 @@ export function GrowthTimeline() {
         const runSimulation = async () => {
             if (!user || soilReportsLoading) return;
             setLoading(true);
+            setError(null);
             try {
                 const result = await simulateCropGrowth({
                     crop: primaryCrop,
@@ -74,6 +77,7 @@ export function GrowthTimeline() {
                 setSimulation(result);
             } catch (error) {
                 console.error("Failed to run growth simulation:", error);
+                setError("The AI failed to generate a forecast. This might be a temporary issue. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -103,6 +107,24 @@ export function GrowthTimeline() {
                 </CardContent>
             </Card>
         )
+    }
+
+    if (error) {
+         return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>30-Day Growth Forecast: {primaryCrop}</CardTitle>
+                    <CardDescription>An AI-powered simulation of your crop's journey for the next month.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Forecast Error</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                </CardContent>
+            </Card>
+        );
     }
 
     if (!simulation) return null;

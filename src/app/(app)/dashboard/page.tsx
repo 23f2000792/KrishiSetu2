@@ -9,8 +9,6 @@ import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { SoilReport } from "@/lib/types";
 import { useUserCollection } from "@/firebase/firestore/use-user-collection";
@@ -23,13 +21,12 @@ export default function DashboardPage() {
     const { user } = useAuth();
     
     // AI State
-    const [yieldPrediction, setYieldPrediction] = useState<string | null>(null);
     const [soilFertility, setSoilFertility] = useState<{value: string, details: string} | null>(null);
     const [latestPrice, setLatestPrice] = useState<number | null>(null);
 
 
     // Loading State
-    const [loadingAI, setLoadingAI] = useState(true);
+    const [loadingMarket, setLoadingMarket] = useState(true);
 
     const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports');
 
@@ -39,7 +36,6 @@ export default function DashboardPage() {
         return [...soilReports].sort((a, b) => b.uploadedAt.toDate().getTime() - a.uploadedAt.toDate().getTime())[0];
     }, [soilReports]);
     
-    const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
     const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
 
     useEffect(() => {
@@ -53,47 +49,28 @@ export default function DashboardPage() {
 
 
     useEffect(() => {
-        if (!user?.farmSize || soilReportsLoading) {
-            setLoadingAI(false);
+        if (!user?.farmSize) {
+            setLoadingMarket(false);
             return;
         }
 
-        const getPredictions = async () => {
-            setLoadingAI(true);
-            
+        const getMarketPrice = async () => {
+            setLoadingMarket(true);
             try {
-                const [growthResult, marketResult] = await Promise.all([
-                    simulateCropGrowth({
-                        crop: primaryCrop,
-                        region: user.region,
-                        language: languageMap[locale],
-                        soilReport: latestSoilReport?.aiSummary,
-                    }),
-                    getMarketData(primaryCrop, user.region),
-                ]);
-
-                if (growthResult?.finalYieldPrediction) {
-                    const predictionText = growthResult.finalYieldPrediction.split(':')[1]?.split(' vs.')[0]?.trim() || "N/A";
-                    setYieldPrediction(predictionText);
-                } else {
-                    setYieldPrediction("N/A");
-                }
-                
+                const marketResult = await getMarketData(primaryCrop, user.region);
                 setLatestPrice(marketResult?.latestPrice || null);
-
             } catch (error) {
-                console.error("Failed to get dashboard AI predictions:", error);
-                setYieldPrediction("N/A");
+                console.error("Failed to get dashboard market price:", error);
                 setLatestPrice(null);
             } finally {
-                setLoadingAI(false);
+                setLoadingMarket(false);
             }
         };
         
-        getPredictions();
-    }, [user, locale, t, primaryCrop, latestSoilReport, soilReportsLoading]);
+        getMarketPrice();
+    }, [user, locale, t, primaryCrop, latestSoilReport]);
 
-    const isLoading = loadingAI || soilReportsLoading;
+    const isLoading = loadingMarket || soilReportsLoading;
 
     const summaryCards = [
         { 
@@ -110,9 +87,9 @@ export default function DashboardPage() {
         },
         { 
             title: t('dashboard.predictedYield'),
-            value: yieldPrediction ? `${yieldPrediction}` : "...", 
+            value: "Forecast", 
             icon: Target, 
-            details: `${primaryCrop} yield per acre`,
+            details: `View 30-day forecast`,
         },
         { 
             title: t('dashboard.mandiPrice'), 
@@ -133,11 +110,20 @@ export default function DashboardPage() {
                     [...Array(4)].map((_, i) => <SummaryCard.Skeleton key={i} animationDelay={i * 100} />)
                 ) : (
                     summaryCards.map((card, index) => (
-                        <SummaryCard 
-                            key={card.title}
-                            {...card}
-                            animationDelay={index * 100}
-                        />
+                        card.title === t('dashboard.predictedYield') ? (
+                             <Link href="/growth-forecast" key={card.title}>
+                                <SummaryCard 
+                                    {...card}
+                                    animationDelay={index * 100}
+                                />
+                             </Link>
+                        ) : (
+                            <SummaryCard 
+                                key={card.title}
+                                {...card}
+                                animationDelay={index * 100}
+                            />
+                        )
                     ))
                 )}
             </div>
@@ -156,15 +142,7 @@ export default function DashboardPage() {
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                {isLoading ? (
-                                    <Skeleton className="h-8 w-2/3" />
-                                ) : (
-                                    <p className="text-2xl font-bold text-foreground">
-                                        {yieldPrediction}
-                                        <span className="text-base font-normal text-muted-foreground"> / acre (Predicted Yield)</span>
-                                    </p>
-                                )}
-                                <p className="text-sm text-muted-foreground mt-1">AI-powered simulation of your crop's upcoming growth cycle.</p>
+                                <p className="text-muted-foreground mt-1">AI-powered simulation of your crop's upcoming growth cycle, including yield prediction.</p>
                             </CardContent>
                         </Card>
                     </Link>
