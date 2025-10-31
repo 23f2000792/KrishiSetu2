@@ -83,12 +83,6 @@ export default function DashboardPage() {
             details: "Optimal moisture levels" 
         },
         { 
-            title: t('dashboard.predictedYield'),
-            value: "Forecast", 
-            icon: Target, 
-            details: `View 30-day forecast`,
-        },
-        { 
             title: t('dashboard.mandiPrice'), 
             value: latestPrice ? `₹${latestPrice.toLocaleString()}`: "...",
             icon: ShoppingBasket, 
@@ -107,42 +101,17 @@ export default function DashboardPage() {
                     [...Array(4)].map((_, i) => <SummaryCard.Skeleton key={i} animationDelay={i * 100} />)
                 ) : (
                     summaryCards.map((card, index) => (
-                        card.title === t('dashboard.predictedYield') ? (
-                             <Link href="/growth-forecast" key={card.title}>
-                                <SummaryCard 
-                                    {...card}
-                                    animationDelay={index * 100}
-                                />
-                             </Link>
-                        ) : (
-                            <SummaryCard 
-                                key={card.title}
-                                {...card}
-                                animationDelay={index * 100}
-                            />
-                        )
+                        <SummaryCard 
+                            key={card.title}
+                            {...card}
+                            animationDelay={index * 100}
+                        />
                     ))
                 )}
             </div>
 
             <div className="grid gap-8 lg:grid-cols-5">
                 <div className="lg:col-span-3 space-y-8 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                    <Link href="/growth-forecast">
-                        <Card className="transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1">
-                             <CardHeader>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <CalendarRange className="h-6 w-6 text-primary" />
-                                        <CardTitle>30-Day Growth Forecast</CardTitle>
-                                    </div>
-                                    <span className="text-sm text-primary hover:underline">View Timeline &rarr;</span>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground mt-1">AI-powered simulation of your crop's upcoming growth cycle, including yield prediction.</p>
-                            </CardContent>
-                        </Card>
-                    </Link>
                     <MarketChart crops={user?.crops} />
                 </div>
                 <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
