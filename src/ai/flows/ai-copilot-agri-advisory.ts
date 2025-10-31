@@ -11,6 +11,8 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {getMarketData} from '@/services/market-service';
+import {getFarmerKnowledgeGraph} from '@/services/knowledge-service';
+import {getFirestore} from 'firebase-admin/firestore';
 
 const AiCopilotAgriAdvisoryInputSchema = z.object({
   query: z
@@ -21,6 +23,7 @@ const AiCopilotAgriAdvisoryInputSchema = z.object({
     .describe(
       'The language for the response (e.g., "English", "Hindi", "Punjabi").'
     ),
+  userId: z.string().describe("The user's unique ID for personalization."),
 });
 export type AiCopilotAgriAdvisoryInput = z.infer<
   typeof AiCopilotAgriAdvisoryInputSchema
@@ -40,6 +43,27 @@ export async function aiCopilotAgriAdvisory(
 ): Promise<AiCopilotAgriAdvisoryOutput> {
   return aiCopilotAgriAdvisoryFlow(input);
 }
+
+const getFarmerHistoryTool = ai.defineTool(
+  {
+    name: 'getFarmerHistory',
+    description: "Get the farmer's historical data, including past soil reports and crop scans, to provide personalized advice.",
+    inputSchema: z.object({
+      userId: z.string().describe("The user's unique ID."),
+    }),
+    outputSchema: z.object({
+      soilReports: z.array(z.any()).optional(),
+      scans: z.array(z.any()).optional(),
+    }),
+  },
+  async ({ userId }) => {
+    // Note: Genkit flows run in a server environment where the Admin SDK is available.
+    // This is an exception to the "client-side only" rule for UI components.
+    const firestore = getFirestore();
+    return await getFarmerKnowledgeGraph(firestore, userId);
+  }
+);
+
 
 const getMandiPriceTool = ai.defineTool(
   {
@@ -71,27 +95,28 @@ const prompt = ai.definePrompt({
   name: 'aiCopilotAgriAdvisoryPrompt',
   input: {schema: AiCopilotAgriAdvisoryInputSchema},
   output: {schema: AiCopilotAgriAdvisoryOutputSchema},
-  tools: [getMandiPriceTool],
-  prompt: `You are an expert agronomist and AI-powered agri-advisory service. Your goal is to provide comprehensive, actionable, and easy-to-understand advice to farmers.
+  tools: [getMandiPriceTool, getFarmerHistoryTool],
+  prompt: `You are an expert agronomist and AI-powered agri-advisory service. Your goal is to provide comprehensive, actionable, and personalized advice to farmers.
+
+**VERY IMPORTANT**: Before answering, you MUST use the \`getFarmerHistory\` tool with the provided \`userId\` to fetch the farmer's past soil reports and crop scan data. This historical context is CRITICAL for providing accurate, long-term, and personalized advice.
 
 When a farmer asks a question:
-1.  **Analyze the Query:** Carefully understand the farmer's needs. Are they asking about crop diseases, market prices, farming techniques, or something else?
-2.  **Disease Diagnosis:** If the query describes symptoms (e.g., "yellow spots on leaves," "stunted growth"), act as an expert diagnostician.
-    *   Identify the most likely disease or nutrient deficiency.
-    *   Provide a detailed treatment plan, including:
-        *   **Cause:** Explain the likely reason for the issue.
-        *   **Symptoms:** Briefly re-iterate the key symptoms to confirm your diagnosis.
-        *   **Treatment:** Offer a clear, step-by-step treatment plan (organic and chemical options if applicable).
-        *   **Prevention:** Suggest long-term preventative measures.
-3.  **Market Prices:** If the query is about crop prices (e.g., "what is the price of wheat in Punjab?"), use the \`getMandiPriceTool\` to provide the latest market rates. Do not invent prices.
-4.  **General Advice:** For all other questions, provide the most accurate, relevant, and practical advice.
+1.  **Use History for Context:** Analyze the historical data from \`getFarmerHistory\`.
+    *   Look at past soil reports. If the farmer asks about fertilizer, reference their soil's nutrient levels (e.g., "Your last soil report showed low Nitrogen...").
+    *   Look at past crop scans. If they ask about a disease, check if it has occurred before (e.g., "I see you had issues with Leaf Rust last season as well...").
+    *   Use this memory to avoid giving generic advice. Your value is in personalization.
+2.  **Analyze the Current Query:** Carefully understand the farmer's immediate need.
+3.  **Disease Diagnosis:** If the query describes symptoms, act as an expert diagnostician. Use the historical data to see if it's a recurring problem.
+4.  **Market Prices:** If the query is about crop prices, use the \`getMandiPriceTool\` to provide the latest market rates.
+5.  **General Advice:** For all other questions, provide the most accurate, relevant, and practical advice, always informed by the farmer's history.
 
 **Response Formatting:**
 *   You MUST respond in the language specified by the user.
-*   Format your response using Markdown for better readability. Use headings (e.g., \`### Treatment Plan\`), lists, and bold text to structure your answer clearly.
+*   Format your response using Markdown for better readability.
 
 Language for response: {{{language}}}
-Farmer Question: {{{query}}}`,
+Farmer Question: {{{query}}}
+User ID: {{{userId}}}`,
 });
 
 const aiCopilotAgriAdvisoryFlow = ai.defineFlow(

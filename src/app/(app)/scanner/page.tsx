@@ -1,20 +1,23 @@
 'use client';
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/page-header";
 import { FileUploader } from "./components/file-uploader";
 import { ScanResult as ScanResultType } from "@/lib/types";
 import { ScanResultCard } from "./components/scan-result";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { scannerResults as pastScans } from "@/lib/data";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { diagnoseCrop } from '@/ai/flows/crop-disease-nutrient-prediction';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Eye } from "lucide-react";
+import { AlertCircle, Eye, Loader2 } from "lucide-react";
 import { CameraView } from "./components/camera-view";
 import { useLanguage } from "@/contexts/language-context";
+import { useAuth } from "@/contexts/auth-context";
+import { useFirebase } from "@/firebase";
+import { useCollection } from "@/firebase/firestore/use-collection";
+import { collection, query, where, orderBy, limit } from "firebase/firestore";
+import Image from "next/image";
 
 export default function ScannerPage() {
     const [result, setResult] = useState<ScanResultType | null>(null);
@@ -22,12 +25,26 @@ export default function ScannerPage() {
     const [error, setError] = useState<string | null>(null);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const { t, locale } = useLanguage();
+    const { user } = useAuth();
+    const { firestore } = useFirebase();
 
     const languageMap = {
       en: 'English',
       hi: 'Hindi',
       pa: 'Punjabi',
     };
+
+    const pastScansQuery = useMemo(() => {
+      if (!firestore || !user) return null;
+      return query(
+        collection(firestore, 'scans'),
+        where('userId', '==', user.id),
+        orderBy('createdAt', 'desc'),
+        limit(10)
+      );
+    }, [firestore, user]);
+
+    const { data: pastScans, isLoading: scansLoading } = useCollection<ScanResultType>(pastScansQuery);
 
     const toDataURL = (file: File): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -38,6 +55,10 @@ export default function ScannerPage() {
     });
 
     const handleScan = async (data: File | string) => {
+        if (!user) {
+            setError(t('scanner.error'));
+            return;
+        }
         setLoading(true);
         setResult(null);
         setError(null);
@@ -48,6 +69,7 @@ export default function ScannerPage() {
             const aiResult = await diagnoseCrop({ photoDataUri: dataUri, language: languageMap[locale] });
             setResult({
                 id: `scan-${Date.now()}`,
+                userId: user.id,
                 imageUrl: dataUri,
                 ...aiResult,
                 createdAt: new Date().toISOString(),
@@ -118,24 +140,34 @@ export default function ScannerPage() {
                     </CardHeader>
                     <CardContent className="flex-grow overflow-hidden">
                         <ScrollArea className="h-[calc(100vh-270px)] pr-4">
-                            <div className="space-y-2">
-                                {pastScans.map(scan => (
-                                    <div key={scan.id} className="group flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
-                                        <div className="relative h-16 w-16 rounded-md overflow-hidden shrink-0 border">
-                                            <Image src={scan.imageUrl} alt={scan.prediction} fill className="object-cover" />
+                           {scansLoading ? (
+                                <div className="space-y-4">
+                                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
+                                </div>
+                           ) : (
+                             <div className="space-y-2">
+                                {pastScans && pastScans.length > 0 ? (
+                                    pastScans.map(scan => (
+                                        <div key={scan.id} className="group flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
+                                            <div className="relative h-16 w-16 rounded-md overflow-hidden shrink-0 border">
+                                                <Image src={scan.imageUrl} alt={scan.prediction} fill className="object-cover" />
+                                            </div>
+                                            <div className="flex-grow">
+                                                <p className="font-semibold text-sm">{scan.prediction}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                     {new Date(scan.createdAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setResult(scan)}>
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
                                         </div>
-                                        <div className="flex-grow">
-                                            <p className="font-semibold text-sm">{scan.prediction}</p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {new Date(scan.createdAt).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setResult(scan)}>
-                                            <Eye className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-muted-foreground text-center py-8">No past scans found.</p>
+                                )}
                             </div>
+                           )}
                         </ScrollArea>
                     </CardContent>
                 </Card>

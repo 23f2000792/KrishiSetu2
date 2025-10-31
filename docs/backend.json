@@ -31,13 +31,16 @@
           "type": "string",
           "description": "The user's phone number."
         },
-        "pushPrefs": {
-          "type": "boolean",
-          "description": "User preference for push notifications."
-        },
-        "voicePrefs": {
-          "type": "boolean",
-          "description": "User preference for voice notifications."
+        "prefs": {
+          "type": "object",
+          "properties": {
+            "push": {
+              "type": "boolean"
+            },
+            "voice": {
+              "type": "boolean"
+            }
+          }
         }
       },
       "required": [
@@ -121,38 +124,104 @@
         "extractedData": {
           "type": "object",
           "properties": {
-            "pH": { "type": "number" },
-            "N": { "type": "string" },
-            "P": { "type": "string" },
-            "K": { "type": "string" },
-            "OC": { "type": "number" },
-            "micronutrients": {
-              "type": "object",
-              "properties": {
-                "Zn": { "type": "number" },
-                "Fe": { "type": "number" },
-                "Mn": { "type": "number" },
-                "Cu": { "type": "number" },
-                "B": { "type": "number" }
-              }
+            "pH": {
+              "type": "number"
             },
-            "EC": { "type": "number" }
+            "N": {
+              "type": "string"
+            },
+            "P": {
+              "type": "string"
+            },
+            "K": {
+              "type": "string"
+            },
+            "OC": {
+              "type": "number"
+            },
+            "EC": {
+              "type": "number"
+            }
           }
         },
         "aiSummary": {
           "type": "object",
           "properties": {
-            "fertilityIndex": { "type": "number" },
-            "soilType": { "type": "string" },
-            "recommendedCrops": { "type": "array", "items": { "type": "string" } },
-            "fertilizerPlan": { "type": "string" },
-            "warnings": { "type": "array", "items": { "type": "string" } },
-            "organicAdvice": { "type": "string" },
-            "explanation": { "type": "string" }
+            "fertilityIndex": {
+              "type": "number"
+            },
+            "soilType": {
+              "type": "string"
+            },
+            "recommendedCrops": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "fertilizerPlan": {
+              "type": "string"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "organicAdvice": {
+              "type": "string"
+            },
+            "explanation": {
+              "type": "string"
+            }
           }
         }
       },
-      "required": ["userId", "uploadedAt", "aiSummary"]
+      "required": [
+        "userId",
+        "uploadedAt",
+        "aiSummary"
+      ]
+    },
+    "Scan": {
+      "title": "Scan",
+      "type": "object",
+      "description": "Represents a crop scan analysis result.",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who performed the scan."
+        },
+        "imageUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the scanned image."
+        },
+        "prediction": {
+          "type": "string",
+          "description": "The AI's prediction for the crop's condition."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "The confidence score of the prediction."
+        },
+        "recommendedSteps": {
+          "type": "string",
+          "description": "The recommended steps to take."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the scan was created."
+        }
+      },
+      "required": [
+        "userId",
+        "imageUrl",
+        "prediction",
+        "confidence",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -223,6 +292,22 @@
             {
               "name": "reportId",
               "description": "The unique identifier for the soil report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/scans/{scanId}",
+        "definition": {
+          "entityName": "Scan",
+          "schema": {
+            "$ref": "#/backend/entities/Scan"
+          },
+          "description": "Stores user-uploaded crop scan analysis results.",
+          "params": [
+            {
+              "name": "scanId",
+              "description": "The unique identifier for the scan."
             }
           ]
         }

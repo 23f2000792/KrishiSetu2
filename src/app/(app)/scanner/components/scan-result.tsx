@@ -4,12 +4,15 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScanResult } from '@/lib/types';
-import { CheckCircle, Save, AlertTriangle, Scan, Bot, Share2 } from 'lucide-react';
+import { CheckCircle, Save, AlertTriangle, Scan, Bot, Share2, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/language-context';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useFirebase } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '@/contexts/auth-context';
 
 type ScanResultCardProps = {
   result: ScanResult;
@@ -22,6 +25,9 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
     const { t } = useLanguage();
     const router = useRouter();
     const { toast } = useToast();
+    const { firestore } = useFirebase();
+    const { user } = useAuth();
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => setConfidence(Math.round(result.confidence * 100)), 300);
@@ -33,18 +39,45 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
             .replace('{prediction}', result.prediction)
             .replace('{recommendations}', result.recommendedSteps);
         
-        // Use sessionStorage to avoid long URIs
         sessionStorage.setItem('copilot-prompt', prompt);
         sessionStorage.setItem('copilot-image', result.imageUrl);
 
         router.push('/chat');
     };
 
-    const handleSave = () => {
-        toast({
-            title: t('scanner.recordSavedTitle'),
-            description: t('scanner.recordSavedDesc'),
-        });
+    const handleSave = async () => {
+        if (!firestore || !user) {
+            toast({
+                variant: 'destructive',
+                title: "Error",
+                description: "You must be logged in to save results.",
+            });
+            return;
+        }
+        setIsSaving(true);
+        try {
+            await addDoc(collection(firestore, 'scans'), {
+                userId: user.id,
+                imageUrl: result.imageUrl,
+                prediction: result.prediction,
+                confidence: result.confidence,
+                recommendedSteps: result.recommendedSteps,
+                createdAt: serverTimestamp(),
+            });
+            toast({
+                title: t('scanner.recordSavedTitle'),
+                description: t('scanner.recordSavedDesc'),
+            });
+        } catch (error) {
+            console.error("Error saving scan:", error);
+            toast({
+                variant: 'destructive',
+                title: "Save Failed",
+                description: "There was an error saving your scan result.",
+            });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleShare = async () => {
@@ -57,7 +90,6 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
             if (navigator.share) {
                 await navigator.share(shareData);
             } else {
-                // Fallback for browsers that don't support navigator.share
                 await navigator.clipboard.writeText(shareData.text);
                 toast({
                     title: t('scanner.copiedToClipboardTitle'),
@@ -114,8 +146,8 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
                 <Bot className="mr-2 h-4 w-4" />
                 {t('scanner.askCopilot')}
             </Button>
-            <Button className="w-full" onClick={handleSave}>
-                <Save className="mr-2 h-4 w-4" />
+            <Button className="w-full" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {t('scanner.saveToRecords')}
             </Button>
         </div>

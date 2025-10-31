@@ -19,7 +19,7 @@ export type User = {
 export type PricePoint = { date: string; price: number };
 
 export type MarketPrice = {
-  id: string;
+  id:string;
   crop: string;
   region: string;
   prices: PricePoint[];
@@ -46,6 +46,7 @@ export type Post = {
 
 export type ScanResult = {
   id: string;
+  userId: string;
   imageUrl: string;
   prediction: string;
   confidence: number;

@@ -95,25 +95,22 @@ export function ChatLayout() {
   }, [locale]);
 
   useEffect(() => {
-    // Check for data from scanner page via sessionStorage first
     const sessionPrompt = sessionStorage.getItem('copilot-prompt');
     const sessionImage = sessionStorage.getItem('copilot-image');
 
     if (sessionPrompt) {
       handleSend(sessionPrompt, sessionImage ?? undefined);
-      // Clean up session storage after use
       sessionStorage.removeItem('copilot-prompt');
       sessionStorage.removeItem('copilot-image');
-      return; // Prioritize session storage data
+      return; 
     }
     
-    // Fallback to check URL parameters for backward compatibility or other use cases
     const initialPrompt = searchParams.get('prompt');
     if (initialPrompt) {
       handleSend(initialPrompt);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
+  }, []); 
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -123,7 +120,7 @@ export function ChatLayout() {
 
   const handleSend = async (prompt?: string, image?: string) => {
     const textToSend = prompt || input;
-    if (!textToSend.trim()) return;
+    if (!textToSend.trim() || !user) return;
 
     const userMessage: Message = { 
         id: Date.now().toString(), 
@@ -136,7 +133,11 @@ export function ChatLayout() {
     setLoading(true);
 
     try {
-      const result = await aiCopilotAgriAdvisory({ query: textToSend, language: languageMap[locale] });
+      const result = await aiCopilotAgriAdvisory({ 
+        query: textToSend, 
+        language: languageMap[locale],
+        userId: user.id,
+      });
       const aiMessage: Message = { id: (Date.now() + 1).toString(), text: result.advice, isUser: false };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
