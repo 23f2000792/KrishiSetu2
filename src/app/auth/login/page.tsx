@@ -25,6 +25,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Github, Languages, Tractor } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import { useLanguage } from '@/contexts/language-context';
 import { demoCredentials } from '@/lib/data';
 
 const formSchema = z.object({
@@ -34,6 +35,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,8 +46,6 @@ export default function LoginPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you'd call an auth service here.
-    // For the demo, we'll try to match against demo credentials.
     if (values.email === demoCredentials.farmer.email) {
       login(demoCredentials.farmer.email, 'Farmer');
     } else if (values.email === demoCredentials.admin.email) {
@@ -63,9 +63,9 @@ export default function LoginPage() {
   return (
     <>
       <CardHeader className="text-center">
-        <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>
+        <CardTitle className="font-headline text-2xl">{t('login.welcome')}</CardTitle>
         <CardDescription>
-          Login to your KrishiSetu account to continue.
+          {t('login.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -76,9 +76,9 @@ export default function LoginPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t('login.emailLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="farmer@krish-demo.test" {...field} />
+                    <Input placeholder={t('login.emailPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -90,13 +90,13 @@ export default function LoginPage() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('login.passwordLabel')}</FormLabel>
                     <Link href="#" className="text-sm text-primary hover:underline">
-                        Forgot password?
+                        {t('login.forgotPassword')}
                     </Link>
                   </div>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder={t('login.passwordPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,7 +106,7 @@ export default function LoginPage() {
               <p className="text-sm font-medium text-destructive">{form.formState.errors.root.message}</p>
             )}
             <Button type="submit" className="w-full">
-              Login
+              {t('login.loginButton')}
             </Button>
           </form>
         </Form>
@@ -116,32 +116,32 @@ export default function LoginPage() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              Or continue with
+              {t('login.orContinueWith')}
             </span>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
             <Button variant="outline" onClick={() => handleDemoLogin('Farmer')}>
-                <Tractor className="mr-2" /> Farmer Demo
+                <Tractor className="mr-2" /> {t('login.farmerDemo')}
             </Button>
             <Button variant="outline" onClick={() => handleDemoLogin('Admin')}>
-                <Github className="mr-2" /> Admin Demo
+                <Github className="mr-2" /> {t('login.adminDemo')}
             </Button>
         </div>
         <Separator />
         <div className="flex justify-center items-center text-sm text-muted-foreground">
             <Languages className="mr-2 h-4 w-4" />
-            <span>English</span>
+            <span>{t('header.english')}</span>
             <Separator orientation="vertical" className="h-4 mx-2" />
-            <span>हिन्दी</span>
+            <span>{t('header.hindi')}</span>
             <Separator orientation="vertical" className="h-4 mx-2" />
-            <span>ਪੰਜਾਬੀ</span>
+            <span>{t('header.punjabi')}</span>
         </div>
       </CardContent>
       <CardFooter className="text-center text-sm text-muted-foreground justify-center">
-          Don&apos;t have an account?&nbsp;
+          {t('login.noAccount')}&nbsp;
           <Link href="/auth/signup" className="text-primary hover:underline">
-            Sign up
+            {t('login.signUp')}
           </Link>
       </CardFooter>
     </>

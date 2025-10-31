@@ -16,10 +16,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/auth-context';
+import { useLanguage } from '@/contexts/language-context';
 import Link from 'next/link';
 
 export function UserNav() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
+
   if (!user) return null;
 
   const getInitials = (name: string) => {
@@ -52,15 +55,15 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/profile">Profile</Link>
+            <Link href="/profile">{t('userNav.profile')}</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/settings">Settings</Link>
+            <Link href="/settings">{t('userNav.settings')}</Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
-          Log out
+          {t('userNav.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

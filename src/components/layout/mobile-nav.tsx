@@ -11,17 +11,19 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '../ui/sidebar';
+import { useLanguage } from '@/contexts/language-context';
 
 export function MobileNav() {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
+  const { t } = useLanguage();
   
   const navItems = [
-    { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
-    { href: '/chat', label: 'Copilot', icon: Bot },
-    { href: '/scanner', label: 'Scan', icon: ScanLine },
-    { href: '/market', label: 'Market', icon: ShoppingBasket },
-    { href: '/community', label: 'Community', icon: Users },
+    { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
+    { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
+    { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
+    { href: '/market', label: t('mobileNav.market'), icon: ShoppingBasket },
+    { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
 
   return (

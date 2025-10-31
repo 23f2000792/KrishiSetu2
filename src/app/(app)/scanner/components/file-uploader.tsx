@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Upload, Camera } from 'lucide-react';
+import { useLanguage } from '@/contexts/language-context';
 
 type FileUploaderProps = {
   onFileUpload: (file: File) => void;
@@ -13,6 +14,7 @@ type FileUploaderProps = {
 export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const { t } = useLanguage();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -54,14 +56,14 @@ export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) 
             <Upload className="h-8 w-8 text-primary" />
           </div>
           <h3 className="text-xl font-semibold font-headline">
-            Drag & Drop or Upload a Photo
+            {t('scanner.dragOrUpload')}
           </h3>
           <p className="text-muted-foreground">
-            Supported formats: PNG, JPG, JPEG. Max file size: 5MB.
+            {t('scanner.supportedFormats')}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button onClick={() => inputRef.current?.click()}>
-              Browse Files
+              {t('scanner.browseFiles')}
             </Button>
             <Input
               ref={inputRef}
@@ -72,7 +74,7 @@ export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) 
             />
             <Button variant="outline" onClick={onCameraOpen}>
               <Camera className="mr-2 h-4 w-4" />
-              Use Camera
+              {t('scanner.useCamera')}
             </Button>
           </div>
         </div>

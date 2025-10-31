@@ -14,12 +14,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { CameraView } from "./components/camera-view";
+import { useLanguage } from "@/contexts/language-context";
 
 export default function ScannerPage() {
     const [result, setResult] = useState<ScanResultType | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
+    const { t } = useLanguage();
 
     const toDataURL = (file: File): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -46,7 +48,7 @@ export default function ScannerPage() {
             });
         } catch (e) {
             console.error(e);
-            setError("Failed to analyze the image. Please try again.");
+            setError(t('scanner.error'));
         } finally {
             setLoading(false);
         }
@@ -63,8 +65,8 @@ export default function ScannerPage() {
             <div className="grid lg:grid-cols-3 gap-8 items-start h-full">
                 <div className="lg:col-span-2 flex flex-col gap-8 h-full">
                     <PageHeader
-                        title="Crop Scanner"
-                        description="Upload or take a photo of a crop to detect diseases or nutrient deficiencies."
+                        title={t('scanner.title')}
+                        description={t('scanner.description')}
                     />
                     <div className="flex-grow animate-fade-in-up">
                         {loading ? (

@@ -7,41 +7,43 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useLanguage } from '@/contexts/language-context';
 
 export default function SettingsPage() {
     const { toast } = useToast();
+    const { t } = useLanguage();
 
     const handleReset = () => {
         toast({
-            title: "Demo Data Reset",
-            description: "The application data has been reset to its initial state.",
+            title: t('settings.resetToastTitle'),
+            description: t('settings.resetToastDesc'),
         });
     }
 
   return (
     <div className="pb-16 md:pb-0">
       <PageHeader
-        title="Settings"
-        description="Manage your application preferences and data."
+        title={t('settings.title')}
+        description={t('settings.description')}
       />
       <div className="max-w-2xl mx-auto">
         <Card>
             <CardHeader>
-                <CardTitle>PWA Settings</CardTitle>
-                <CardDescription>Configure offline and data synchronization behavior.</CardDescription>
+                <CardTitle>{t('settings.pwaSettings')}</CardTitle>
+                <CardDescription>{t('settings.pwaDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="flex items-center justify-between space-x-2 p-4 border rounded-lg">
                     <div className='flex items-center gap-2'>
                         <Wifi />
-                        <Label htmlFor="offline-mode">Offline Functionality</Label>
+                        <Label htmlFor="offline-mode">{t('settings.offline')}</Label>
                     </div>
                     <Switch id="offline-mode" />
                 </div>
                 <div className="flex items-center justify-between space-x-2 p-4 border rounded-lg">
                     <div className='flex items-center gap-2'>
                         <RefreshCw />
-                        <Label htmlFor="data-sync">Automatic Data Sync</Label>
+                        <Label htmlFor="data-sync">{t('settings.dataSync')}</Label>
                     </div>
                     <Switch id="data-sync" defaultChecked/>
                 </div>
@@ -52,16 +54,16 @@ export default function SettingsPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle>Demo Settings</CardTitle>
-                <CardDescription>Manage data for this demonstration app.</CardDescription>
+                <CardTitle>{t('settings.demoSettings')}</CardTitle>
+                <CardDescription>{t('settings.demoDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex items-center justify-between space-x-2 p-4 border rounded-lg border-destructive/50">
                     <div>
-                        <Label htmlFor="reset-data" className='text-destructive'>Reset Demo Data</Label>
-                        <p className="text-sm text-muted-foreground">This will restore all data to the original demo state.</p>
+                        <Label htmlFor="reset-data" className='text-destructive'>{t('settings.resetDemo')}</Label>
+                        <p className="text-sm text-muted-foreground">{t('settings.resetDemoDesc')}</p>
                     </div>
-                    <Button variant="destructive" onClick={handleReset}>Reset</Button>
+                    <Button variant="destructive" onClick={handleReset}>{t('settings.reset')}</Button>
                 </div>
             </CardContent>
         </Card>

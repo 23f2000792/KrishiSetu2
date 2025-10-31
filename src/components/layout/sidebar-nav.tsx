@@ -16,24 +16,26 @@ import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { useSidebar } from '../ui/sidebar';
+import { useLanguage } from '@/contexts/language-context';
 
 export function SidebarNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { setOpenMobile } = useSidebar();
+  const { t } = useLanguage();
 
   const navItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/chat', label: 'AI Copilot', icon: Bot },
-    { href: '/market', label: 'Market Prices', icon: ShoppingBasket },
-    { href: '/scanner', label: 'Crop Scanner', icon: ScanLine },
-    { href: '/community', label: 'Community', icon: Users },
-    { href: '/profile', label: 'Profile', icon: Landmark, gap: true },
-    { href: '/settings', label: 'Settings', icon: Settings },
+    { href: '/dashboard', label: t('sidebar.dashboard'), icon: LayoutDashboard },
+    { href: '/chat', label: t('sidebar.aiCopilot'), icon: Bot },
+    { href: '/market', label: t('sidebar.marketPrices'), icon: ShoppingBasket },
+    { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
+    { href: '/community', label: t('sidebar.community'), icon: Users },
+    { href: '/profile', label: t('sidebar.profile'), icon: Landmark, gap: true },
+    { href: '/settings', label: t('sidebar.settings'), icon: Settings },
   ];
   
   const adminNavItems = [
-    { href: '/admin', label: 'Admin Panel', icon: Shield },
+    { href: '/admin', label: t('sidebar.adminPanel'), icon: Shield },
   ];
 
   const allNavItems = user?.role === 'Admin' ? [...navItems, ...adminNavItems] : navItems;

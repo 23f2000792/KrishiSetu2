@@ -10,6 +10,7 @@ import {
 import { marketPrices } from "@/lib/data";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
+import { useLanguage } from "@/contexts/language-context";
 
 const chartData = marketPrices.reduce((acc, crop) => {
     crop.prices.forEach(pricePoint => {
@@ -39,11 +40,12 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function MarketChart() {
+  const { t } = useLanguage();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Market Overview</CardTitle>
-        <CardDescription>Price trends for key crops (₹ per quintal)</CardDescription>
+        <CardTitle>{t('dashboard.marketChartTitle')}</CardTitle>
+        <CardDescription>{t('dashboard.marketChartDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-64 w-full">

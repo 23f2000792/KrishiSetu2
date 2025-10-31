@@ -26,6 +26,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Github, Tractor } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/language-context';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -36,6 +37,7 @@ const formSchema = z.object({
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,9 +60,9 @@ export default function SignupPage() {
   return (
     <>
       <CardHeader className="text-center">
-        <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
+        <CardTitle className="font-headline text-2xl">{t('signup.createAccount')}</CardTitle>
         <CardDescription>
-          Join KrishiSetu and revolutionize your farming.
+          {t('signup.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -71,9 +73,9 @@ export default function SignupPage() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t('signup.nameLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ramesh Kumar" {...field} />
+                    <Input placeholder={t('signup.namePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,9 +86,9 @@ export default function SignupPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t('signup.emailLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="ramesh@farm.com" {...field} />
+                    <Input placeholder={t('signup.emailPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,16 +99,16 @@ export default function SignupPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t('signup.passwordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder={t('signup.passwordPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button type="submit" className="w-full">
-              Sign Up
+              {t('signup.signupButton')}
             </Button>
           </form>
         </Form>
@@ -116,23 +118,23 @@ export default function SignupPage() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              Or sign up with
+              {t('signup.orSignUpWith')}
             </span>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
             <Button variant="outline">
-                <Tractor className="mr-2" /> Google
+                <Tractor className="mr-2" /> {t('signup.google')}
             </Button>
             <Button variant="outline">
-                <Github className="mr-2" /> GitHub
+                <Github className="mr-2" /> {t('signup.github')}
             </Button>
         </div>
       </CardContent>
       <CardFooter className="text-center text-sm text-muted-foreground justify-center">
-          Already have an account?&nbsp;
+          {t('signup.hasAccount')}&nbsp;
           <Link href="/auth/login" className="text-primary hover:underline">
-            Login
+            {t('signup.login')}
           </Link>
       </CardFooter>
     </>

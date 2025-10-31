@@ -27,8 +27,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { User } from '@/lib/types';
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/language-context";
 
 export function UserList({ users }: { users: User[] }) {
+    const { t } = useLanguage();
     const getInitials = (name: string) => {
         const names = name.split(' ');
         return names.length > 1 ? `${names[0][0]}${names[names.length - 1][0]}` : name.substring(0, 2);
@@ -37,18 +39,18 @@ export function UserList({ users }: { users: User[] }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>A list of all users in the system.</CardDescription>
+                <CardTitle>{t('admin.userManagement')}</CardTitle>
+                <CardDescription>{t('admin.userListDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>User</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Region</TableHead>
-                            <TableHead>Contact</TableHead>
-                            <TableHead><span className="sr-only">Actions</span></TableHead>
+                            <TableHead>{t('admin.user')}</TableHead>
+                            <TableHead>{t('admin.role')}</TableHead>
+                            <TableHead>{t('admin.region')}</TableHead>
+                            <TableHead>{t('admin.contact')}</TableHead>
+                            <TableHead><span className="sr-only">{t('admin.actions')}</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -77,9 +79,9 @@ export function UserList({ users }: { users: User[] }) {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                                            <DropdownMenuLabel>{t('admin.actions')}</DropdownMenuLabel>
+                                            <DropdownMenuItem>{t('admin.edit')}</DropdownMenuItem>
+                                            <DropdownMenuItem>{t('admin.delete')}</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>

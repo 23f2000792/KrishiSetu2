@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useLanguage } from '@/contexts/language-context';
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is too short"),
@@ -26,6 +27,7 @@ const profileSchema = z.object({
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -49,8 +51,8 @@ export default function ProfilePage() {
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
     console.log("Updated profile:", values);
     toast({
-      title: "Profile Updated",
-      description: "Your changes have been saved successfully.",
+      title: t('profile.profileUpdated'),
+      description: t('profile.profileUpdatedDesc'),
     });
   };
   
@@ -63,8 +65,8 @@ export default function ProfilePage() {
   return (
     <div className="pb-16 md:pb-0">
       <PageHeader
-        title="My Profile"
-        description="View and manage your personal information and preferences."
+        title={t('profile.title')}
+        description={t('profile.description')}
       />
       <Card>
         <CardHeader>
@@ -85,48 +87,48 @@ export default function ProfilePage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <FormField name="name" control={form.control} render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>{t('profile.fullName')}</FormLabel>
                     <FormControl><Input {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField name="email" control={form.control} render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('profile.email')}</FormLabel>
                     <FormControl><Input {...field} disabled /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField name="phone" control={form.control} render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>{t('profile.phone')}</FormLabel>
                     <FormControl><Input {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField name="region" control={form.control} render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Region</FormLabel>
+                    <FormLabel>{t('profile.region')}</FormLabel>
                     <FormControl><Input {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                  <FormField name="languages" control={form.control} render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Languages</FormLabel>
-                    <FormControl><Input {...field} placeholder="e.g. English, Hindi" /></FormControl>
+                    <FormLabel>{t('profile.languages')}</FormLabel>
+                    <FormControl><Input {...field} placeholder={t('profile.languagesPlaceholder')} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
               </div>
 
               <div className="space-y-4">
-                 <h3 className="text-lg font-medium">Preferences</h3>
+                 <h3 className="text-lg font-medium">{t('profile.preferences')}</h3>
                  <div className="grid md:grid-cols-2 gap-6">
                     <FormField name="prefs.push" control={form.control} render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                                <FormLabel>Push Notifications</FormLabel>
+                                <FormLabel>{t('profile.pushNotifications')}</FormLabel>
                                 <FormMessage />
                             </div>
                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
@@ -135,7 +137,7 @@ export default function ProfilePage() {
                     <FormField name="prefs.voice" control={form.control} render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                                <FormLabel>Voice Input/Output</FormLabel>
+                                <FormLabel>{t('profile.voiceIO')}</FormLabel>
                                 <FormMessage />
                             </div>
                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
@@ -145,8 +147,8 @@ export default function ProfilePage() {
               </div>
               
               <div className="flex justify-between items-center">
-                <Button type="submit">Save Changes</Button>
-                <Button variant="destructive" onClick={logout}>Log Out</Button>
+                <Button type="submit">{t('profile.saveChanges')}</Button>
+                <Button variant="destructive" onClick={logout}>{t('profile.logout')}</Button>
               </div>
             </form>
           </Form>

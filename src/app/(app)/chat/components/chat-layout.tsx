@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { aiCopilotAgriAdvisory } from '@/ai/flows/ai-copilot-agri-advisory';
 import { suggestQuickPrompts } from '@/ai/flows/suggest-quick-prompts';
+import { useLanguage } from '@/contexts/language-context';
 
 type Message = {
   id: string;
@@ -21,6 +22,7 @@ type Message = {
 
 export function ChatLayout() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -65,7 +67,7 @@ export function ChatLayout() {
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error("AI response error:", error);
-      const errorMessage: Message = { id: (Date.now() + 1).toString(), text: "Sorry, I'm having trouble connecting right now. Please try again later.", isUser: false };
+      const errorMessage: Message = { id: (Date.now() + 1).toString(), text: t('chat.error'), isUser: false };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoading(false);
@@ -123,8 +125,8 @@ export function ChatLayout() {
                     <div className="mx-auto mb-4 bg-primary/10 p-4 rounded-full w-fit">
                         <Sparkles className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="font-medium">Welcome to the AI Copilot</p>
-                    <p className="text-muted-foreground text-sm mt-1">Start by asking a question or select a prompt below.</p>
+                    <p className="font-medium">{t('chat.welcomeMessage')}</p>
+                    <p className="text-muted-foreground text-sm mt-1">{t('chat.welcomeHint')}</p>
                      <div className="mt-6 flex flex-wrap justify-center gap-2">
                         {quickPrompts.map(prompt => (
                             <Badge key={prompt} variant="secondary" className="cursor-pointer hover:bg-primary/10" onClick={() => handleSend(prompt)}>
@@ -143,15 +145,15 @@ export function ChatLayout() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleSend()}
-            placeholder="Type your message..."
+            placeholder={t('chat.inputPlaceholder')}
             className="pr-24 h-12 rounded-full"
             disabled={loading}
           />
           <div className="absolute inset-y-0 right-2 flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full" disabled={loading}>
+            <Button variant="ghost" size="icon" className="rounded-full" disabled={loading} aria-label={t('chat.micButton')}>
               <Mic className="h-5 w-5" />
             </Button>
-            <Button size="icon" className="rounded-full" onClick={() => handleSend()} disabled={loading || !input.trim()}>
+            <Button size="icon" className="rounded-full" onClick={() => handleSend()} disabled={loading || !input.trim()} aria-label={t('chat.sendButton')}>
               <Send className="h-5 w-5" />
             </Button>
           </div>

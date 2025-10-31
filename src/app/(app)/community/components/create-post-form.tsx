@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/language-context';
 
 const formSchema = z.object({
   content: z.string().min(10, { message: 'Post must be at least 10 characters long.' }),
@@ -17,6 +18,7 @@ const formSchema = z.object({
 
 export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
     const { toast } = useToast();
+    const { t } = useLanguage();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: { content: '' },
@@ -25,8 +27,8 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values);
         toast({
-            title: "Post Created (Demo)",
-            description: "Your post has been shared with the community.",
+            title: t('community.postCreated'),
+            description: t('community.postCreatedDesc'),
         });
         onPostCreated();
     }
@@ -39,10 +41,10 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
                     name="content"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Your Message</FormLabel>
+                            <FormLabel>{t('community.yourMessage')}</FormLabel>
                             <FormControl>
                                 <Textarea
-                                    placeholder="What's on your mind? Ask a question or share an update..."
+                                    placeholder={t('community.messagePlaceholder')}
                                     rows={5}
                                     {...field}
                                 />
@@ -57,7 +59,7 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
                         name="image"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Attach Image (Optional)</FormLabel>
+                                <FormLabel>{t('community.attachImage')}</FormLabel>
                                 <FormControl>
                                     <Input type="file" {...field} />
                                 </FormControl>
@@ -70,17 +72,17 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
                         name="language"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Language</FormLabel>
+                                <FormLabel>{t('community.language')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select language" />
+                                            <SelectValue placeholder={t('community.selectLanguage')} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="English">English</SelectItem>
-                                        <SelectItem value="Hindi">हिन्दी</SelectItem>
-                                        <SelectItem value="Punjabi">ਪੰਜਾਬੀ</SelectItem>
+                                        <SelectItem value="English">{t('header.english')}</SelectItem>
+                                        <SelectItem value="Hindi">{t('header.hindi')}</SelectItem>
+                                        <SelectItem value="Punjabi">{t('header.punjabi')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -89,7 +91,7 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
                     />
                 </div>
                 <div className="flex justify-end">
-                    <Button type="submit">Post to Community</Button>
+                    <Button type="submit">{t('community.postToCommunity')}</Button>
                 </div>
             </form>
         </Form>

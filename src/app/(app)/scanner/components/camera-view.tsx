@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Camera, Zap, X, Image as ImageIcon, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { useLanguage } from '@/contexts/language-context';
 
 type CameraViewProps = {
   onCapture: (dataUri: string) => void;
@@ -15,14 +16,15 @@ export function CameraView({ onCapture, onClose }: CameraViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const getCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         toast({
             variant: 'destructive',
-            title: 'Camera Not Supported',
-            description: 'Your browser does not support camera access.',
+            title: t('scanner.cameraNotSupportedTitle'),
+            description: t('scanner.cameraNotSupportedDesc'),
         });
         setHasCameraPermission(false);
         return;
@@ -42,8 +44,8 @@ export function CameraView({ onCapture, onClose }: CameraViewProps) {
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this feature.',
+          title: t('scanner.cameraAccessDeniedTitle'),
+          description: t('scanner.cameraAccessDeniedDesc'),
         });
       }
     };
@@ -56,7 +58,7 @@ export function CameraView({ onCapture, onClose }: CameraViewProps) {
             stream.getTracks().forEach(track => track.stop());
         }
     }
-  }, [toast]);
+  }, [toast, t]);
 
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
@@ -83,9 +85,9 @@ export function CameraView({ onCapture, onClose }: CameraViewProps) {
                 <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-background/80'>
                     <Alert variant="destructive" className='max-w-sm'>
                         <ImageIcon className="h-4 w-4" />
-                        <AlertTitle>Camera Access Required</AlertTitle>
+                        <AlertTitle>{t('scanner.cameraViewTitle')}</AlertTitle>
                         <AlertDescription>
-                            Please allow camera access in your browser to use this feature. You might need to refresh the page.
+                            {t('scanner.cameraViewDescription')}
                         </AlertDescription>
                     </Alert>
                 </div>
