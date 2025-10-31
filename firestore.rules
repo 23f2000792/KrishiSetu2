@@ -30,26 +30,32 @@ service cloud.firestore {
       allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
     }
     
-    // For user-specific collections, enforce ownership for all operations.
-    // A user can only 'list' (query) documents if they are filtering by their own userId.
+    // For user-specific collections, enforce ownership.
+    // 'list' requires a query filter on userId.
+    // 'get' requires the user to own the document.
+    // 'create'/'update' requires the incoming data to have the correct userId.
     match /soil_reports/{reportId} {
-      allow read, create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow get: if request.auth != null && resource.data.userId == request.auth.uid;
       allow list: if request.auth != null && request.query.where.userId == request.auth.uid;
+      allow create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     match /scans/{scanId} {
-       allow read, create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
        allow list: if request.auth != null && request.query.where.userId == request.auth.uid;
+       allow create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     match /yield_reports/{reportId} {
-       allow read, create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
        allow list: if request.auth != null && request.query.where.userId == request.auth.uid;
+       allow create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     match /profit_reports/{reportId} {
-       allow read, create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
        allow list: if request.auth != null && request.query.where.userId == request.auth.uid;
+       allow create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
   }
 }
