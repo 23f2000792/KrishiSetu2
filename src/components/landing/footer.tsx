@@ -46,8 +46,8 @@ export function Footer() {
             <div>
                 <h3 className="font-headline font-semibold text-foreground">{t('landing.legal')}</h3>
                 <ul className="mt-4 space-y-2">
-                    <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('landing.privacyPolicy')}</Link></li>
-                    <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('landing.termsOfService')}</Link></li>
+                    <li><Link href="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">{t('landing.privacyPolicy')}</Link></li>
+                    <li><Link href="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors">{t('landing.termsOfService')}</Link></li>
                 </ul>
             </div>
             <div>
