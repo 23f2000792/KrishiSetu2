@@ -96,7 +96,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
          // If admin doesn't exist, create it
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password);
+                // Try to sign up the user. If it fails because the email is already in use, it means
+                // the account exists but with a different password, so we just try to sign in again.
+                // This handles race conditions or partially created accounts.
+                const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password).catch(
+                    async (signupError) => {
+                        if (signupError.code === 'auth/email-already-in-use') {
+                            // Account exists, so just sign in
+                            return signInWithEmailAndPassword(auth, creds.email, creds.password);
+                        }
+                        throw signupError; // Re-throw other signup errors
+                    }
+                );
+                
                 const firebaseUser = userCredential.user;
                 const adminUser: Omit<User, 'id'> = {
                     name: 'Admin User',
@@ -107,16 +119,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     prefs: { push: true, voice: false },
                 };
                 await setDoc(doc(firestore, "users", firebaseUser.uid), adminUser);
-                // After creating, try signing in again.
-                await signInWithEmailAndPassword(auth, creds.email, creds.password);
-            } catch (signupError: any) {
-                 if (signupError.code === 'auth/email-already-in-use') {
-                    // This can happen if creation succeeded but sign-in failed before. Just sign in.
-                     await signInWithEmailAndPassword(auth, creds.email, creds.password);
-                 } else {
-                    console.error("Admin creation/login error:", signupError);
-                    toast({ variant: 'destructive', title: 'Admin Setup Failed', description: signupError.message });
-                 }
+            } catch (e: any) {
+                console.error("Admin creation/login error:", e);
+                toast({ variant: 'destructive', title: 'Admin Login Failed', description: e.message });
             }
         } else {
             console.error("Admin Login error:", error);

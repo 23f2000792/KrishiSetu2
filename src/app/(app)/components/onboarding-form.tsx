@@ -36,7 +36,7 @@ const formSchema = z.object({
     return !!data.crop1 || !!data.crop2 || !!data.crop3 || !!data.crop4 || !!data.crop5;
 }, {
     message: 'Please select at least one crop.',
-    path: ['crop1'], // Arbitrarily assign error to the first crop field
+    path: ['crop1'],
 });
 
 export function OnboardingForm({ onFinished }: { onFinished: () => void }) {

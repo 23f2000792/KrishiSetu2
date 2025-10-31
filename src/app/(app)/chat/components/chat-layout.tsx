@@ -228,7 +228,7 @@ export function ChatLayout() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleSend()}
-            placeholder={t('chat.inputPlaceholder')}
+            placeholder={loading ? "Typing..." : t('chat.inputPlaceholder')}
             className="pr-24 h-12 rounded-full"
             disabled={loading}
           />

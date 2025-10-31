@@ -111,8 +111,8 @@ const prompt = ai.definePrompt({
   3.  **Market Analysis:** Based on the region and soil type, identify 3-4 suitable crops. Then, you MUST use the \`getMarketDataForMultipleCrops\` tool to get their recent average market prices to analyze potential profitability.
   4.  **Synthesize & Recommend:**
       *   Weigh all the factors: soil suitability, water requirements vs. rainfall forecast, and market prices/demand.
-      *   Select the **single best crop**.
-      *   Calculate a simple, compelling ROI comparison. For example, if Mustard is better than Wheat, state it like "~24% higher ROI than Wheat."
+      *   Select the **single best crop**. If you cannot determine a clear winner (e.g., market data is unavailable), make a logical recommendation based on soil and weather data alone.
+      *   Calculate a simple, compelling ROI comparison. For example, if Mustard is better than Wheat, state it like "~24% higher ROI than Wheat." If you cannot calculate ROI, provide a qualitative reason for your choice.
       *   Provide a concise justification for your choice, explaining *why* it's the best option based on the data you gathered (soil, weather, market).
 
   **IMPORTANT:** Your entire response must be in the specified language.

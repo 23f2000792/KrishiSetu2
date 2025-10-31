@@ -86,6 +86,16 @@ export default function ScannerPage() {
         setResult(null);
         setError(null);
     }
+    
+    const getScanDate = (scan: ScanResultType) => {
+        if (scan.createdAt && typeof scan.createdAt === 'object' && 'toDate' in scan.createdAt) {
+            // It's a Firestore Timestamp
+            return (scan.createdAt as any).toDate().toLocaleDateString();
+        }
+        // It's a string or something else
+        return new Date(scan.createdAt).toLocaleDateString();
+    }
+
 
     return (
         <div className="pb-16 md:pb-0">
@@ -155,7 +165,7 @@ export default function ScannerPage() {
                                             <div className="flex-grow">
                                                 <p className="font-semibold text-sm">{scan.prediction}</p>
                                                 <p className="text-xs text-muted-foreground">
-                                                     {new Date(scan.createdAt).toLocaleDateString()}
+                                                     {getScanDate(scan)}
                                                 </p>
                                             </div>
                                             <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setResult(scan)}>

@@ -1,3 +1,4 @@
+'use client';
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,11 +22,16 @@ export function PostCard({ post }: PostCardProps) {
   const getRelativeTime = () => {
     if (!post.createdAt) return 'Just now';
     try {
-      const date = post.createdAt.toDate();
-      return formatDistanceToNow(date, { addSuffix: true });
+      // Check if it's a Firestore Timestamp
+      if (typeof post.createdAt === 'object' && 'toDate' in post.createdAt) {
+        const date = (post.createdAt as any).toDate();
+        return formatDistanceToNow(date, { addSuffix: true });
+      }
+      // Fallback for string dates from mock data or other sources
+      return formatDistanceToNow(new Date(post.createdAt as any), { addSuffix: true });
     } catch (e) {
-      // Fallback for string dates from mock data
-      return post.createdAt as unknown as string;
+      // Final fallback if date is invalid
+      return 'a while ago';
     }
   };
 
