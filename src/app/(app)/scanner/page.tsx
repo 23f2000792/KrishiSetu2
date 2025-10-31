@@ -81,10 +81,11 @@ export default function ScannerPage() {
     }
     
     const getScanDate = (scan: ScanResultType) => {
-        if (scan.createdAt && typeof scan.createdAt === 'object' && 'toDate' in scan.createdAt) {
+        if (!scan.createdAt) return '';
+        if (typeof (scan.createdAt as any).toDate === 'function') {
             return (scan.createdAt as any).toDate().toLocaleDateString();
         }
-        return new Date(scan.createdAt as any).toLocaleDateString();
+        return new Date(scan.createdAt).toLocaleDateString();
     }
 
 
