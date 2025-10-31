@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
-import Link from 'next/link';
 
 export function UserNav() {
   const { user, logout } = useAuth();
@@ -53,12 +52,16 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/profile">{t('userNav.profile')}</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings">{t('userNav.settings')}</Link>
-          </DropdownMenuItem>
+          <a href="/profile">
+            <DropdownMenuItem>
+              {t('userNav.profile')}
+            </DropdownMenuItem>
+          </a>
+          <a href="/settings">
+            <DropdownMenuItem>
+              {t('userNav.settings')}
+            </DropdownMenuItem>
+          </a>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
