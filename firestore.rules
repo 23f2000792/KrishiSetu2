@@ -35,7 +35,9 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if isSignedIn();
       allow create: if isOwner(request.resource.data.authorId);
-      allow update: if (isOwner(resource.data.authorId) && request.resource.data.keys().hasAny(['content', 'image', 'upvotes'])) || (isSignedIn() && request.resource.data.keys().hasAll(['comments']));
+      allow update: if 
+        (isOwner(resource.data.authorId) && request.resource.data.keys().hasAny(['content', 'image', 'upvotes'])) ||
+        (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments']));
       allow delete: if isOwner(resource.data.authorId);
     }
     
