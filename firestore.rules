@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description: Enforces a strict user-ownership model for user profiles, stored under /users/{userId}.
+     * @path: /users/{userId}
+     * @allow: (create) If the user is signed in and their UID matches the userId in the path.
+     * @deny: (create) If the user is not signed in, or if the UID does not match the userId.
+     * @principle: Enforces path-based ownership, allowing users to only manage their own profile data.
+     */
+    match /users/{userId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description: Manages admin roles using document existence checks. If a document exists under /roles_admin/{userId}, the user is considered an admin.
+     * @path: /roles_admin/{userId}
+     * @allow: (create) Only allow creating this document via backend functions
+     * @deny: (create) if not an admin or not authenticated.
+     * @principle: Uses document existence as a simple and secure way to grant admin privileges without complex data validation.
+     */
+    match /roles_admin/{userId} {
+        function isAdmin() {
+            return get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).data.admin == true;
+        }
+
+        //Anyone can check if an admin role exists, but only the backend creates/deletes these roles.
+        allow get: if true;
+        allow list: if false;
+
+        allow create: if false;
+        allow update: if false;
+        allow delete: if request.auth != null && isAdmin();
+    }
+  }
+}

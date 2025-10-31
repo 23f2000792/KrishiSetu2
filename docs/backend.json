@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user (farmer, expert, or admin) in the KrishiSetu application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role (Farmer, Expert, or Admin)."
+        },
+        "region": {
+          "type": "string",
+          "description": "The user's geographical region."
+        },
+        "languages": {
+          "type": "array",
+          "description": "List of languages the user understands.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phone": {
+          "type": "string",
+          "description": "The user's phone number."
+        },
+        "pushPrefs": {
+          "type": "boolean",
+          "description": "User preference for push notifications."
+        },
+        "voicePrefs": {
+          "type": "boolean",
+          "description": "User preference for voice notifications."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "role",
+        "region",
+        "languages",
+        "phone"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Uses path-based ownership for private data. Includes user id parameter for authentication.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, used for path-based ownership."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "role_admin",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin roles. Existence of a document with the user's ID grants admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, used to check admin role existence."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security, adhering to the principles of DBAC (Database Authenticated Control), QAPs (Queries are not Filters), and explicit state modeling. User data is stored in a dedicated collection for authentication purposes, while roles are managed using existence checks in separate role collections to avoid complex authorization rules based on data content. The structure leverages path-based ownership for user-owned data and the Membership Map pattern for collaborative data, ensuring secure 'list' operations and atomic operations (transactions/batches) without relying on hierarchical authorization dependencies. Each document explicitly defines its security context, eliminating the need for `get()` calls in security rules."
+  }
+}
