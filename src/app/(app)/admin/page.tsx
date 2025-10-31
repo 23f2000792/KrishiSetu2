@@ -1,6 +1,6 @@
 'use client';
 import { PageHeader } from "@/components/page-header"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/contexts/auth-context"
 import { UserList } from "./components/user-list";
 import { users } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
