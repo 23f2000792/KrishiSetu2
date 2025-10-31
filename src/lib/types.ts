@@ -83,6 +83,7 @@ export type SoilReport = {
     organicAdvice: string;
     warnings: string[];
     explanation: string;
+    efficiencyForecast: string;
   };
 }
 

@@ -37,7 +37,7 @@ export function SidebarNav() {
     { href: '/growth-forecast', label: t('sidebar.growthForecast'), icon: CalendarRange },
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
     { href: '/soil-analyzer', label: t('sidebar.soilAnalyzer'), icon: Leaf },
-    { href: '/post-harvest', label: "Post-Harvest", icon: BarChart },
+    { href: '/yield-analytics', label: "Yield Analytics", icon: BarChart },
     { href: '/community', label: t('sidebar.community'), icon: Users },
     { href: '/profile', label: t('sidebar.profile'), icon: Landmark, gap: true },
     { href: '/settings', label: t('sidebar.settings'), icon: Settings },

@@ -26,7 +26,7 @@ const formSchema = z.object({
     actualYield: z.coerce.number().min(0.1, 'Please enter a valid yield amount.'),
 });
 
-export default function PostHarvestAnalyticsPage() {
+export default function YieldAnalyticsPage() {
     const { t, locale } = useLanguage();
     const { user } = useAuth();
     const { firestore } = useFirebase();
@@ -100,8 +100,8 @@ export default function PostHarvestAnalyticsPage() {
     return (
         <div className="animate-fade-in pb-16 md:pb-0">
             <PageHeader
-                title="Post-Harvest Analytics"
-                description="Analyze your harvest yield and profitability."
+                title="Yield Analytics"
+                description="Analyze your harvest yield against AI predictions."
             />
             <Card className="max-w-2xl mx-auto">
                 <CardHeader>
