@@ -25,22 +25,33 @@ export default function DashboardPage() {
     // AI State
     const [outbreakAlert, setOutbreakAlert] = useState<string | null>(null);
     const [yieldPrediction, setYieldPrediction] = useState<string | null>(null);
+    const [soilFertility, setSoilFertility] = useState<{value: string, details: string} | null>(null);
+
 
     // Loading State
     const [loadingAI, setLoadingAI] = useState(true);
 
     const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>(
-        'soil_reports'
+        'soil_reports', { orderBy: ['uploadedAt', 'desc'], limit: 1 }
     );
 
     const latestSoilReport = useMemo(() => {
         if (!soilReports || soilReports.length === 0) return null;
-        // Sort on the client-side to find the most recent report
-        return [...soilReports].sort((a, b) => b.uploadedAt.toDate().getTime() - a.uploadedAt.toDate().getTime())[0];
+        return soilReports[0];
     }, [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
     const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
+
+    useEffect(() => {
+        if (user && !soilReportsLoading) {
+            setSoilFertility({
+                value: latestSoilReport ? `${latestSoilReport.aiSummary.fertilityIndex}/100` : "N/A",
+                details: latestSoilReport ? latestSoilReport.aiSummary.fertilityStatus : t('dashboard.loading')
+            });
+        }
+    }, [user, soilReportsLoading, latestSoilReport, t]);
+
 
     useEffect(() => {
         const getPredictions = async () => {
@@ -67,7 +78,13 @@ export default function DashboardPage() {
                 ]);
 
                 setOutbreakAlert(outbreakResult.alert);
-                setYieldPrediction(growthResult.finalYieldPrediction.split(':')[1].split(' vs.')[0].trim());
+                if (growthResult?.finalYieldPrediction) {
+                    const predictionText = growthResult.finalYieldPrediction.split(':')[1]?.split(' vs.')[0]?.trim() || "N/A";
+                    setYieldPrediction(predictionText);
+                } else {
+                    setYieldPrediction("N/A");
+                }
+
 
             } catch (error) {
                 console.error("Failed to get dashboard AI predictions:", error);
@@ -88,9 +105,9 @@ export default function DashboardPage() {
     const summaryCards = [
         { 
             title: t('dashboard.soilFertility'), 
-            value: latestSoilReport ? `${latestSoilReport.aiSummary.fertilityIndex}/100` : "N/A", 
+            value: soilFertility?.value ?? "...", 
             icon: Leaf, 
-            details: latestSoilReport ? latestSoilReport.aiSummary.fertilityStatus : (soilReportsLoading ? t('dashboard.loading') : 'No soil report found'),
+            details: soilFertility?.details ?? t('dashboard.loading'),
         },
         { 
             title: t('dashboard.irrigation'), 
