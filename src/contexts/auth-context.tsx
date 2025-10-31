@@ -15,10 +15,11 @@ interface AuthContextType {
   user: User | null;
   authUser: AuthUser | null;
   isAuthenticated: boolean;
-  login: (email: string, role: UserRole) => void;
+  login: (email: string, password: string) => void;
   logout: () => void;
   signup: (name:string, email: string, password: string, role: UserRole) => void;
   loading: boolean;
+  handleDemoLogin: (role: 'Admin') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,31 +61,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [authUser, isUserLoading, fetchUserProfile]);
 
-  const login = async (email: string, role: UserRole) => {
+  const login = async (email: string, password: string) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, demoCredentials.farmer.password);
+      await signInWithEmailAndPassword(auth, email, password);
       // Auth state change will be handled by the onAuthStateChanged listener in useFirebase
-      // which will then trigger the useEffect to fetch the user profile.
-       const userDocRef = doc(firestore, 'users', userCredential.user.uid);
-       const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-            const userData = userDoc.data() as User;
-            if (userData.role === role) {
-                if (role === 'Admin') {
-                    router.push('/admin/dashboard');
-                } else {
-                    router.push('/dashboard');
-                }
-            } else {
-                await signOut(auth);
-                toast({ variant: 'destructive', title: 'Role mismatch', description: 'Please log in with the correct role.' });
-            }
-        }
+      // which will then trigger the useEffect to fetch the user profile and redirect.
     } catch (error: any) {
       console.error("Login error:", error);
       toast({ variant: 'destructive', title: 'Login Failed', description: error.message });
     }
   };
+
+  const handleDemoLogin = async (role: 'Admin') => {
+    const creds = demoCredentials.admin;
+    try {
+        await signInWithEmailAndPassword(auth, creds.email, creds.password);
+    } catch (error: any) {
+         // If admin doesn't exist, create it
+        if (error.code === 'auth/user-not-found') {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, creds.email, creds.password);
+                const firebaseUser = userCredential.user;
+                const adminUser: Omit<User, 'id'> = {
+                    name: 'Admin User',
+                    email: creds.email,
+                    role: 'Admin',
+                    region: 'N/A',
+                    languages: ['English'],
+                    phone: '',
+                    prefs: { push: true, voice: false },
+                    avatar: `https://i.pravatar.cc/150?u=${firebaseUser.uid}`,
+                };
+                await setDoc(doc(firestore, "users", firebaseUser.uid), adminUser);
+            } catch (signupError: any) {
+                console.error("Admin creation error:", signupError);
+                toast({ variant: 'destructive', title: 'Admin Setup Failed', description: signupError.message });
+            }
+        } else {
+            console.error("Admin Login error:", error);
+            toast({ variant: 'destructive', title: 'Admin Login Failed', description: error.message });
+        }
+    }
+  };
+
 
   const signup = async (name: string, email: string, password: string, role: UserRole) => {
     try {
@@ -156,7 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, loading, pathname, router, user]);
 
-  const value = { user, authUser, isAuthenticated, login, logout, signup, loading };
+  const value = { user, authUser, isAuthenticated, login, logout, signup, loading, handleDemoLogin };
 
   if (loading) {
     return (

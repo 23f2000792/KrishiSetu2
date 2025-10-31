@@ -23,11 +23,10 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Github, Languages, Tractor } from 'lucide-react';
+import { Github, Languages, Tractor, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
-import { demoCredentials } from '@/lib/data';
-import { toast } from '@/hooks/use-toast';
+
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -35,7 +34,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, handleDemoLogin } = useAuth();
   const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,20 +46,8 @@ export default function LoginPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // We can't determine role from email/password alone in this demo setup.
-    // The demo buttons are the primary way to log in.
-    // We'll try to log in as a farmer by default if form is used.
-    toast({
-        title: 'Using Demo Login',
-        description: 'For this demo, please use the "Farmer Demo" or "Admin Demo" buttons for specific roles.',
-    });
-    login(values.email, 'Farmer');
+    login(values.email, values.password);
   }
-
-  const handleDemoLogin = (role: 'Farmer' | 'Admin') => {
-    const creds = role === 'Farmer' ? demoCredentials.farmer : demoCredentials.admin;
-    login(creds.email, role);
-  };
 
   return (
     <>
@@ -122,12 +109,9 @@ export default function LoginPage() {
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" onClick={() => handleDemoLogin('Farmer')}>
-                <Tractor className="mr-2" /> {t('login.farmerDemo')}
-            </Button>
+        <div className="grid grid-cols-1 gap-4">
             <Button variant="outline" onClick={() => handleDemoLogin('Admin')}>
-                <Github className="mr-2" /> {t('login.adminDemo')}
+                <ShieldCheck className="mr-2" /> {t('login.adminDemo')}
             </Button>
         </div>
         <Separator />

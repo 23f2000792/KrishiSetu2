@@ -2,13 +2,9 @@ import type { User, MarketPrice, Post, ScanResult, UserRole } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 export const demoCredentials = {
-  farmer: {
-    email: 'farmer@krish-demo.test',
-    password: 'FarmerPass123!',
-  },
   admin: {
     email: 'admin@krish-demo.test',
-    password: 'AdminPass123!',
+    password: 'admin@123',
   },
 };
 

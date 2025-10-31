@@ -31,7 +31,7 @@ export function Hero() {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Button asChild size="lg" className="w-full sm:w-auto transform-gpu transition-transform hover:scale-105 shadow-lg shadow-primary/20">
                 <Link href="/auth/login">
-                  {t('landing.tryDemo')} <ArrowRight className="ml-2" />
+                  {t('header.login')} <ArrowRight className="ml-2" />
                 </Link>
               </Button>
             </div>
