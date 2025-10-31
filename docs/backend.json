@@ -283,6 +283,42 @@
         "analysis",
         "createdAt"
       ]
+    },
+    "ProfitReport": {
+      "title": "Profit Report",
+      "type": "object",
+      "description": "Represents a cost and profitability analysis for a crop season.",
+      "properties": {
+        "userId": { "type": "string" },
+        "crop": { "type": "string" },
+        "farmSize": { "type": "number" },
+        "costs": {
+          "type": "object",
+          "properties": {
+            "seedCost": { "type": "number" },
+            "fertilizerCost": { "type": "number" },
+            "pesticideCost": { "type": "number" },
+            "laborCost": { "type": "number" },
+            "irrigationCost": { "type": "number" },
+            "transportCost": { "type": "number" },
+            "otherCost": { "type": "number" }
+          }
+        },
+        "results": {
+          "type": "object",
+          "properties": {
+            "totalCost": { "type": "number" },
+            "totalRevenue": { "type": "number" },
+            "netProfit": { "type": "number" },
+            "roi": { "type": "number" }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "crop", "costs", "results", "createdAt"]
     }
   },
   "auth": {
@@ -387,6 +423,14 @@
               "description": "The unique identifier for the yield report."
             }
           ]
+        }
+      },
+       {
+        "path": "/profit_reports/{reportId}",
+        "definition": {
+          "entityName": "ProfitReport",
+          "schema": { "$ref": "#/backend/entities/ProfitReport" },
+          "description": "Stores cost and profitability analysis reports for farmers."
         }
       }
     ],

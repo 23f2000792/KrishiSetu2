@@ -14,6 +14,7 @@ import {
   CalendarRange,
   BarChart,
   Book,
+  Wallet,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,7 @@ export function SidebarNav() {
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
     { href: '/soil-analyzer', label: t('sidebar.soilAnalyzer'), icon: Leaf },
     { href: '/yield-analytics', label: "Yield Analytics", icon: BarChart },
+    { href: '/profit-dashboard', label: t('sidebar.profitDashboard'), icon: Wallet },
     { href: '/community', label: t('sidebar.community'), icon: Users },
     { href: '/profile', label: t('sidebar.profile'), icon: Landmark, gap: true },
     { href: '/settings', label: t('sidebar.settings'), icon: Settings },

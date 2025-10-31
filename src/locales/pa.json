@@ -21,6 +21,7 @@
     "cropScanner": "ਫਸਲ ਸਕੈਨਰ",
     "soilAnalyzer": "ਮਿੱਟੀ ਵਿਸ਼ਲੇਸ਼ਕ",
     "yieldAnalytics": "ਉਪਜ ਵਿਸ਼ਲੇਸ਼ਣ",
+    "profitDashboard": "ਮੁਨਾਫਾ ਡੈਸ਼ਬੋਰਡ",
     "community": "ਭਾਈਚਾਰਾ",
     "profile": "ਪ੍ਰੋਫਾਈਲ",
     "settings": "ਸੈਟਿੰਗਾਂ",
@@ -35,7 +36,8 @@
     "soil": "ਮਿੱਟੀ",
     "market": "ਬਾਜ਼ਾਰ",
     "community": "ਭਾਈਚਾਰਾ",
-    "planner": "ਯੋਜਨਾਕਾਰ"
+    "planner": "ਯੋਜਨਾਕਾਰ",
+    "profit": "ਮੁਨਾਫਾ"
   },
   "landing": {
     "heroTitle": "ਚੁਸਤ ਖੇਤੀ,\nਰੌਸ਼ਨ ਭਵਿੱਖ",

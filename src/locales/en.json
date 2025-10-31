@@ -21,6 +21,7 @@
     "cropScanner": "Crop Scanner",
     "soilAnalyzer": "Soil Analyzer",
     "yieldAnalytics": "Yield Analytics",
+    "profitDashboard": "Profit Dashboard",
     "community": "Community",
     "profile": "Profile",
     "settings": "Settings",
@@ -35,7 +36,8 @@
     "soil": "Soil",
     "market": "Market",
     "community": "Community",
-    "planner": "Planner"
+    "planner": "Planner",
+    "profit": "Profit"
   },
   "landing": {
     "heroTitle": "Smarter Farming,\nBrighter Future",
@@ -101,7 +103,7 @@
     "wheatPrice": "Wheat price",
     "aiAdvisory": "AI Advisory",
     "copilotSuggestion": "Copilot suggestion",
-    "marketChartTitle": "Mandi Price Trends & Forecasts",
+    "marketChartTitle": "Mandi Price Trends &amp; Forecasts",
     "marketChartDescription": "Price trends for key crops in your region (₹ per quintal)",
     "quickActionsTitle": "Quick Actions",
     "quickActionsDescription": "Jump right into what you need.",

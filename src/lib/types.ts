@@ -92,3 +92,26 @@ export type YieldReport = {
   analysis: string;
   createdAt: Timestamp;
 };
+
+export type ProfitReport = {
+  id: string;
+  userId: string;
+  crop: string;
+  farmSize: number;
+  costs: {
+    seedCost: number;
+    fertilizerCost: number;
+    pesticideCost: number;
+    laborCost: number;
+    irrigationCost: number;
+    transportCost: number;
+    otherCost: number;
+  };
+  results: {
+    totalCost: number;
+    totalRevenue: number;
+    netProfit: number;
+    roi: number;
+  };
+  createdAt: Timestamp;
+};
