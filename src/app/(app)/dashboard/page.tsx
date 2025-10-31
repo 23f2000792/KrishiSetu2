@@ -36,12 +36,7 @@ export default function DashboardPage() {
     const latestSoilReport = useMemo(() => {
         if (!soilReports || soilReports.length === 0) return null;
         // Sort on the client-side to find the most recent report
-        const sortedReports = [...soilReports].sort((a, b) => {
-            const dateA = a.uploadedAt?.toDate()?.getTime() || 0;
-            const dateB = b.uploadedAt?.toDate()?.getTime() || 0;
-            return dateB - dateA;
-        });
-        return sortedReports[0];
+        return [...soilReports].sort((a, b) => b.uploadedAt.toDate().getTime() - a.uploadedAt.toDate().getTime())[0];
     }, [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
@@ -58,12 +53,12 @@ export default function DashboardPage() {
 
 
     useEffect(() => {
-        const getPredictions = async () => {
-            if (!user?.farmSize) {
-                setLoadingAI(false);
-                return;
-            };
+        if (!user?.farmSize || soilReportsLoading) {
+            setLoadingAI(false);
+            return;
+        }
 
+        const getPredictions = async () => {
             setLoadingAI(true);
             
             try {
@@ -95,9 +90,7 @@ export default function DashboardPage() {
             }
         };
         
-        if (user && !soilReportsLoading) {
-          getPredictions();
-        }
+        getPredictions();
     }, [user, locale, t, primaryCrop, latestSoilReport, soilReportsLoading]);
 
     const isLoading = loadingAI || soilReportsLoading;

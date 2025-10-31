@@ -15,6 +15,7 @@ import {getFarmerKnowledgeGraph} from '@/services/knowledge-service';
 import { getInitializedFirebaseAdmin } from '@/firebase/admin';
 import { analyzeSoilCard } from './soil-card-analyzer';
 import { analyzeProfitability } from './profit-analyst-flow';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const KrishiAiAgriAdvisoryInputSchema = z.object({
   query: z
@@ -117,6 +118,7 @@ const financeAgent = ai.defineTool({
 
 const prompt = ai.definePrompt({
   name: 'krishiAiAgriAdvisoryPrompt',
+  model: googleAI.model('gemini-1.5-flash-latest'),
   input: {schema: KrishiAiAgriAdvisoryInputSchema},
   output: {schema: KrishiAiAgriAdvisoryOutputSchema},
   tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, financeAgent],
