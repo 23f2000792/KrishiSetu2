@@ -25,7 +25,7 @@ type Message = {
 
 export function ChatLayout() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,10 +33,16 @@ export function ChatLayout() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
+  const languageMap = {
+    en: 'English',
+    hi: 'Hindi',
+    pa: 'Punjabi',
+  };
+
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
-        const result = await suggestQuickPrompts();
+        const result = await suggestQuickPrompts({ language: languageMap[locale] });
         setQuickPrompts(result.prompts);
       } catch (error) {
         console.error("Failed to fetch quick prompts", error);
@@ -48,7 +54,7 @@ export function ChatLayout() {
       }
     };
     fetchPrompts();
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     const initialPrompt = searchParams.get('prompt');
@@ -81,7 +87,7 @@ export function ChatLayout() {
     setLoading(true);
 
     try {
-      const result = await aiCopilotAgriAdvisory({ query: textToSend });
+      const result = await aiCopilotAgriAdvisory({ query: textToSend, language: languageMap[locale] });
       const aiMessage: Message = { id: (Date.now() + 1).toString(), text: result.advice, isUser: false };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {

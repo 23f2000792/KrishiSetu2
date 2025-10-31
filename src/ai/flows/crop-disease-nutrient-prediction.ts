@@ -18,6 +18,7 @@ const CropDiseaseNutrientPredictionInputSchema = z.object({
     .describe(
       "A photo of a crop, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+    language: z.string().describe('The language for the response (e.g., "English", "Hindi", "Punjabi").'),
 });
 export type CropDiseaseNutrientPredictionInput = z.infer<
   typeof CropDiseaseNutrientPredictionInputSchema
@@ -46,10 +47,12 @@ const cropDiseaseNutrientPredictionPrompt = ai.definePrompt({
   prompt: `You are an expert in plant pathology and nutrient deficiencies for Indian agriculture.
 
   Analyze the provided image of a crop and provide a prediction of potential diseases or nutrient deficiencies.
+  Your entire response (prediction title and recommended steps) MUST be in the specified language.
   Your prediction should be a short, clear title (max 3 words), like "Wheat Leaf Rust" or "Nitrogen Deficiency". If the plant is healthy, predict "Healthy Crop".
   Provide a confidence level for your prediction (from 0.0 to 1.0).
   Also, provide a concise, actionable paragraph of recommended steps to address the issue. Start with the most important action. The recommendations should be practical for a small to medium-scale farmer in India.
 
+  Language for response: {{{language}}}
   Image: {{media url=photoDataUri}}
   `,
 });

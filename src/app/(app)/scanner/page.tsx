@@ -21,7 +21,13 @@ export default function ScannerPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const { t } = useLanguage();
+    const { t, locale } = useLanguage();
+
+    const languageMap = {
+      en: 'English',
+      hi: 'Hindi',
+      pa: 'Punjabi',
+    };
 
     const toDataURL = (file: File): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -39,7 +45,7 @@ export default function ScannerPage() {
 
         try {
             const dataUri = typeof data === 'string' ? data : await toDataURL(data);
-            const aiResult = await diagnoseCrop({ photoDataUri: dataUri });
+            const aiResult = await diagnoseCrop({ photoDataUri: dataUri, language: languageMap[locale] });
             setResult({
                 id: `scan-${Date.now()}`,
                 imageUrl: dataUri,
