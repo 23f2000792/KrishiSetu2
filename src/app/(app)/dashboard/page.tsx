@@ -1,22 +1,46 @@
 'use client';
 import { PageHeader } from "@/components/page-header"
-import { Bot, Droplets, Leaf, LineChart, MessageSquare, ShoppingCart, Tractor } from "lucide-react";
+import { Bot, Droplets, Leaf, LineChart, Bug, ShoppingCart, Tractor } from "lucide-react";
 import SummaryCard from "./components/summary-card";
 import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
 import { GrowthTimeline } from "./components/growth-timeline";
+import { diseaseOutbreakPredictionFlow } from "@/ai/flows/disease-outbreak-prediction";
+import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
-    const { t } = useLanguage();
+    const { t, locale } = useLanguage();
     const { user } = useAuth();
+    const [outbreakAlert, setOutbreakAlert] = useState<string | null>(null);
+
+    const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
+
+    useEffect(() => {
+        const getOutbreakPrediction = async () => {
+            if (!user) return;
+            try {
+                const result = await diseaseOutbreakPredictionFlow({
+                    crop: 'Wheat', // This would be dynamic in a real app
+                    region: user.region,
+                    language: languageMap[locale],
+                });
+                setOutbreakAlert(result.alert);
+            } catch (error) {
+                console.error("Failed to get outbreak prediction:", error);
+                setOutbreakAlert(t('dashboard.outbreakError'));
+            }
+        };
+        getOutbreakPrediction();
+    }, [user, locale, t]);
+
 
     const summaryCards = [
         { title: t('dashboard.soilFertility'), value: "82/100", icon: Leaf, details: t('dashboard.healthy'), trend: "up" as const, change: "+5%" },
         { title: t('dashboard.irrigation'), value: "In 2 days", icon: Droplets, details: t('dashboard.soilMoisture') },
         { title: t('dashboard.mandiForecast'), value: "+4.3%", icon: LineChart, details: t('dashboard.wheatPrice'), trend: "up" as const },
-        { title: t('dashboard.aiAdvisory'), value: "Apply NPK", icon: Bot, details: t('dashboard.copilotSuggestion') },
+        { title: t('dashboard.outbreakAlert'), value: "High Risk", icon: Bug, details: outbreakAlert || "Loading..." },
     ];
     
     return (

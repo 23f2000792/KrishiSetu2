@@ -105,7 +105,9 @@
     "analyzeSoil": "Analyze Soil Card",
     "analyzeSoilDesc": "Get detailed soil insights.",
     "askCopilot": "Ask AI Copilot",
-    "askCopilotDesc": "Get expert advice anytime."
+    "askCopilotDesc": "Get expert advice anytime.",
+    "outbreakAlert": "Outbreak Alert",
+    "outbreakError": "Could not fetch alert."
   },
   "chat": {
     "title": "AI Copilot",
