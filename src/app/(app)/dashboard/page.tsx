@@ -31,13 +31,17 @@ export default function DashboardPage() {
     // Loading State
     const [loadingAI, setLoadingAI] = useState(true);
 
-    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>(
-        'soil_reports', { orderBy: ['uploadedAt', 'desc'], limit: 1 }
-    );
+    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports');
 
     const latestSoilReport = useMemo(() => {
         if (!soilReports || soilReports.length === 0) return null;
-        return soilReports[0];
+        // Sort on the client-side to find the most recent report
+        const sortedReports = [...soilReports].sort((a, b) => {
+            const dateA = a.uploadedAt?.toDate()?.getTime() || 0;
+            const dateB = b.uploadedAt?.toDate()?.getTime() || 0;
+            return dateB - dateA;
+        });
+        return sortedReports[0];
     }, [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
