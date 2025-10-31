@@ -8,6 +8,8 @@ import {
   type DocumentData,
   type QueryConstraint,
   type OrderByDirection,
+  orderBy,
+  limit,
 } from 'firebase/firestore';
 import { useCollection, type UseCollectionResult } from './use-collection';
 import { useAuth } from '@/contexts/auth-context';
@@ -49,10 +51,10 @@ export function useUserCollection<T>(
 
     const constraints: QueryConstraint[] = [where('userId', '==', user.id)];
     if (options?.orderBy) {
-      constraints.push(firestoreQuery.prototype.orderBy.apply(firestoreQuery, options.orderBy));
+      constraints.push(orderBy(...options.orderBy));
     }
     if (options?.limit) {
-      constraints.push(firestoreQuery.prototype.limit.apply(firestoreQuery, [options.limit]));
+      constraints.push(limit(options.limit));
     }
     
     return firestoreQuery(
