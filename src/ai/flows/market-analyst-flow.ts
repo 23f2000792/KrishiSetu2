@@ -20,6 +20,7 @@ const MarketAnalysisInputSchema = z.object({
 export type MarketAnalysisInput = z.infer<typeof MarketAnalysisInputSchema>;
 
 const MarketAnalysisOutputSchema = z.object({
+    latestPrice: z.number().describe("The most recent price for the crop in the specified region."),
     summary: z.string().describe("A 2-3 sentence expert summary of the current market situation and near-term outlook."),
     forecast: z.string().describe("A 7-day price forecast (e.g., 'Prices are expected to rise by 2-4%')."),
     risks: z.string().describe("Potential risks that could affect the price (e.g., 'High arrivals may suppress prices')."),
@@ -40,6 +41,7 @@ const getMarketDataTool = ai.defineTool(
             region: z.string().describe('The region (city or state) to get the market price from.'),
         }),
         outputSchema: z.object({
+            latestPrice: z.number().optional(),
             historicalPrices: z.array(z.object({ date: z.string(), price: z.number() })).describe("A list of prices for the last 30 days."),
         }),
     },
@@ -48,7 +50,7 @@ const getMarketDataTool = ai.defineTool(
         if (!data) {
             return { historicalPrices: [] };
         }
-        return { historicalPrices: data.prices };
+        return { latestPrice: data.latestPrice, historicalPrices: data.prices };
     }
 );
 
@@ -58,7 +60,10 @@ const prompt = ai.definePrompt({
     crop: z.string(),
     region: z.string(),
     language: z.string(),
-    historicalPrices: z.array(z.object({ date: z.string(), price: z.number() })),
+    marketData: z.object({
+        latestPrice: z.number().optional(),
+        historicalPrices: z.array(z.object({ date: z.string(), price: z.number() })),
+    }),
   }) },
   output: { schema: MarketAnalysisOutputSchema },
   prompt: `You are an expert agricultural market analyst for the Indian market. Your task is to analyze historical price data for a crop and provide a concise, actionable report for a farmer.
@@ -68,17 +73,18 @@ const prompt = ai.definePrompt({
   **Market Data for Analysis:**
   - Crop: {{{crop}}}
   - Region: {{{region}}}
+  - Latest Price: ₹{{marketData.latestPrice}} per quintal
   - Historical Prices (last 30 days):
-    {{#each historicalPrices}}
+    {{#each marketData.historicalPrices}}
     - {{date}}: ₹{{price}} per quintal
     {{/each}}
 
   **Your Task:**
-
-  1.  **Write a Summary:** Provide a 2-3 sentence expert summary of the current market situation based on the price trend. Mention if the market is stable, volatile, rising, or falling.
-  2.  **Create a 7-Day Forecast:** Based on the historical trend, provide a simple 7-day price forecast (e.g., "Prices are expected to rise slightly by 2-4%," "Market likely to remain stable with minor fluctuations," "Potential for a 3-5% drop due to recent high arrivals").
-  3.  **Identify Risks:** What are the immediate risks that could negatively impact the price? (e.g., "New government import policies," "High arrivals from other states," "Lower demand due to weather").
-  4.  **Identify Opportunities:** What are the potential opportunities for the farmer? (e.g., "Upcoming festival may boost demand," "Consider storing for a week as prices are trending up," "Good export demand reported").
+  1.  **Set Latest Price:** Directly use the provided \`latestPrice\` for the output.
+  2.  **Write a Summary:** Provide a 2-3 sentence expert summary of the current market situation based on the price trend. Mention if the market is stable, volatile, rising, or falling.
+  3.  **Create a 7-Day Forecast:** Based on the historical trend, provide a simple 7-day price forecast (e.g., "Prices are expected to rise slightly by 2-4%," "Market likely to remain stable with minor fluctuations," "Potential for a 3-5% drop due to recent high arrivals").
+  4.  **Identify Risks:** What are the immediate risks that could negatively impact the price? (e.g., "New government import policies," "High arrivals from other states," "Lower demand due to weather").
+  5.  **Identify Opportunities:** What are the potential opportunities for the farmer? (e.g., "Upcoming festival may boost demand," "Consider storing for a week as prices are trending up," "Good export demand reported").
 
   Language for response: {{{language}}}
   `,
@@ -95,7 +101,7 @@ const marketAnalysisFlow = ai.defineFlow(
 
     const { output } = await prompt({
         ...input,
-        historicalPrices: marketData.historicalPrices,
+        marketData,
     });
     return output!;
   }

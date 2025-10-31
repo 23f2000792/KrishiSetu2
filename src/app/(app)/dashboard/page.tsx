@@ -25,6 +25,8 @@ export default function DashboardPage() {
     const [outbreakAlert, setOutbreakAlert] = useState<string | null>(null);
     const [yieldPrediction, setYieldPrediction] = useState<string | null>(null);
     const [marketForecast, setMarketForecast] = useState<{ value: string, trend: 'up' | 'down' } | null>(null);
+    const [latestPrice, setLatestPrice] = useState<number | null>(null);
+
 
     // Loading State
     const [loadingAI, setLoadingAI] = useState(true);
@@ -67,6 +69,7 @@ export default function DashboardPage() {
 
                 setOutbreakAlert(outbreakResult.alert);
                 setYieldPrediction(growthResult.finalYieldPrediction.split(':')[1].split(' vs.')[0].trim());
+                setLatestPrice(marketResult.latestPrice);
                 
                 const forecastMatch = marketResult.forecast.match(/(-?\d+(\.\d+)?%)/);
                 if (forecastMatch) {
@@ -107,10 +110,11 @@ export default function DashboardPage() {
         },
         { 
             title: t('dashboard.mandiForecast'), 
-            value: marketForecast?.value || "...", 
+            value: latestPrice ? `₹${latestPrice.toLocaleString()}` : "...", 
             icon: LineChart, 
             details: `${primaryCrop} price`, 
-            trend: marketForecast?.trend
+            trend: marketForecast?.trend,
+            change: marketForecast?.value
         },
         { 
             title: t('dashboard.outbreakAlert'), 
