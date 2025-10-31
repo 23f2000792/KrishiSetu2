@@ -9,9 +9,9 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { getFirestore } from 'firebase-admin/firestore';
 import { getFarmerKnowledgeGraph } from '@/services/knowledge-service';
 import { getMarketData } from '@/services/market-service';
+import { getInitializedFirebaseAdmin } from '@/firebase/admin';
 
 const CropPlannerInputSchema = z.object({
   userId: z.string().describe('The unique ID of the farmer.'),
@@ -91,7 +91,7 @@ const getFarmerHistoryTool = ai.defineTool(
     }),
   },
   async ({ userId }) => {
-    const firestore = getFirestore();
+    const { firestore } = getInitializedFirebaseAdmin();
     const data = await getFarmerKnowledgeGraph(firestore, userId);
     return { soilReports: data.soilReports };
   }

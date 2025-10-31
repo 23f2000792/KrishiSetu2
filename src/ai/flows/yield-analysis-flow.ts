@@ -9,8 +9,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { getFirestore } from 'firebase-admin/firestore';
 import { getFarmerKnowledgeGraph } from '@/services/knowledge-service';
+import { getInitializedFirebaseAdmin } from '@/firebase/admin';
 
 const YieldAnalysisInputSchema = z.object({
   crop: z.string().describe('The crop being analyzed.'),
@@ -46,7 +46,7 @@ const getFarmerHistoryTool = ai.defineTool(
     }),
   },
   async ({ userId }) => {
-    const firestore = getFirestore();
+    const { firestore } = getInitializedFirebaseAdmin();
     return await getFarmerKnowledgeGraph(firestore, userId);
   }
 );

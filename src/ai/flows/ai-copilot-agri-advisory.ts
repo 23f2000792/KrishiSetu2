@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {getMarketData} from '@/services/market-service';
 import {getFarmerKnowledgeGraph} from '@/services/knowledge-service';
-import {getFirestore} from 'firebase-admin/firestore';
+import { getInitializedFirebaseAdmin } from '@/firebase/admin';
 
 const AiCopilotAgriAdvisoryInputSchema = z.object({
   query: z
@@ -59,7 +59,7 @@ const getFarmerHistoryTool = ai.defineTool(
   async ({ userId }) => {
     // Note: Genkit flows run in a server environment where the Admin SDK is available.
     // This is an exception to the "client-side only" rule for UI components.
-    const firestore = getFirestore();
+    const { firestore } = getInitializedFirebaseAdmin();
     return await getFarmerKnowledgeGraph(firestore, userId);
   }
 );
