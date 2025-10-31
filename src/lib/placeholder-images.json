@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "Farmer in a field",
-      "imageUrl": "https://images.unsplash.com/photo-1564071074086-4d0aac31eb4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZmFybWVyJTIwZmllbGR8ZW58MHx8fHwxNzYxODQ0ODk4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "farmer field"
+      "description": "Farmer smiling in a lush green field with crops",
+      "imageUrl": "https://images.unsplash.com/photo-1625246333195-78d9c3874449?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzbWlsaW5nJTIwZmFybWVyfGVufDB8fHx8MTc2NTU5NDQ0NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smiling farmer"
     },
     {
       "id": "avatar1",
@@ -74,21 +74,21 @@
     },
     {
       "id": "feature_copilot",
-      "description": "AI Copilot feature image",
-      "imageUrl": "https://images.unsplash.com/photo-1640884625898-d113eaa279f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyb2JvdCUyMGZhcm18ZW58MHx8fHwxNzYxODg3NDQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "robot farm"
+      "description": "Farmer using a tablet in a field, representing AI assistance.",
+      "imageUrl": "https://images.unsplash.com/photo-1620714223084-86c9df355950?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmYXJtZXIlMjB0YWJsZXR8ZW58MHx8fHwxNzY1NTk0NzkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer tablet"
     },
     {
       "id": "feature_market",
-      "description": "Market predictor feature image",
-      "imageUrl": "https://images.unsplash.com/photo-1639825752750-5061ded5503b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtYXJrZXQlMjBjaGFydHxlbnwwfHx8fDE3NjE4ODc0NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "Digital chart showing upward market trends.",
+      "imageUrl": "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYXJrZXQlMjBjaGFydHxlbnwwfHx8fDE3NjU1OTQ4MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "market chart"
     },
     {
       "id": "feature_scanner",
-      "description": "Leaf scanner feature image",
-      "imageUrl": "https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWduaWZ5aW5nJTIwZ2xhc3N8ZW58MHx8fHwxNzYxODYxOTQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "magnifying glass"
+      "description": "Close-up of a person's hand holding a smartphone, scanning a plant leaf.",
+      "imageUrl": "https://images.unsplash.com/photo-1615897571369-14a51139415a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb2JpbGUlMjBzY2FufGVufDB8fHx8MTc2NTU5NDg1OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mobile scan"
     }
   ]
 }
