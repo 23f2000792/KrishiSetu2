@@ -35,8 +35,10 @@ export default function ScannerPage() {
     const { data: pastScans, isLoading: scansLoading } = useUserCollection<ScanResultType>(
         'scans',
         query,
-        orderBy('createdAt', 'desc'),
-        limit(10)
+        orderBy,
+        ['createdAt', 'desc'],
+        limit,
+        10
     );
 
     const toDataURL = (file: File): Promise<string> =>

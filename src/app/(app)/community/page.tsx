@@ -11,14 +11,14 @@ import { useCollection } from "@/firebase/firestore/use-collection";
 import { useFirebase } from "@/firebase/provider";
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { Post } from "@/lib/types";
-import { useMemo } from "react";
+import { useMemoFirebase } from "@/firebase";
 
 export default function CommunityPage() {
     const [open, setOpen] = useState(false);
     const { t } = useLanguage();
     const { firestore } = useFirebase();
 
-    const postsQuery = useMemo(() => {
+    const postsQuery = useMemoFirebase(() => {
       if (!firestore) return null;
       return query(collection(firestore, 'posts'), orderBy('createdAt', 'desc'));
     }, [firestore]);
