@@ -1,3 +1,4 @@
+
 {
   "header": {
     "login": "Login",
@@ -20,8 +21,7 @@
     "growthForecast": "Growth Forecast",
     "cropScanner": "Crop Scanner",
     "soilAnalyzer": "Soil Analyzer",
-    "yieldAnalytics": "Yield Analytics",
-    "profitDashboard": "Profit Dashboard",
+    "postHarvest": "Post-Harvest",
     "community": "Community",
     "profile": "Profile",
     "settings": "Settings",

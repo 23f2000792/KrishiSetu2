@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -36,8 +37,7 @@ export function SidebarNav() {
     { href: '/crop-planner', label: 'Crop Planner', icon: Book },
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
     { href: '/soil-analyzer', label: t('sidebar.soilAnalyzer'), icon: Leaf },
-    { href: '/yield-analytics', label: "Yield Analytics", icon: BarChart },
-    { href: '/profit-dashboard', label: t('sidebar.profitDashboard'), icon: Wallet },
+    { href: '/post-harvest', label: "Post-Harvest", icon: BarChart },
     { href: '/community', label: t('sidebar.community'), icon: Users },
     { href: '/profile', label: t('sidebar.profile'), icon: Landmark, gap: true },
     { href: '/settings', label: t('sidebar.settings'), icon: Settings },
