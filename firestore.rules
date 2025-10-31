@@ -8,14 +8,12 @@ service cloud.firestore {
     }
 
     // Helper function to check if the user is the owner of a document
-    // For read/delete, checks the existing document on the server
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
     
     // Helper function to check if the user has an admin role
     function isAdmin() {
-      // In a real app, this might be a custom claim. For this demo, we check for a doc in a specific collection.
       return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
@@ -33,23 +31,32 @@ service cloud.firestore {
     // Any authenticated user can create posts. Posts are publicly readable.
     // Only the author of a post can update or delete it.
     match /posts/{postId} {
-      // Anyone can read posts. Only signed-in users can create them.
       allow read, create: if isSignedIn();
-      // Only the original author can update or delete their post.
       allow update, delete: if isOwner(resource.data.authorId);
     }
     
-    // Generic rules for user-owned collections (soil_reports, scans, yield_reports, profit_reports)
-    match /{collection}/{docId} 
-      where collection in ['soil_reports', 'scans', 'yield_reports', 'profit_reports'] {
-      
-      // READ: A user can get a single document if they are the owner.
-      // A user can LIST documents only if their query is filtered by their own userId.
+    // Rules for user-owned collections
+    match /soil_reports/{reportId} {
       allow get: if isOwner(resource.data.userId);
       allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
-      
-      // WRITE: A user can create, update, or delete a document if they are the owner.
-      // For create/update, we check the incoming data. For delete, there's no incoming data so it's implicitly allowed if they could 'get' it.
+      allow write: if isOwner(request.resource.data.userId);
+    }
+
+    match /scans/{scanId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
+      allow write: if isOwner(request.resource.data.userId);
+    }
+
+    match /yield_reports/{reportId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
+      allow write: if isOwner(request.resource.data.userId);
+    }
+
+    match /profit_reports/{reportId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
       allow write: if isOwner(request.resource.data.userId);
     }
   }
