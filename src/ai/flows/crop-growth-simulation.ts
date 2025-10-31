@@ -39,7 +39,13 @@ export async function simulateCropGrowth(input: CropGrowthSimulationInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'cropGrowthSimulationPrompt',
-  input: { schema: CropGrowthSimulationInputSchema },
+  input: { schema: z.object({
+    crop: z.string(),
+    region: z.string(),
+    language: z.string(),
+    soilReportJson: z.string(),
+    previousYield: z.number().optional(),
+  }) },
   output: { schema: CropGrowthSimulationOutputSchema },
   prompt: `You are an expert agronomist and crop modeling AI. Your task is to generate a plausible 30-day (4-week) growth simulation for a farmer's crop.
 
@@ -58,7 +64,7 @@ const prompt = ai.definePrompt({
   - Crop: {{{crop}}}
   - Region: {{{region}}}
   - Language for response: {{{language}}}
-  - Latest Soil Report: {{jsonStringify soilReport}}
+  - Latest Soil Report: {{{soilReportJson}}}
   - Previous Season's Yield: {{{previousYield}}} quintals/acre
 
   Generate the 4-week timeline now.
@@ -72,7 +78,10 @@ const cropGrowthSimulationFlow = ai.defineFlow(
     outputSchema: CropGrowthSimulationOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    const { output } = await prompt({
+        ...input,
+        soilReportJson: JSON.stringify(input.soilReport || {}, null, 2),
+    });
     return output!;
   }
 );
