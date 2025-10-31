@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { FileUploader } from "./components/file-uploader";
 import { ScanResult as ScanResultType } from "@/lib/types";
@@ -14,7 +14,7 @@ import { AlertCircle, Eye, Loader2 } from "lucide-react";
 import { CameraView } from "./components/camera-view";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
-import { useFirebase } from "@/firebase";
+import { useFirebase, useMemoFirebase } from "@/firebase";
 import { useCollection } from "@/firebase/firestore/use-collection";
 import { collection, query, where, orderBy, limit } from "firebase/firestore";
 import Image from "next/image";
@@ -34,7 +34,7 @@ export default function ScannerPage() {
       pa: 'Punjabi',
     };
 
-    const pastScansQuery = useMemo(() => {
+    const pastScansQuery = useMemoFirebase(() => {
       if (!firestore || !user) return null;
       return query(
         collection(firestore, 'scans'),
