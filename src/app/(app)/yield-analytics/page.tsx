@@ -37,7 +37,7 @@ export default function YieldAnalyticsPage() {
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: { crop: user?.crops?.[0] || '' },
+        defaultValues: { crop: user?.crops?.[0] || '', totalYield: 0 },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
