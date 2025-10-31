@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
-import { useFirebase } from '@/firebase';
+import { useFirebase, useMemoFirebase } from '@/firebase';
 import { collection, addDoc, serverTimestamp, Timestamp, query, orderBy } from 'firebase/firestore';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import { Loader2, Send } from 'lucide-react';
 import type { Comment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useCollection } from '@/firebase/firestore/use-collection';
-import { useMemoFirebase } from '@/firebase';
+import { errorEmitter, FirestorePermissionError } from '@/firebase';
 
 const commentSchema = z.object({
   comment: z.string().min(1, 'Comment cannot be empty.'),
@@ -74,19 +74,21 @@ export function CommentThread({ postId }: CommentThreadProps) {
       createdAt: serverTimestamp(),
     };
 
-    try {
-        await addDoc(commentsColRef, newComment);
+    addDoc(commentsColRef, newComment)
+      .then(() => {
         form.reset();
-    } catch (error) {
-        console.error("Error creating comment:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Could not post comment. Please check your permissions and try again."
+      })
+      .catch((error) => {
+        const permissionError = new FirestorePermissionError({
+          path: commentsColRef.path,
+          operation: 'create',
+          requestResourceData: newComment,
         });
-    } finally {
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
         setIsSubmitting(false);
-    }
+      });
   }
 
   return (
