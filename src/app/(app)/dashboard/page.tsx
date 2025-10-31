@@ -111,7 +111,7 @@ export default function DashboardPage() {
                             </CardContent>
                         </Card>
                     </Link>
-                    <MarketChart />
+                    <MarketChart crops={user?.crops} />
                 </div>
                 <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
                      <div className="space-y-8">

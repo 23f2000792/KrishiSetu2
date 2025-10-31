@@ -11,36 +11,49 @@ import { marketPrices } from "@/lib/data";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from "@/contexts/language-context";
+import { useMemo } from "react";
 
-const chartData = marketPrices.reduce((acc, crop) => {
-    crop.prices.forEach(pricePoint => {
-        let entry = acc.find(item => item.date === pricePoint.date);
-        if (!entry) {
-            entry = { date: pricePoint.date };
-            acc.push(entry);
-        }
-        (entry as any)[crop.crop] = pricePoint.price;
-    });
-    return acc;
-}, [] as any[]);
+const availableChartColors = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+];
 
-const chartConfig = {
-  'Wheat': {
-    label: 'Wheat',
-    color: 'hsl(var(--chart-1))',
-  },
-  'Rice (Basmati)': {
-    label: 'Rice (Basmati)',
-    color: 'hsl(var(--chart-2))',
-  },
-  'Cotton': {
-    label: 'Cotton',
-    color: 'hsl(var(--chart-3))',
-  },
-} satisfies ChartConfig;
-
-export function MarketChart() {
+export function MarketChart({ crops }: { crops?: string[] }) {
   const { t } = useLanguage();
+
+  const { chartData, chartConfig, enabledCrops } = useMemo(() => {
+    const enabledCrops = crops && crops.length > 0
+        ? marketPrices.filter(mp => crops.includes(mp.crop))
+        : marketPrices.slice(0, 2); // Default to first 2 if no crops are selected
+
+    const chartConfig: ChartConfig = {};
+    enabledCrops.forEach((crop, index) => {
+        chartConfig[crop.crop] = {
+            label: crop.crop,
+            color: availableChartColors[index % availableChartColors.length],
+        };
+    });
+
+    const chartData = enabledCrops.reduce((acc, crop) => {
+        crop.prices.forEach(pricePoint => {
+            let entry = acc.find(item => item.date === pricePoint.date);
+            if (!entry) {
+                entry = { date: pricePoint.date };
+                acc.push(entry);
+            }
+            (entry as any)[crop.crop] = pricePoint.price;
+        });
+        return acc;
+    }, [] as any[]);
+
+    chartData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return { chartData, chartConfig, enabledCrops };
+  }, [crops]);
+
   return (
     <Card className="transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
@@ -54,14 +67,12 @@ export function MarketChart() {
                 margin={{ top: 5, right: 10, left: -10, bottom: 0 }}
             >
                 <defs>
-                    <linearGradient id="colorWheat" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--color-Wheat)" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="var(--color-Wheat)" stopOpacity={0.1}/>
+                   {enabledCrops.map(crop => (
+                     <linearGradient key={crop.crop} id={`color${crop.crop.replace(/[^a-zA-Z0-9]/g, '')}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={`var(--color-${crop.crop})`} stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor={`var(--color-${crop.crop})`} stopOpacity={0.1}/>
                     </linearGradient>
-                    <linearGradient id="colorCotton" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--color-Cotton)" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="var(--color-Cotton)" stopOpacity={0.1}/>
-                    </linearGradient>
+                   ))}
                 </defs>
                 <CartesianGrid vertical={false} />
                 <XAxis 
@@ -82,8 +93,17 @@ export function MarketChart() {
                     content={<ChartTooltipContent indicator="dot" />}
                 />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Area dataKey="Wheat" type="monotone" stroke="var(--color-Wheat)" fill="url(#colorWheat)" strokeWidth={2} dot={false} />
-                <Area dataKey="Cotton" type="monotone" stroke="var(--color-Cotton)" fill="url(#colorCotton)" strokeWidth={2} dot={false} />
+                {enabledCrops.map(crop => (
+                    <Area 
+                        key={crop.crop} 
+                        dataKey={crop.crop} 
+                        type="monotone" 
+                        stroke={`var(--color-${crop.crop})`} 
+                        fill={`url(#color${crop.crop.replace(/[^a-zA-Z0-9]/g, '')})`} 
+                        strokeWidth={2} 
+                        dot={false}
+                    />
+                ))}
             </AreaChart>
         </ChartContainer>
       </CardContent>
