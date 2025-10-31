@@ -32,7 +32,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MarketPrice } from "@/lib/types"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Line, LineChart, ResponsiveContainer } from 'recharts';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -71,16 +71,6 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
                     <div className="h-12 w-32">
                         <ResponsiveContainer>
                             <LineChart data={prices}>
-                                <Tooltip
-                                    contentStyle={{
-                                        fontSize: '12px',
-                                        padding: '2px 8px',
-                                        borderRadius: 'var(--radius)',
-                                        border: '1px solid hsl(var(--border))',
-                                        background: 'hsl(var(--background))'
-                                    }}
-                                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
-                                />
                                 <Line type="monotone" dataKey="price" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                             </LineChart>
                         </ResponsiveContainer>
