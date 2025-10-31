@@ -40,7 +40,6 @@ export async function simulateCropGrowth(input: CropGrowthSimulationInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'cropGrowthSimulationPrompt',
-  model: googleAI.model('gemini-1.5-flash-latest'),
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
