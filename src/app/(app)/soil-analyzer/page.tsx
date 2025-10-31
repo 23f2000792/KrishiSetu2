@@ -62,25 +62,21 @@ export default function SoilAnalyzerPage() {
     setAnalysisResult(null);
 
     try {
-      // In a real application, you would first upload the file,
-      // then run OCR/parsing on the backend.
-      // Here, we are mocking the data extraction step on the client.
       const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
       
       const result = await analyzeSoilCard({
         ...mockExtractedData,
-        region: user.region, // Use the logged-in user's region
+        region: user.region, 
         language: languageMap[locale],
       });
 
       setAnalysisResult(result);
 
-      // Save the report to Firestore
       if (firestore) {
         await addDoc(collection(firestore, 'soil_reports'), {
           userId: user.id,
           uploadedAt: serverTimestamp(),
-          fileUrl: `mock-path/${fileName}`, // Placeholder URL
+          fileUrl: `mock-path/${fileName}`,
           extractedData: mockExtractedData,
           aiSummary: result,
         });
@@ -172,8 +168,8 @@ export default function SoilAnalyzerPage() {
                              <CardTitle className='text-base'>{t('soil.npkStatus')}</CardTitle>
                         </CardHeader>
                          <CardContent>
-                           <div className="flex justify-around items-center h-full">
-                                <p className='text-lg'><span className='font-bold'>N:</span> {mockExtractedData.N}</p>
+                           <div className="flex justify-around items-center h-full text-foreground">
+                                <p className='text-lg'><span className='font-bold'>N:</span> <span className='text-red-600'>{mockExtractedData.N}</span></p>
                                 <p className='text-lg'><span className='font-bold'>P:</span> {mockExtractedData.P}</p>
                                 <p className='text-lg'><span className='font-bold'>K:</span> {mockExtractedData.K}</p>
                            </div>

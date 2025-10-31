@@ -103,7 +103,7 @@
     "wheatPrice": "Wheat price",
     "aiAdvisory": "AI Advisory",
     "copilotSuggestion": "Copilot suggestion",
-    "marketChartTitle": "Mandi Price Trends &amp; Forecasts",
+    "marketChartTitle": "Mandi Price Trends & Forecasts",
     "marketChartDescription": "Price trends for key crops in your region (₹ per quintal)",
     "quickActionsTitle": "Quick Actions",
     "quickActionsDescription": "Jump right into what you need.",
@@ -157,7 +157,7 @@
   "scanner": {
     "title": "Crop Scanner",
     "description": "Upload or take a photo of a crop to detect diseases or nutrient deficiencies.",
-    "dragOrUpload": "Drag &amp; Drop or Upload a Photo",
+    "dragOrUpload": "Drag & Drop or Upload a Photo",
     "supportedFormats": "Supported formats: PNG, JPG, JPEG. Max file size: 5MB.",
     "browseFiles": "Browse Files",
     "useCamera": "Use Camera",
@@ -190,7 +190,7 @@
   "soil": {
     "title": "Soil Analyzer",
     "description": "Upload your soil health card to get an AI-powered analysis.",
-    "dragOrUpload": "Drag &amp; Drop or Upload Soil Card",
+    "dragOrUpload": "Drag & Drop or Upload Soil Card",
     "supportedFormats": "Supported formats: PNG, JPG, PDF. Max file size: 5MB.",
     "browseFiles": "Browse Files",
     "analyzeButton": "Analyze Soil Card",

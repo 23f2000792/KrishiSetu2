@@ -2,18 +2,26 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, ThumbsUp, MoreHorizontal } from "lucide-react";
+import { MessageCircle, ThumbsUp, MoreHorizontal, Loader2 } from "lucide-react";
 import { Post } from "@/lib/types";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from 'date-fns';
+import { useFirebase } from "@/firebase";
+import { doc, updateDoc, increment } from "firebase/firestore";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 type PostCardProps = {
   post: Post;
 };
 
 export function PostCard({ post }: PostCardProps) {
+  const { firestore } = useFirebase();
+  const { toast } = useToast();
+  const [isLiking, setIsLiking] = useState(false);
+
   const getInitials = (name: string) => {
     const names = name.split(' ');
     return names.length > 1 ? `${names[0][0]}${names[names.length - 1][0]}` : name.substring(0, 2);
@@ -22,17 +30,41 @@ export function PostCard({ post }: PostCardProps) {
   const getRelativeTime = () => {
     if (!post.createdAt) return 'Just now';
     try {
-      // Check if it's a Firestore Timestamp
       if (typeof post.createdAt === 'object' && 'toDate' in post.createdAt) {
         const date = (post.createdAt as any).toDate();
         return formatDistanceToNow(date, { addSuffix: true });
       }
-      // Fallback for string dates from mock data or other sources
       return formatDistanceToNow(new Date(post.createdAt as any), { addSuffix: true });
     } catch (e) {
-      // Final fallback if date is invalid
       return 'a while ago';
     }
+  };
+
+  const handleLike = async () => {
+    if (!firestore) return;
+    setIsLiking(true);
+    const postRef = doc(firestore, 'posts', post.id);
+    try {
+      await updateDoc(postRef, {
+        upvotes: increment(1)
+      });
+    } catch (error) {
+      console.error("Error liking post:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not like the post. Please try again."
+      });
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
+  const handleComment = () => {
+    toast({
+      title: "Coming Soon!",
+      description: "Commenting functionality is under development."
+    });
   };
 
   return (
@@ -72,11 +104,11 @@ export function PostCard({ post }: PostCardProps) {
       </CardContent>
       <CardFooter className="flex justify-between items-center border-t pt-4">
         <div className="flex gap-2">
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground">
-                <ThumbsUp className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground" onClick={handleLike} disabled={isLiking}>
+                {isLiking ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
                 <span>{post.upvotes}</span>
             </Button>
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground">
+            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground" onClick={handleComment}>
                 <MessageCircle className="h-4 w-4" />
                 <span>{post.comments?.length || 0}</span>
             </Button>
