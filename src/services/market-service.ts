@@ -1,9 +1,10 @@
 import { marketPrices } from '@/lib/data';
-import type { PricePoint } from '@/lib/types';
+import type { MarketPrice, PricePoint } from '@/lib/types';
 
 type MarketData = {
     latestPrice: number;
     prices: PricePoint[];
+    forecast: number;
 } | null;
 
 /**
@@ -14,30 +15,45 @@ type MarketData = {
  * @returns An object with the latest price and 30-day history, or null if not found.
  */
 export async function getMarketData(crop: string, region: string): Promise<MarketData> {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+
   const normalizedCrop = crop.toLowerCase();
   const normalizedRegion = region.toLowerCase();
 
-  const marketData = marketPrices.find(
+  let marketData = marketPrices.find(
     (item) =>
-      item.crop.toLowerCase().includes(normalizedCrop) &&
-      (item.region.toLowerCase() === normalizedRegion || region === '')
+      item.crop.toLowerCase() === normalizedCrop &&
+      item.region.toLowerCase() === normalizedRegion
   );
+
+  if (!marketData) {
+    marketData = marketPrices.find(item => item.crop.toLowerCase() === normalizedCrop);
+  }
 
   if (marketData && marketData.prices.length > 0) {
     return {
         latestPrice: marketData.prices[marketData.prices.length - 1].price,
         prices: marketData.prices,
-    }
-  }
-
-  // Fallback: If region-specific price is not found, check for any price for that crop
-  const anyRegionMarketData = marketPrices.find(item => item.crop.toLowerCase().includes(normalizedCrop));
-  if (anyRegionMarketData && anyRegionMarketData.prices.length > 0) {
-    return {
-        latestPrice: anyRegionMarketData.prices[anyRegionMarketData.prices.length - 1].price,
-        prices: anyRegionMarketData.prices,
+        forecast: marketData.forecast,
     }
   }
 
   return null;
+}
+
+export async function getMarketDataForCrops(crops: string[], region: string): Promise<MarketPrice[]> {
+    const results: MarketPrice[] = [];
+    for (const crop of crops) {
+        const data = await getMarketData(crop, region);
+        if (data) {
+            results.push({
+                id: `market-${crop}`,
+                crop,
+                region,
+                prices: data.prices,
+                forecast: data.forecast,
+            });
+        }
+    }
+    return results;
 }
