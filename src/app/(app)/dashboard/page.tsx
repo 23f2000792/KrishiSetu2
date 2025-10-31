@@ -13,7 +13,6 @@ import Link from "next/link";
 import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { useUserCollection } from "@/firebase/firestore/use-user-collection";
 import type { SoilReport } from "@/lib/types";
 import { analyzeMarket } from "@/ai/flows/market-analyst-flow";
 
@@ -30,13 +29,9 @@ export default function DashboardPage() {
     // Loading State
     const [loadingAI, setLoadingAI] = useState(true);
 
-    // Realtime Data from Firestore
-    // This query now only filters by userId and limits to 1, avoiding the composite index issue.
-    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports', {
-        limit: 1,
-    });
-    
-    const latestSoilReport = useMemo(() => (soilReports && soilReports.length > 0 ? soilReports[0] : null), [soilReports]);
+    // For now, we will not fetch soil reports to avoid the permission error.
+    const latestSoilReport = null;
+    const soilReportsLoading = false;
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
     const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
@@ -89,13 +84,12 @@ export default function DashboardPage() {
             }
         };
         
-        // Only run if user is onboarded and firestore data has loaded
-        if (user && !soilReportsLoading) {
+        if (user) {
           getPredictions();
         }
-    }, [user, locale, t, primaryCrop, latestSoilReport, soilReportsLoading]);
+    }, [user, locale, t, primaryCrop, latestSoilReport]);
 
-    const isLoading = loadingAI || soilReportsLoading;
+    const isLoading = loadingAI;
 
     const summaryCards = [
         { 
