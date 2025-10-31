@@ -13,8 +13,11 @@ function CropPlanResult({ result }: { result: CropPlannerOutput }) {
 
     // Simple markdown to HTML renderer
     const MarkdownRenderer = ({ content }: { content: string }) => {
-        const html = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br />');
-        return <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: html }} />;
+        // Convert markdown bold to strong tags and newlines to br tags
+        const html = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br />');
+        return <div className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: html }} />;
     };
 
     return (
@@ -36,7 +39,7 @@ function CropPlanResult({ result }: { result: CropPlannerOutput }) {
                 </Card>
                 <div>
                     <h3 className="font-semibold flex items-center gap-2 mb-2"><Lightbulb size={20} /> AI Justification</h3>
-                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                    <div className="p-4 bg-secondary/50 rounded-lg border space-y-2">
                         <MarkdownRenderer content={result.justification} />
                     </div>
                 </div>
@@ -77,7 +80,7 @@ export default function CropPlannerPage() {
                 description="Get an AI-powered recommendation for your next planting season."
             />
             <div className="max-w-2xl mx-auto">
-                {!result && (
+                {!result ? (
                     <Card className="text-center">
                         <CardHeader>
                             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
@@ -100,8 +103,9 @@ export default function CropPlannerPage() {
                             {error && <p className="text-destructive text-sm mt-4">{error}</p>}
                         </CardContent>
                     </Card>
+                ) : (
+                    <CropPlanResult result={result} />
                 )}
-                {result && <CropPlanResult result={result} />}
             </div>
         </div>
     );
