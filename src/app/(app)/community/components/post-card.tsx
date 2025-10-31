@@ -9,13 +9,15 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from 'date-fns';
 import { useFirebase } from "@/firebase";
-import { doc, updateDoc, increment } from "firebase/firestore";
+import { doc, updateDoc, increment, arrayUnion, arrayRemove } from "firebase/firestore";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CommentThread } from "./comment-thread";
+import { useAuth } from "@/contexts/auth-context";
+import { cn } from "@/lib/utils";
 
 type PostCardProps = {
   post: Post;
@@ -23,6 +25,7 @@ type PostCardProps = {
 
 export function PostCard({ post }: PostCardProps) {
   const { firestore } = useFirebase();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [isLiking, setIsLiking] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -46,9 +49,11 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   const handleLike = async () => {
-    if (!firestore) return;
+    if (!firestore || !user) return;
     setIsLiking(true);
     const postRef = doc(firestore, 'posts', post.id);
+    
+    // For this demo, we'll just increment. A real app would track who liked it.
     const updateData = { upvotes: increment(1) };
 
     updateDoc(postRef, updateData)
@@ -72,7 +77,7 @@ export function PostCard({ post }: PostCardProps) {
 
   return (
     <Collapsible open={isCommentsOpen} onOpenChange={setIsCommentsOpen} asChild>
-      <Card className="flex flex-col transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1">
+      <Card className="flex flex-col transform-gpu transition-all duration-300 ease-out hover:shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -85,17 +90,20 @@ export function PostCard({ post }: PostCardProps) {
                 <p className="text-xs text-muted-foreground">{getRelativeTime()}</p>
               </div>
             </div>
-              <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View Profile</DropdownMenuItem>
-                      <DropdownMenuItem>Report</DropdownMenuItem>
-                  </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-1">
+                 <Badge variant="secondary">{post.language}</Badge>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem>View Profile</DropdownMenuItem>
+                        <DropdownMenuItem>Report</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
           </div>
         </CardHeader>
         <CardContent className="flex-grow space-y-4 pt-0">
@@ -106,20 +114,17 @@ export function PostCard({ post }: PostCardProps) {
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between items-center border-t pt-2">
-          <div className="flex gap-2">
-              <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground" onClick={handleLike} disabled={isLiking}>
-                  {isLiking ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
-                  <span>{post.upvotes}</span>
-              </Button>
-              <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground">
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{post.comments?.length || 0}</span>
-                  </Button>
-              </CollapsibleTrigger>
-          </div>
-          <Badge variant="secondary">{post.language}</Badge>
+        <CardFooter className="flex justify-around items-center border-t py-1">
+            <Button variant="ghost" className="flex-1 text-muted-foreground rounded-none" onClick={handleLike} disabled={isLiking}>
+                {isLiking ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
+                <span className="ml-2">{post.upvotes}</span>
+            </Button>
+            <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="flex-1 text-muted-foreground rounded-none">
+                    <MessageCircle className="h-4 w-4" />
+                    <span className="ml-2">{post.comments?.length || 0}</span>
+                </Button>
+            </CollapsibleTrigger>
         </CardFooter>
         <CollapsibleContent>
           <div className="px-6 pb-4">

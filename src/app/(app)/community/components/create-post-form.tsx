@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const formSchema = z.object({
   content: z.string().min(10, { message: 'Post must be at least 10 characters long.' }),
@@ -21,7 +23,7 @@ const formSchema = z.object({
   language: z.string({ required_error: 'Please select a language.' }),
 });
 
-export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
+function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
     const { toast } = useToast();
     const { t } = useLanguage();
     const { user } = useAuth();
@@ -67,7 +69,7 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
                 description: t('community.postCreatedDesc'),
             });
             onPostCreated();
-            form.reset();
+            form.reset({ content: '', language: 'English' });
         } catch (error) {
             console.error('Error creating post:', error);
             toast({
@@ -79,76 +81,96 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
             setIsSubmitting(false);
         }
     }
+    
+    if (!user) return null;
+    
+    const getInitials = (name: string) => {
+        const names = name.split(' ');
+        return names.length > 1 ? `${names[0][0]}${names[names.length - 1][0]}` : name.substring(0, 2);
+    };
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormControl>
-                                <Textarea
-                                    placeholder={t('community.messagePlaceholder')}
-                                    rows={5}
-                                    className="resize-none border-0 focus-visible:ring-0 shadow-none p-0 text-base"
-                                    {...field}
-                                    disabled={isSubmitting}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <FormField
-                        control={form.control}
-                        name="language"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs uppercase text-muted-foreground">{t('community.language')}</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                 <CardHeader className="flex-row items-start gap-4 p-4">
+                    <Avatar className="h-10 w-10">
+                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="w-full">
+                        <FormField
+                            control={form.control}
+                            name="content"
+                            render={({ field }) => (
+                                <FormItem>
                                     <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={t('community.selectLanguage')} />
-                                        </SelectTrigger>
+                                        <Textarea
+                                            placeholder={t('community.messagePlaceholder')}
+                                            rows={3}
+                                            className="resize-none border-0 focus-visible:ring-0 shadow-none p-0 text-base"
+                                            {...field}
+                                            disabled={isSubmitting}
+                                        />
                                     </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="English">{t('header.english')}</SelectItem>
-                                        <SelectItem value="Hindi">{t('header.hindi')}</SelectItem>
-                                        <SelectItem value="Punjabi">{t('header.punjabi')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                    <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                            <FormItem className="hidden">
+                                <FormControl>
+                                    <Input type="file" ref={imageInputRef} onChange={(e) => field.onChange(e.target.files)} disabled={isSubmitting} />
+                                </FormControl>
                             </FormItem>
                         )}
                     />
-                </div>
-                
-                 <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
-                        <FormItem className="hidden">
-                            <FormControl>
-                                <Input type="file" ref={imageInputRef} onChange={(e) => field.onChange(e.target.files)} disabled={isSubmitting} />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                <div className="flex justify-between items-center">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => imageInputRef.current?.click()} disabled={isSubmitting}>
-                        <Paperclip className="h-5 w-5 text-muted-foreground" />
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
+                </CardContent>
+                <CardFooter className="flex justify-between items-center p-4 pt-0">
+                    <div className="flex gap-2">
+                        <Button type="button" variant="ghost" size="icon" onClick={() => imageInputRef.current?.click()} disabled={isSubmitting}>
+                            <Paperclip className="h-5 w-5 text-muted-foreground" />
+                        </Button>
+                         <FormField
+                            control={form.control}
+                            name="language"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                                        <FormControl>
+                                            <SelectTrigger className="w-auto border-0 bg-transparent text-muted-foreground">
+                                                <SelectValue placeholder={t('community.selectLanguage')} />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="English">{t('header.english')}</SelectItem>
+                                            <SelectItem value="Hindi">{t('header.hindi')}</SelectItem>
+                                            <SelectItem value="Punjabi">{t('header.punjabi')}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {t('community.postToCommunity')}
                     </Button>
-                </div>
+                </CardFooter>
             </form>
         </Form>
     );
+}
+
+
+export function CreatePostCard({ onPostCreated }: { onPostCreated: () => void }) {
+    return (
+        <Card>
+            <CreatePostForm onPostCreated={onPostCreated} />
+        </Card>
+    )
 }
