@@ -34,25 +34,25 @@ service cloud.firestore {
     match /scans/{scanId} {
       allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn();
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
     }
 
     match /soil_reports/{reportId} {
       allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn();
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
     }
 
     match /yield_reports/{reportId} {
       allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn();
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
     }
     
     match /profit_reports/{reportId} {
       allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn();
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
     }
 
     match /roles_admin/{userId} {
