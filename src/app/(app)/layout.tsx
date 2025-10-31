@@ -7,9 +7,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const pathname = usePathname();
 
-  // If user is an Admin and trying to access farmer pages, redirect to /admin
+  // If user is an Admin and trying to access farmer pages, redirect to /admin/dashboard
   if (user?.role === 'Admin' && !pathname.startsWith('/admin')) {
-    redirect('/admin');
+    redirect('/admin/dashboard');
   }
 
   // If user is a Farmer and trying to access admin pages, redirect to /dashboard

@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   ScanLine,
   Settings,
-  Shield,
   ShoppingBasket,
   Users,
 } from 'lucide-react';
@@ -35,21 +34,22 @@ export function SidebarNav() {
   ];
   
   const adminNavItems = [
-    { href: '/admin', label: t('sidebar.adminPanel'), icon: Shield },
+     { href: '/admin/dashboard', label: t('sidebar.adminPanel'), icon: LayoutDashboard },
   ];
 
-  const allNavItems = user?.role === 'Admin' ? [...navItems, ...adminNavItems] : navItems;
+  const itemsToDisplay = user?.role === 'Admin' ? adminNavItems : navItems;
+
 
   return (
     <div className="flex h-full flex-col gap-4 py-4">
       <div className="px-4">
-        <Link href="/dashboard" onClick={() => setOpenMobile(false)}>
+        <Link href={user?.role === 'Admin' ? '/admin/dashboard' : '/dashboard'} onClick={() => setOpenMobile(false)}>
           <Logo />
         </Link>
       </div>
       <nav className="flex-1 px-2">
         <ul className="space-y-1">
-          {allNavItems.map((item) => (
+          {itemsToDisplay.map((item) => (
             <li key={item.href} className={cn(item.gap && 'pt-4 mt-4 border-t')}>
               <Link
                 href={item.href}

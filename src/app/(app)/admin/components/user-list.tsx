@@ -47,8 +47,8 @@ export function UserList({ users }: { users: User[] }) {
                     <TableHeader>
                         <TableRow>
                             <TableHead>{t('admin.user')}</TableHead>
-                            <TableHead>{t('admin.role')}</TableHead>
-                            <TableHead>{t('admin.region')}</TableHead>
+                            <TableHead className="hidden sm:table-cell">{t('admin.role')}</TableHead>
+                            <TableHead className="hidden md:table-cell">{t('admin.region')}</TableHead>
                             <TableHead>{t('admin.contact')}</TableHead>
                             <TableHead><span className="sr-only">{t('admin.actions')}</span></TableHead>
                         </TableRow>
@@ -58,17 +58,17 @@ export function UserList({ users }: { users: User[] }) {
                             <TableRow key={user.id}>
                                 <TableCell>
                                     <div className="flex items-center gap-3">
-                                        <Avatar>
+                                        <Avatar className="hidden sm:flex">
                                             <AvatarImage src={user.avatar} alt={user.name} />
                                             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                                         </Avatar>
                                         <div className="font-medium">{user.name}</div>
                                     </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="hidden sm:table-cell">
                                     <Badge variant={user.role === 'Admin' ? 'destructive' : 'secondary'} className={cn(user.role === 'Admin' && 'bg-amber-600')}>{user.role}</Badge>
                                 </TableCell>
-                                <TableCell>{user.region}</TableCell>
+                                <TableCell className="hidden md:table-cell">{user.region}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>
                                     <DropdownMenu>

@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('krishi-user', JSON.stringify({id: userToLogin.id, role: userToLogin.role}));
       // Redirect based on role
       if (userToLogin.role === 'Admin') {
-        router.push('/admin');
+        router.push('/admin/dashboard');
       } else {
         router.push('/dashboard');
       }
@@ -75,12 +75,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (isAuthenticated) {
         if (isAuthPage) {
           if (user.role === 'Admin') {
-            router.push('/admin');
+            router.push('/admin/dashboard');
           } else {
             router.push('/dashboard');
           }
         } else if (user.role === 'Admin' && !pathname.startsWith('/admin')) {
-          router.push('/admin');
+          router.push('/admin/dashboard');
         } else if (user.role === 'Farmer' && pathname.startsWith('/admin')) {
           router.push('/dashboard');
         }
