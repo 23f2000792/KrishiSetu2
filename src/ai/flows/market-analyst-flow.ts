@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A specialist AI agent that analyzes and predicts crop market prices.
@@ -56,6 +57,7 @@ const getMarketDataTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'marketAnalystPrompt',
+  model: 'gemini-1.5-flash',
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
