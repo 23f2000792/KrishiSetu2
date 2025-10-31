@@ -32,33 +32,37 @@ service cloud.firestore {
     // Any authenticated user can create posts. Posts are publicly readable.
     // Only the author of a post can update or delete it.
     match /posts/{postId} {
-      allow read, create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.authorId);
+      allow read: if isSignedIn();
+      allow create, update, delete: if isOwner(request.resource.data.authorId) || isOwner(resource.data.authorId);
     }
     
+    match /posts/{postId}/comments/{commentId} {
+        allow create: if isSignedIn();
+    }
+
     // Rules for user-owned collections
     match /soil_reports/{reportId} {
       allow get: if isOwner(resource.data.userId);
       allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
-      allow write: if isOwner(request.resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
 
     match /scans/{scanId} {
       allow get: if isOwner(resource.data.userId);
       allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
-      allow write: if isOwner(request.resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
 
     match /yield_reports/{reportId} {
       allow get: if isOwner(resource.data.userId);
       allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
-      allow write: if isOwner(request.resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
 
     match /profit_reports/{reportId} {
       allow get: if isOwner(resource.data.userId);
       allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
-      allow write: if isOwner(request.resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
   }
 }

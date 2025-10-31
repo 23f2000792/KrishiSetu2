@@ -37,6 +37,11 @@ export function useUserCollection<T>(
 ): UseCollectionResult<T> {
   const { user } = useAuth();
   const { firestore } = useFirebase();
+  
+  // Destructure for stable dependencies in useMemoFirebase
+  const orderField = options?.orderBy?.[0];
+  const orderDirection = options?.orderBy?.[1];
+  const limitCount = options?.limit;
 
   const userQuery = useMemoFirebase(() => {
     if (!user || !firestore) {
@@ -44,19 +49,18 @@ export function useUserCollection<T>(
     }
 
     const constraints: QueryConstraint[] = [where('userId', '==', user.id)];
-    if (options?.orderBy) {
-      constraints.push(orderBy(options.orderBy[0], options.orderBy[1]));
+    if (orderField && orderDirection) {
+      constraints.push(orderBy(orderField, orderDirection));
     }
-    if (options?.limit) {
-      constraints.push(limit(options.limit));
+    if (limitCount) {
+      constraints.push(limit(limitCount));
     }
     
     return firestoreQuery(
       collection(firestore, collectionName),
       ...constraints
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore, collectionName, options?.orderBy?.[0], options?.orderBy?.[1], options?.limit]);
+  }, [user, firestore, collectionName, orderField, orderDirection, limitCount]);
 
   // The type assertion is safe because useCollection handles null queries.
   return useCollection<T>(userQuery as Query<DocumentData> | null);
