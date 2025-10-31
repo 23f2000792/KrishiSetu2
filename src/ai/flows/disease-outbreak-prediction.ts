@@ -9,7 +9,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { geminiPro } from 'genkit/models';
 
 const DiseaseOutbreakPredictionInputSchema = z.object({
   crop: z.string().describe('The primary crop to check for risks (e.g., "Wheat").'),
@@ -91,7 +90,6 @@ const getWeatherForecastTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'diseaseOutbreakPredictorPrompt',
-  model: geminiPro,
   input: { schema: DiseaseOutbreakPredictionInputSchema },
   output: { schema: DiseaseOutbreakPredictionOutputSchema },
   tools: [getRegionalScanDataTool, getWeatherForecastTool],
