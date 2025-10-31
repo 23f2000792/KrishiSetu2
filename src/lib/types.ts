@@ -47,7 +47,7 @@ export type Post = {
   image?: string;
   language: string;
   upvotes: number;
-  comments: Comment[];
+  comments: []; // This is now deprecated but kept for type safety with old data
   createdAt: Timestamp;
 };
 

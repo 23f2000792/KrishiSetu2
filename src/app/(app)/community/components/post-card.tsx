@@ -9,15 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from 'date-fns';
 import { useFirebase } from "@/firebase";
-import { doc, updateDoc, increment, arrayUnion, arrayRemove } from "firebase/firestore";
-import { useState } from "react";
+import { doc, updateDoc, increment, collection, query, getDocs } from "firebase/firestore";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CommentThread } from "./comment-thread";
 import { useAuth } from "@/contexts/auth-context";
-import { cn } from "@/lib/utils";
 
 type PostCardProps = {
   post: Post;
@@ -29,6 +26,20 @@ export function PostCard({ post }: PostCardProps) {
   const { toast } = useToast();
   const [isLiking, setIsLiking] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(post.comments?.length || 0);
+
+  // Fetch comment count on mount
+  useEffect(() => {
+    if (!firestore) return;
+    const getCommentCount = async () => {
+        const commentsRef = collection(firestore, 'posts', post.id, 'comments');
+        const q = query(commentsRef);
+        const querySnapshot = await getDocs(q);
+        setCommentCount(querySnapshot.size);
+    };
+    getCommentCount();
+  }, [firestore, post.id]);
+
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -53,26 +64,22 @@ export function PostCard({ post }: PostCardProps) {
     setIsLiking(true);
     const postRef = doc(firestore, 'posts', post.id);
     
-    // For this demo, we'll just increment. A real app would track who liked it.
     const updateData = { upvotes: increment(1) };
 
-    updateDoc(postRef, updateData)
-      .catch((serverError) => {
-        const permissionError = new FirestorePermissionError({
-            path: postRef.path,
-            operation: 'update',
-            requestResourceData: { upvotes: 'increment(1)' }
-        });
-        errorEmitter.emit('permission-error', permissionError);
+    try {
+        await updateDoc(postRef, updateData);
+    }
+    catch (error) {
+        console.error("Error liking post:", error);
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not like the post. Please try again."
         });
-      })
-      .finally(() => {
+    }
+    finally {
         setIsLiking(false);
-      });
+    }
   };
 
   return (
@@ -122,13 +129,13 @@ export function PostCard({ post }: PostCardProps) {
             <CollapsibleTrigger asChild>
                 <Button variant="ghost" className="flex-1 text-muted-foreground rounded-none">
                     <MessageCircle className="h-4 w-4" />
-                    <span className="ml-2">{post.comments?.length || 0}</span>
+                    <span className="ml-2">{commentCount}</span>
                 </Button>
             </CollapsibleTrigger>
         </CardFooter>
         <CollapsibleContent>
           <div className="px-6 pb-4">
-              <CommentThread postId={post.id} comments={post.comments} />
+              <CommentThread postId={post.id} />
           </div>
         </CollapsibleContent>
       </Card>

@@ -29,23 +29,19 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Any authenticated user can create posts. Posts are publicly readable.
-    // Post content cannot be edited after creation.
-    // Any signed-in user can add a comment or upvote.
+    // Posts are public, but can only be created by signed-in users.
+    // Content cannot be edited. Upvotes can be changed by any signed-in user.
     match /posts/{postId} {
       allow read: if isSignedIn();
       allow create: if isOwner(request.resource.data.authorId);
-      allow update: if isSignedIn() && (
-                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes']) ||
-                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments'])
-                    );
+      allow update: if isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes']);
       allow delete: if isOwner(resource.data.authorId);
-    }
-    
-    // This rule is implicitly covered by the update rule on the parent post document.
-    // However, if comments were a subcollection, this would be necessary.
-    match /posts/{postId}/comments/{commentId} {
+
+      // Comments subcollection: any signed-in user can create a comment.
+      match /comments/{commentId} {
         allow create: if isSignedIn();
+        allow read, update, delete: if false; // Comments are immutable by default
+      }
     }
 
     // Rules for user-owned collections

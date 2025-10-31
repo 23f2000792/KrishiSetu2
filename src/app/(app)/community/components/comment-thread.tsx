@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
 import { useFirebase } from '@/firebase';
-import { doc, updateDoc, arrayUnion, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, Timestamp, query, orderBy } from 'firebase/firestore';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
@@ -15,8 +15,8 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Send } from 'lucide-react';
 import type { Comment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useMemoFirebase } from '@/firebase';
 
 const commentSchema = z.object({
   comment: z.string().min(1, 'Comment cannot be empty.'),
@@ -24,14 +24,20 @@ const commentSchema = z.object({
 
 type CommentThreadProps = {
   postId: string;
-  comments: Comment[];
 };
 
-export function CommentThread({ postId, comments }: CommentThreadProps) {
+export function CommentThread({ postId }: CommentThreadProps) {
   const { user } = useAuth();
   const { firestore } = useFirebase();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const commentsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'));
+  }, [firestore, postId]);
+  
+  const { data: comments, isLoading } = useCollection<Comment>(commentsQuery);
 
   const form = useForm<z.infer<typeof commentSchema>>({
     resolver: zodResolver(commentSchema),
@@ -59,9 +65,8 @@ export function CommentThread({ postId, comments }: CommentThreadProps) {
     }
 
     setIsSubmitting(true);
-    const postRef = doc(firestore, 'posts', postId);
+    const commentsColRef = collection(firestore, 'posts', postId, 'comments');
     const newComment = {
-      id: `${user.id}-${Date.now()}`,
       authorId: user.id,
       authorName: user.name,
       authorAvatar: user.avatar || '',
@@ -70,21 +75,14 @@ export function CommentThread({ postId, comments }: CommentThreadProps) {
     };
 
     try {
-        await updateDoc(postRef, {
-            comments: arrayUnion(newComment)
-        });
+        await addDoc(commentsColRef, newComment);
         form.reset();
     } catch (error) {
-        const permissionError = new FirestorePermissionError({
-            path: postRef.path,
-            operation: 'update',
-            requestResourceData: { comments: 'arrayUnion(...)' }
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        console.error("Error creating comment:", error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Could not post comment. Please try again."
+          description: "Could not post comment. Please check your permissions and try again."
         });
     } finally {
         setIsSubmitting(false);
@@ -94,7 +92,12 @@ export function CommentThread({ postId, comments }: CommentThreadProps) {
   return (
     <div className="space-y-4 pt-4 border-t">
       <div className="max-h-60 overflow-y-auto space-y-4 pr-2">
-        {comments && comments.length > 0 ? (
+        {isLoading && (
+          <div className="flex justify-center items-center py-4">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        )}
+        {!isLoading && comments && comments.length > 0 ? (
           comments.map((comment, index) => (
             <div key={comment.id || index} className="flex items-start gap-3">
               <Avatar className="h-8 w-8">
@@ -113,7 +116,7 @@ export function CommentThread({ postId, comments }: CommentThreadProps) {
             </div>
           ))
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">No comments yet. Be the first to reply!</p>
+          !isLoading && <p className="text-sm text-muted-foreground text-center py-4">No comments yet. Be the first to reply!</p>
         )}
       </div>
 
