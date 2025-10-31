@@ -83,7 +83,10 @@ export function CropMultiSelect({ selected, onChange, className }: CropMultiSele
                         <CommandItem
                             key={option.value}
                             value={option.value}
-                            onSelect={handleSelect}
+                            onSelect={(currentValue) => {
+                                handleSelect(currentValue);
+                                setOpen(false);
+                            }}
                             disabled={selected.length >= 5 && !selected.includes(option.value)}
                         >
                             <Check
