@@ -19,7 +19,6 @@
     "aiCopilot": "ਏਆਈ ਕੋਪਾਇਲਟ",
     "marketPrices": "ਮਾਰਕੀਟ ਕੀਮਤਾਂ",
     "growthForecast": "ਵਿਕਾਸ ਦੀ ਭਵਿੱਖਬਾਣੀ",
-    "satellite": "ਸੈਟੇਲਾਈਟ",
     "cropScanner": "ਫਸਲ ਸਕੈਨਰ",
     "soilAnalyzer": "ਮਿੱਟੀ ਵਿਸ਼ਲੇਸ਼ਕ",
     "postHarvest": "ਵਾਢੀ ਤੋਂ ਬਾਅਦ",
@@ -37,8 +36,7 @@
     "market": "ਬਾਜ਼ਾਰ",
     "community": "ਭਾਈਚਾਰਾ",
     "planner": "ਯੋਜਨਾਕਾਰ",
-    "profit": "ਮੁਨਾਫਾ",
-    "satellite": "ਸੈਟੇਲਾਈਟ"
+    "profit": "ਮੁਨਾਫਾ"
   },
   "landing": {
     "heroTitle": "ਚੁਸਤ ਖੇਤੀ,\nਰੌਸ਼ਨ ਭਵਿੱਖ",

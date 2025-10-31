@@ -19,7 +19,6 @@
     "aiCopilot": "AI Copilot",
     "marketPrices": "Market Prices",
     "growthForecast": "Growth Forecast",
-    "satellite": "Satellite",
     "cropScanner": "Crop Scanner",
     "soilAnalyzer": "Soil Analyzer",
     "postHarvest": "Post-Harvest",
@@ -37,8 +36,7 @@
     "market": "Market",
     "community": "Community",
     "planner": "Planner",
-    "profit": "Profit",
-    "satellite": "Satellite"
+    "profit": "Profit"
   },
   "landing": {
     "heroTitle": "Smarter Farming,\nBrighter Future",

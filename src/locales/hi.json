@@ -19,7 +19,6 @@
     "aiCopilot": "एआई सह-पायलट",
     "marketPrices": "बाजार मूल्य",
     "growthForecast": "विकास पूर्वानुमान",
-    "satellite": "सैटेलाइट",
     "cropScanner": "फसल स्कैनर",
     "soilAnalyzer": "मृदा विश्लेषक",
     "postHarvest": "कटाई के बाद",
@@ -37,8 +36,7 @@
     "market": "बाजार",
     "community": "समुदाय",
     "planner": "योजनाकार",
-    "profit": "लाभ",
-    "satellite": "सैटेलाइट"
+    "profit": "लाभ"
   },
   "landing": {
     "heroTitle": "स्मार्ट खेती,\nउज्ज्वल भविष्य",

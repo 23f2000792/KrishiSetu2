@@ -35,7 +35,6 @@ export function SidebarNav() {
     { href: '/chat', label: t('sidebar.aiCopilot'), icon: Bot },
     { href: '/market', label: t('sidebar.marketPrices'), icon: ShoppingBasket },
     { href: '/growth-forecast', label: t('sidebar.growthForecast'), icon: CalendarRange },
-    { href: '/satellite-insights', label: t('sidebar.satellite'), icon: Satellite },
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
     { href: '/soil-analyzer', label: t('sidebar.soilAnalyzer'), icon: Leaf },
     { href: '/post-harvest', label: "Post-Harvest", icon: BarChart },

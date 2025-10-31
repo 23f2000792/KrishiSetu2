@@ -28,7 +28,7 @@ export function MobileNav() {
     { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
     { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
     { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
-    { href: '/satellite-insights', label: t('mobileNav.satellite'), icon: Satellite },
+    { href: '/soil-analyzer', label: t('mobileNav.soil'), icon: Leaf },
     { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
 
