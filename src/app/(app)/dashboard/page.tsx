@@ -7,82 +7,142 @@ import { QuickActions } from "./components/quick-actions";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
 import { diseaseOutbreakPredictionFlow } from "@/ai/flows/disease-outbreak-prediction";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { useUserCollection } from "@/firebase/firestore/use-user-collection";
+import type { SoilReport } from "@/lib/types";
+import { analyzeMarket } from "@/ai/flows/market-analyst-flow";
+
 
 export default function DashboardPage() {
     const { t, locale } = useLanguage();
     const { user } = useAuth();
+    
+    // AI State
     const [outbreakAlert, setOutbreakAlert] = useState<string | null>(null);
     const [yieldPrediction, setYieldPrediction] = useState<string | null>(null);
-    const [loadingYield, setLoadingYield] = useState(true);
+    const [marketForecast, setMarketForecast] = useState<{ value: string, trend: 'up' | 'down' } | null>(null);
 
+    // Loading State
+    const [loadingAI, setLoadingAI] = useState(true);
+
+    // Realtime Data from Firestore
+    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports', {
+        orderBy: ['uploadedAt', 'desc'],
+        limit: 1,
+    });
+
+    const latestSoilReport = useMemo(() => (soilReports && soilReports.length > 0 ? soilReports[0] : null), [soilReports]);
+    
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
+    const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
 
     useEffect(() => {
         const getPredictions = async () => {
-            if (!user) return;
-            
-            // Outbreak Prediction
-            try {
-                const outbreakResult = await diseaseOutbreakPredictionFlow({
-                    crop: user.crops?.[0] || 'Wheat',
-                    region: user.region,
-                    language: languageMap[locale],
-                });
-                setOutbreakAlert(outbreakResult.alert);
-            } catch (error) {
-                console.error("Failed to get outbreak prediction:", error);
-                setOutbreakAlert(t('dashboard.outbreakError'));
-            }
+            if (!user?.farmSize) {
+                setLoadingAI(false);
+                return;
+            };
 
-            // Yield Prediction
-            setLoadingYield(true);
+            setLoadingAI(true);
+            
             try {
-                 const growthResult = await simulateCropGrowth({
-                    crop: user.crops?.[0] || 'Wheat',
-                    region: user.region,
-                    language: languageMap[locale],
-                    soilReport: { pH: 6.8, N: "Medium", P: "High", K: "Medium", OC: 0.6 },
-                });
+                const [outbreakResult, growthResult, marketResult] = await Promise.all([
+                     diseaseOutbreakPredictionFlow({
+                        crop: primaryCrop,
+                        region: user.region,
+                        language: languageMap[locale],
+                    }),
+                    simulateCropGrowth({
+                        crop: primaryCrop,
+                        region: user.region,
+                        language: languageMap[locale],
+                        soilReport: latestSoilReport?.aiSummary,
+                    }),
+                    analyzeMarket({
+                        crop: primaryCrop,
+                        region: user.region,
+                        language: languageMap[locale],
+                    })
+                ]);
+
+                setOutbreakAlert(outbreakResult.alert);
                 setYieldPrediction(growthResult.finalYieldPrediction.split(':')[1].split(' vs.')[0].trim());
+                
+                const forecastMatch = marketResult.forecast.match(/(-?\d+(\.\d+)?%)/);
+                if (forecastMatch) {
+                    const trend = forecastMatch[0].includes('-') ? 'down' : 'up';
+                    setMarketForecast({ value: forecastMatch[0], trend });
+                }
+
             } catch (error) {
-                console.error("Failed to get yield prediction:", error);
+                console.error("Failed to get dashboard AI predictions:", error);
+                setOutbreakAlert(t('dashboard.outbreakError'));
                 setYieldPrediction("N/A");
+                setMarketForecast({ value: "N/A", trend: 'down'});
             } finally {
-                setLoadingYield(false);
+                setLoadingAI(false);
             }
         };
-        if(user?.farmSize) { // Only run if user has been onboarded
+        
+        // Only run if user is onboarded and firestore data has loaded
+        if (user && !soilReportsLoading) {
           getPredictions();
         }
-    }, [user, locale, t]);
+    }, [user, locale, t, primaryCrop, latestSoilReport, soilReportsLoading]);
 
+    const isLoading = loadingAI || soilReportsLoading;
 
     const summaryCards = [
-        { title: t('dashboard.soilFertility'), value: "82/100", icon: Leaf, details: t('dashboard.healthy'), trend: "up" as const, change: "+5%" },
-        { title: t('dashboard.irrigation'), value: "In 2 days", icon: Droplets, details: t('dashboard.soilMoisture') },
-        { title: t('dashboard.mandiForecast'), value: "+4.3%", icon: LineChart, details: `${user?.crops?.[0] || 'Wheat'} price`, trend: "up" as const },
-        { title: t('dashboard.outbreakAlert'), value: "High Risk", icon: Bug, details: outbreakAlert || t('dashboard.loading') },
+        { 
+            title: t('dashboard.soilFertility'), 
+            value: latestSoilReport ? `${latestSoilReport.aiSummary.fertilityIndex}/100` : "N/A", 
+            icon: Leaf, 
+            details: latestSoilReport ? latestSoilReport.aiSummary.fertilityStatus : t('dashboard.loading'),
+            trend: "up" as const, 
+        },
+        { 
+            title: t('dashboard.irrigation'), 
+            value: "In 3 days", 
+            icon: Droplets, 
+            details: "Optimal moisture levels" 
+        },
+        { 
+            title: t('dashboard.mandiForecast'), 
+            value: marketForecast?.value || "...", 
+            icon: LineChart, 
+            details: `${primaryCrop} price`, 
+            trend: marketForecast?.trend
+        },
+        { 
+            title: t('dashboard.outbreakAlert'), 
+            value: outbreakAlert?.split(' ')[0] || "...", // "High", "No" etc.
+            icon: Bug, 
+            details: outbreakAlert || t('dashboard.loading') 
+        },
     ];
     
     return (
         <div className="pb-16 md:pb-0 animate-fade-in">
             <PageHeader
                 title={`👋 ${t('dashboard.greeting')}, ${user?.name.split(' ')[0]}!`}
-                description={user?.farmSize ? `${user?.region} | ${user.crops?.[0] || 'Crop'} | ${user.farmSize} acres` : user?.region}
+                description={user?.farmSize ? `${user?.region} | ${primaryCrop} | ${user.farmSize} acres` : user?.region}
             />
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                {summaryCards.map((card, index) => (
-                    <SummaryCard 
-                        key={card.title}
-                        {...card}
-                        animationDelay={index * 100}
-                    />
-                ))}
+                {isLoading ? (
+                    [...Array(4)].map((_, i) => <SummaryCard.Skeleton key={i} animationDelay={i * 100} />)
+                ) : (
+                    summaryCards.map((card, index) => (
+                        <SummaryCard 
+                            key={card.title}
+                            {...card}
+                            animationDelay={index * 100}
+                        />
+                    ))
+                )}
             </div>
 
             <div className="grid gap-8 lg:grid-cols-5">
@@ -99,7 +159,7 @@ export default function DashboardPage() {
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                {loadingYield ? (
+                                {isLoading ? (
                                     <Skeleton className="h-8 w-2/3" />
                                 ) : (
                                     <p className="text-2xl font-bold text-foreground">
