@@ -57,14 +57,25 @@ export function ChatLayout() {
   }, [locale]);
 
   useEffect(() => {
-    const initialPrompt = searchParams.get('prompt');
-    const initialImage = searchParams.get('image');
-    if (initialPrompt) {
-      handleSend(initialPrompt, initialImage ?? undefined);
+    // Check for data from scanner page via sessionStorage first
+    const sessionPrompt = sessionStorage.getItem('copilot-prompt');
+    const sessionImage = sessionStorage.getItem('copilot-image');
+
+    if (sessionPrompt) {
+      handleSend(sessionPrompt, sessionImage ?? undefined);
+      // Clean up session storage after use
+      sessionStorage.removeItem('copilot-prompt');
+      sessionStorage.removeItem('copilot-image');
+      return; // Prioritize session storage data
     }
-    // We only want this to run once on mount when the page loads with search params.
+    
+    // Fallback to check URL parameters for backward compatibility or other use cases
+    const initialPrompt = searchParams.get('prompt');
+    if (initialPrompt) {
+      handleSend(initialPrompt);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []); // Run only once on mount
 
   useEffect(() => {
     if (scrollAreaRef.current) {

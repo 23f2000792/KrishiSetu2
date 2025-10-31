@@ -33,9 +33,11 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
             .replace('{prediction}', result.prediction)
             .replace('{recommendations}', result.recommendedSteps);
         
-        const encodedPrompt = encodeURIComponent(prompt);
-        const encodedImage = encodeURIComponent(result.imageUrl);
-        router.push(`/chat?prompt=${encodedPrompt}&image=${encodedImage}`);
+        // Use sessionStorage to avoid long URIs
+        sessionStorage.setItem('copilot-prompt', prompt);
+        sessionStorage.setItem('copilot-image', result.imageUrl);
+
+        router.push('/chat');
     };
 
     const handleSave = () => {
