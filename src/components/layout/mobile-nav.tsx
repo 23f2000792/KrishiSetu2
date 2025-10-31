@@ -10,9 +10,12 @@ import {
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSidebar } from '../ui/sidebar';
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+  
   const navItems = [
     { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { href: '/chat', label: 'Copilot', icon: Bot },
@@ -29,15 +32,16 @@ export function MobileNav() {
             <li key={item.href} className="relative">
               <Link
                 href={item.href}
+                onClick={() => setOpenMobile(false)}
                 className={cn(
                   'flex flex-col items-center gap-1 text-muted-foreground transition-colors w-16 py-2 rounded-lg',
-                  pathname.startsWith(item.href) ? 'text-primary' : 'hover:text-primary'
+                  pathname === item.href ? 'text-primary' : 'hover:text-primary'
                 )}
               >
                 <item.icon className="h-6 w-6" />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
-               {pathname.startsWith(item.href) && (
+               {pathname === item.href && (
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
               )}
             </li>

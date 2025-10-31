@@ -6,7 +6,7 @@ import Link from "next/link";
 const actions = [
     {
         icon: ScanLine,
-        title: "Scan a Leaf",
+        title: "Scan a Crop",
         description: "Diagnose crop issues instantly.",
         href: "/scanner",
         color: "text-green-500",
@@ -40,16 +40,16 @@ export function QuickActions() {
       <CardContent>
         <div className="space-y-4">
           {actions.map((action) => (
-            <Link href={action.href} key={action.title} className="block">
-                <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors">
-                    <div className={`p-3 rounded-full ${action.bgColor}`}>
-                        <action.icon className={`h-6 w-6 ${action.color}`} />
+            <Link href={action.href} key={action.title} className="block group">
+                <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors group-hover:border-primary">
+                    <div className={`p-3 rounded-full ${action.bgColor} transition-colors group-hover:bg-primary/20`}>
+                        <action.icon className={`h-6 w-6 ${action.color} transition-colors group-hover:text-primary`} />
                     </div>
                     <div className="flex-1">
                         <p className="font-semibold">{action.title}</p>
                         <p className="text-sm text-muted-foreground">{action.description}</p>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
                 </div>
             </Link>
           ))}

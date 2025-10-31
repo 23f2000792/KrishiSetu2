@@ -7,9 +7,10 @@ import { Upload, Camera } from 'lucide-react';
 
 type FileUploaderProps = {
   onFileUpload: (file: File) => void;
+  onCameraOpen: () => void;
 };
 
-export function FileUploader({ onFileUpload }: FileUploaderProps) {
+export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -41,7 +42,7 @@ export function FileUploader({ onFileUpload }: FileUploaderProps) {
 
   return (
     <Card 
-        className={`border-2 border-dashed transition-colors ${isDragging ? 'border-primary bg-primary/10' : ''}`}
+        className={`border-2 border-dashed transition-colors duration-300 ${isDragging ? 'border-primary bg-primary/10 scale-105' : 'border-border'}`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -53,7 +54,7 @@ export function FileUploader({ onFileUpload }: FileUploaderProps) {
             <Upload className="h-8 w-8 text-primary" />
           </div>
           <h3 className="text-xl font-semibold font-headline">
-            Drag & Drop or Click to Upload
+            Drag & Drop or Upload a Photo
           </h3>
           <p className="text-muted-foreground">
             Supported formats: PNG, JPG, JPEG. Max file size: 5MB.
@@ -69,7 +70,7 @@ export function FileUploader({ onFileUpload }: FileUploaderProps) {
               accept="image/png, image/jpeg, image/jpg"
               onChange={handleFileChange}
             />
-            <Button variant="outline" onClick={() => inputRef.current?.click()}>
+            <Button variant="outline" onClick={onCameraOpen}>
               <Camera className="mr-2 h-4 w-4" />
               Use Camera
             </Button>

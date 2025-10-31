@@ -23,8 +23,8 @@ const features = [
   },
   {
     icon: <ScanLine className="h-8 w-8 text-primary" />,
-    title: 'Leaf Scanner',
-    description: 'Quickly diagnose crop diseases and nutrient deficiencies. Just snap a photo of a leaf to get an instant analysis and solution.',
+    title: 'Crop Scanner',
+    description: 'Quickly diagnose crop diseases and nutrient deficiencies. Just snap a photo of a crop to get an instant analysis and solution.',
     image_id: 'feature_scanner'
   },
 ];
@@ -47,7 +47,7 @@ export function Features() {
             return (
             <Card 
                 key={feature.title} 
-                className="text-center transform-gpu transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20 animate-fade-in-up"
+                className="text-center transform-gpu transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20 animate-fade-in-up group"
                 style={{ animationDelay: `${index * 150}ms` }}
             >
               <CardHeader>
@@ -56,8 +56,8 @@ export function Features() {
                 </div>
                 <CardTitle className="font-headline text-2xl pt-4">{feature.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{feature.description}</p>
+              <CardContent className='flex flex-col flex-grow'>
+                <p className="text-muted-foreground flex-grow">{feature.description}</p>
                  {featureImage && (
                     <div className="mt-6 aspect-video relative rounded-lg overflow-hidden border">
                         <Image

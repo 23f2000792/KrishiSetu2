@@ -15,16 +15,18 @@ import {
 import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
+import { useSidebar } from '../ui/sidebar';
 
 export function SidebarNav() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { setOpenMobile } = useSidebar();
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/chat', label: 'AI Copilot', icon: Bot },
     { href: '/market', label: 'Market Prices', icon: ShoppingBasket },
-    { href: '/scanner', label: 'Leaf Scanner', icon: ScanLine },
+    { href: '/scanner', label: 'Crop Scanner', icon: ScanLine },
     { href: '/community', label: 'Community', icon: Users },
     { href: '/profile', label: 'Profile', icon: Landmark, gap: true },
     { href: '/settings', label: 'Settings', icon: Settings },
@@ -39,7 +41,7 @@ export function SidebarNav() {
   return (
     <div className="flex h-full flex-col gap-4 py-4">
       <div className="px-4">
-        <Link href="/dashboard">
+        <Link href="/dashboard" onClick={() => setOpenMobile(false)}>
           <Logo />
         </Link>
       </div>
@@ -49,6 +51,7 @@ export function SidebarNav() {
             <li key={item.href} className={cn(item.gap && 'pt-4 mt-4 border-t')}>
               <Link
                 href={item.href}
+                onClick={() => setOpenMobile(false)}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-primary/10',
                   pathname === item.href && 'bg-primary/10 font-medium text-primary'
