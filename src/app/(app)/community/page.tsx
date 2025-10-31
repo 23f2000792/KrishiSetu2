@@ -21,7 +21,7 @@ export default function CommunityPage() {
     const postsQuery = useMemoFirebase(() => {
       if (!firestore) return null;
       return query(collection(firestore, 'posts'), orderBy('createdAt', 'desc'));
-    }, [firestore]);
+    }, [firestore, collection, orderBy]);
 
     const { data: posts, isLoading } = useCollection<Post>(postsQuery);
 
