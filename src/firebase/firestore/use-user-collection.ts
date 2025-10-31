@@ -15,11 +15,6 @@ import { useCollection, type UseCollectionResult } from './use-collection';
 import { useAuth } from '@/contexts/auth-context';
 import { useFirebase } from '../provider';
 
-type QueryFn = typeof firestoreQuery;
-type OrderByFn = (fieldPath: string, directionStr?: OrderByDirection) => QueryConstraint;
-type LimitFn = (limit: number) => QueryConstraint;
-
-
 /**
  * A hook to fetch a collection filtered by the currently authenticated user's ID.
  *
@@ -28,10 +23,9 @@ type LimitFn = (limit: number) => QueryConstraint;
  *
  * @template T - The type of the documents in the collection.
  * @param {string} collectionName - The name of the Firestore collection to query.
- * @param {QueryFn} queryFn - The `query` function from 'firebase/firestore'.
- * @param {OrderByFn} orderByFn - The `orderBy` function from 'firebase/firestore'.
- * @param {LimitFn} limitFn - The `limit` function from 'firebase/firestore'.
- * @param {QueryConstraint[]} queryConstraints - Optional additional Firestore query constraints (e.g., orderBy, limit).
+ * @param {object} [options] - Optional query options.
+ * @param {[string, OrderByDirection]} [options.orderBy] - Field to order by and direction.
+ * @param {number} [options.limit] - Number of documents to limit.
  * @returns {UseCollectionResult<T>} An object containing the data, loading state, and any errors.
  */
 export function useUserCollection<T>(
@@ -51,7 +45,7 @@ export function useUserCollection<T>(
 
     const constraints: QueryConstraint[] = [where('userId', '==', user.id)];
     if (options?.orderBy) {
-      constraints.push(orderBy(...options.orderBy));
+      constraints.push(orderBy(options.orderBy[0], options.orderBy[1]));
     }
     if (options?.limit) {
       constraints.push(limit(options.limit));
@@ -62,7 +56,7 @@ export function useUserCollection<T>(
       ...constraints
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore, collectionName, options?.orderBy, options?.limit]);
+  }, [user, firestore, collectionName, options?.orderBy?.[0], options?.orderBy?.[1], options?.limit]);
 
   // The type assertion is safe because useCollection handles null queries.
   return useCollection<T>(userQuery as Query<DocumentData> | null);

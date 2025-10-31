@@ -1,3 +1,4 @@
+
 'use client';
 import { PageHeader } from "@/components/page-header"
 import { Bot, Droplets, Leaf, LineChart, Bug, ShoppingCart, Tractor, CalendarRange } from "lucide-react";
@@ -101,7 +102,7 @@ export default function DashboardPage() {
             title: t('dashboard.soilFertility'), 
             value: latestSoilReport ? `${latestSoilReport.aiSummary.fertilityIndex}/100` : "N/A", 
             icon: Leaf, 
-            details: latestSoilReport ? latestSoilReport.aiSummary.fertilityStatus : t('dashboard.loading'),
+            details: latestSoilReport ? latestSoilReport.aiSummary.fertilityStatus : (soilReportsLoading ? t('dashboard.loading') : 'No soil report found'),
             trend: "up" as const, 
         },
         { 
