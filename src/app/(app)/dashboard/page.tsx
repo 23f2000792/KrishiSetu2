@@ -6,12 +6,12 @@ import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
-import { GrowthTimeline } from "./components/growth-timeline";
 import { diseaseOutbreakPredictionFlow } from "@/ai/flows/disease-outbreak-prediction";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 export default function DashboardPage() {
     const { t, locale } = useLanguage();
