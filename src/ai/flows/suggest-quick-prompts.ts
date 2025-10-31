@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const QuickPromptsInputSchema = z.object({
   language: z.string().describe('The language for the response (e.g., "English", "Hindi", "Punjabi").'),
@@ -29,6 +30,7 @@ export async function suggestQuickPrompts(input: QuickPromptsInput): Promise<Qui
 
 const prompt = ai.definePrompt({
   name: 'suggestQuickPromptsPrompt',
+  model: googleAI.model('gemini-1.5-pro'),
   input: {schema: QuickPromptsInputSchema},
   output: {schema: QuickPromptsOutputSchema},
   prompt: `You are an AI assistant designed to help farmers by suggesting quick prompts to get started with the AI Copilot.
