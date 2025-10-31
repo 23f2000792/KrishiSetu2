@@ -9,11 +9,6 @@ import {
   ScanLine,
   ShoppingBasket,
   Users,
-  CalendarRange,
-  BarChart,
-  Book,
-  Wallet,
-  Satellite,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '../ui/sidebar';
@@ -33,7 +28,7 @@ export function MobileNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-background/80 border-t backdrop-blur-sm z-40">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-background/95 border-t backdrop-blur-sm z-40">
       <nav className="h-full">
         <ul className="flex h-full items-center justify-around">
           {navItems.map((item) => (
@@ -50,7 +45,7 @@ export function MobileNav() {
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
                {pathname === item.href && (
-                <div className="absolute -top-1 left-1/2 -translate-x-2 w-8 h-1 bg-primary rounded-full" />
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
               )}
             </li>
           ))}

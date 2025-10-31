@@ -17,15 +17,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
-        <Sidebar className="hidden md:flex md:flex-col md:border-r">
-          <SidebarContent>
-            <SidebarNav />
-          </SidebarContent>
-        </Sidebar>
-        <div className="flex flex-1 flex-col">
-          <Header />
-          <main className={cn("flex-1 p-4 md:p-8 pt-6 bg-secondary/50", isMobile && 'pb-20')}>
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <div className="flex flex-1">
+          <Sidebar className="hidden md:flex md:flex-col md:border-r">
+            <SidebarContent>
+              <SidebarNav />
+            </SidebarContent>
+          </Sidebar>
+          <main className={cn("flex-1 p-4 md:p-8 pt-6 bg-secondary/50", isMobile && 'pb-24')}>
             {children}
           </main>
         </div>
