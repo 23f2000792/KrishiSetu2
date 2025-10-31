@@ -4,23 +4,32 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/language-context';
-import { Paperclip, Loader2 } from 'lucide-react';
+import { Paperclip, Loader2, X } from 'lucide-react';
 import React from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 const formSchema = z.object({
   content: z.string().min(10, { message: 'Post must be at least 10 characters long.' }),
-  image: z.any().optional(),
   language: z.string({ required_error: 'Please select a language.' }),
+});
+
+// Function to convert file to data URL
+const toDataURL = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
 });
 
 function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
@@ -29,11 +38,28 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
     const { user } = useAuth();
     const { firestore } = useFirebase();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [imageFile, setImageFile] = React.useState<File | null>(null);
     const imageInputRef = React.useRef<HTMLInputElement>(null);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: { content: '', language: 'English' },
     });
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                toast({
+                    variant: 'destructive',
+                    title: 'File too large',
+                    description: 'Please select an image smaller than 5MB.',
+                });
+                return;
+            }
+            setImageFile(file);
+        }
+    };
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!user || !firestore) {
@@ -46,16 +72,19 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
         }
 
         setIsSubmitting(true);
+        let imageUrl: string | undefined = undefined;
 
         try {
-            // In a real app, you would handle image uploads to a service like Firebase Storage
-            // and get a URL back. For now, we'll ignore the image.
+            if (imageFile) {
+                imageUrl = await toDataURL(imageFile);
+            }
             
             const postData = {
                 authorId: user.id,
                 authorName: user.name,
                 authorAvatar: user.avatar || '',
                 content: values.content,
+                image: imageUrl,
                 language: values.language,
                 upvotes: 0,
                 comments: [],
@@ -70,6 +99,10 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
             });
             onPostCreated();
             form.reset({ content: '', language: 'English' });
+            setImageFile(null);
+            if (imageInputRef.current) {
+                imageInputRef.current.value = '';
+            }
         } catch (error) {
             console.error('Error creating post:', error);
             toast({
@@ -118,17 +151,32 @@ function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
                     </div>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                    <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field }) => (
-                            <FormItem className="hidden">
-                                <FormControl>
-                                    <Input type="file" ref={imageInputRef} onChange={(e) => field.onChange(e.target.files)} disabled={isSubmitting} />
-                                </FormControl>
-                            </FormItem>
-                        )}
+                    <Input 
+                        type="file" 
+                        ref={imageInputRef} 
+                        onChange={handleFileChange}
+                        className="hidden" 
+                        accept="image/png, image/jpeg"
+                        disabled={isSubmitting} 
                     />
+                    {imageFile && (
+                        <div className="mt-2">
+                             <Badge variant="secondary" className="flex items-center justify-between">
+                                <span>{imageFile.name}</span>
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-5 w-5 ml-2" 
+                                    onClick={() => {
+                                        setImageFile(null);
+                                        if (imageInputRef.current) imageInputRef.current.value = '';
+                                    }}
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </Badge>
+                        </div>
+                    )}
                 </CardContent>
                 <CardFooter className="flex justify-between items-center p-4 pt-0">
                     <div className="flex gap-2">
