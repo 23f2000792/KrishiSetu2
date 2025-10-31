@@ -42,7 +42,7 @@ const chartConfig = {
 export function MarketChart() {
   const { t } = useLanguage();
   return (
-    <Card>
+    <Card className="transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
         <CardTitle>{t('dashboard.marketChartTitle')}</CardTitle>
         <CardDescription>{t('dashboard.marketChartDescription')}</CardDescription>

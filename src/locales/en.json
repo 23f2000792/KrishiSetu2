@@ -17,6 +17,7 @@
     "dashboard": "Dashboard",
     "aiCopilot": "AI Copilot",
     "marketPrices": "Market Prices",
+    "growthForecast": "Growth Forecast",
     "cropScanner": "Crop Scanner",
     "soilAnalyzer": "Soil Analyzer",
     "community": "Community",
@@ -27,6 +28,7 @@
   "mobileNav": {
     "home": "Home",
     "copilot": "Copilot",
+    "forecast": "Forecast",
     "scan": "Scan",
     "soil": "Soil",
     "market": "Market",
@@ -107,7 +109,8 @@
     "askCopilot": "Ask AI Copilot",
     "askCopilotDesc": "Get expert advice anytime.",
     "outbreakAlert": "Outbreak Alert",
-    "outbreakError": "Could not fetch alert."
+    "outbreakError": "Could not fetch alert.",
+    "loading": "Loading..."
   },
   "chat": {
     "title": "AI Copilot",
@@ -271,5 +274,9 @@
     "ingestData": "Ingest Market Data",
     "seedData": "Seed Demo Data",
     "seedDataDesc": "Reset all demo data to the default state."
+  },
+  "growthForecast": {
+    "title": "30-Day Growth Forecast",
+    "description": "An AI-powered simulation of your crop's journey for the next month."
   }
 }

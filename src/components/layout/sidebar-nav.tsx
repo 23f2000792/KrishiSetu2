@@ -11,6 +11,7 @@ import {
   Settings,
   ShoppingBasket,
   Users,
+  CalendarRange,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ export function SidebarNav() {
     { href: '/dashboard', label: t('sidebar.dashboard'), icon: LayoutDashboard },
     { href: '/chat', label: t('sidebar.aiCopilot'), icon: Bot },
     { href: '/market', label: t('sidebar.marketPrices'), icon: ShoppingBasket },
+    { href: '/growth-forecast', label: t('sidebar.growthForecast'), icon: CalendarRange },
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
     { href: '/soil-analyzer', label: t('sidebar.soilAnalyzer'), icon: Leaf },
     { href: '/community', label: t('sidebar.community'), icon: Users },

@@ -9,6 +9,7 @@ import {
   ScanLine,
   ShoppingBasket,
   Users,
+  CalendarRange,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '../ui/sidebar';
@@ -22,8 +23,8 @@ export function MobileNav() {
   const navItems = [
     { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
     { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
+    { href: '/growth-forecast', label: t('mobileNav.forecast'), icon: CalendarRange },
     { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
-    { href: '/soil-analyzer', label: t('mobileNav.soil'), icon: Leaf },
     { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
 
