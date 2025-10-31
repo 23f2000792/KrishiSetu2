@@ -1,7 +1,7 @@
 
 'use client';
 import { PageHeader } from "@/components/page-header"
-import { Bot, Droplets, Leaf, LineChart, Bug, ShoppingCart, Tractor, CalendarRange } from "lucide-react";
+import { Bot, Droplets, Leaf, LineChart, Bug, ShoppingCart, Tractor, CalendarRange, Target } from "lucide-react";
 import SummaryCard from "./components/summary-card";
 import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
@@ -14,7 +14,6 @@ import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { SoilReport } from "@/lib/types";
-import { analyzeMarket } from "@/ai/flows/market-analyst-flow";
 
 
 export default function DashboardPage() {
@@ -24,9 +23,6 @@ export default function DashboardPage() {
     // AI State
     const [outbreakAlert, setOutbreakAlert] = useState<string | null>(null);
     const [yieldPrediction, setYieldPrediction] = useState<string | null>(null);
-    const [marketForecast, setMarketForecast] = useState<{ value: string, trend: 'up' | 'down' } | null>(null);
-    const [latestPrice, setLatestPrice] = useState<number | null>(null);
-
 
     // Loading State
     const [loadingAI, setLoadingAI] = useState(true);
@@ -48,7 +44,7 @@ export default function DashboardPage() {
             setLoadingAI(true);
             
             try {
-                const [outbreakResult, growthResult, marketResult] = await Promise.all([
+                const [outbreakResult, growthResult] = await Promise.all([
                      diseaseOutbreakPredictionFlow({
                         crop: primaryCrop,
                         region: user.region,
@@ -60,28 +56,15 @@ export default function DashboardPage() {
                         language: languageMap[locale],
                         soilReport: latestSoilReport?.aiSummary,
                     }),
-                    analyzeMarket({
-                        crop: primaryCrop,
-                        region: user.region,
-                        language: languageMap[locale],
-                    })
                 ]);
 
                 setOutbreakAlert(outbreakResult.alert);
                 setYieldPrediction(growthResult.finalYieldPrediction.split(':')[1].split(' vs.')[0].trim());
-                setLatestPrice(marketResult.latestPrice);
-                
-                const forecastMatch = marketResult.forecast.match(/(-?\d+(\.\d+)?%)/);
-                if (forecastMatch) {
-                    const trend = forecastMatch[0].includes('-') ? 'down' : 'up';
-                    setMarketForecast({ value: forecastMatch[0], trend });
-                }
 
             } catch (error) {
                 console.error("Failed to get dashboard AI predictions:", error);
                 setOutbreakAlert(t('dashboard.outbreakError'));
                 setYieldPrediction("N/A");
-                setMarketForecast({ value: "N/A", trend: 'down'});
             } finally {
                 setLoadingAI(false);
             }
@@ -100,7 +83,6 @@ export default function DashboardPage() {
             value: latestSoilReport ? `${latestSoilReport.aiSummary.fertilityIndex}/100` : "N/A", 
             icon: Leaf, 
             details: latestSoilReport ? latestSoilReport.aiSummary.fertilityStatus : (soilReportsLoading ? t('dashboard.loading') : 'No soil report found'),
-            trend: "up" as const, 
         },
         { 
             title: t('dashboard.irrigation'), 
@@ -109,12 +91,10 @@ export default function DashboardPage() {
             details: "Optimal moisture levels" 
         },
         { 
-            title: t('dashboard.mandiForecast'), 
-            value: latestPrice ? `₹${latestPrice.toLocaleString()}` : "...", 
-            icon: LineChart, 
-            details: `${primaryCrop} price`, 
-            trend: marketForecast?.trend,
-            change: marketForecast?.value
+            title: "Predicted Yield",
+            value: yieldPrediction ? `${yieldPrediction}` : "...", 
+            icon: Target, 
+            details: `${primaryCrop} yield per acre`,
         },
         { 
             title: t('dashboard.outbreakAlert'), 
