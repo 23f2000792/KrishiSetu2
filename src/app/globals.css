@@ -8,27 +8,27 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 20% 98%; /* #F8FAFB */
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 142.1 76.2% 36.3%;
+    --primary: 145 75% 39%; /* #0F9D58 */
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 45 93% 47%;
+    --accent: 38 92% 56%; /* #F6A623 */
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 142.1 76.2% 36.3%;
-    --chart-1: 142.1 76.2% 36.3%;
-    --chart-2: 45 93% 47%;
+    --ring: 145 75% 39%;
+    --chart-1: 145 75% 39%;
+    --chart-2: 38 92% 56%;
     --chart-3: 221 83% 53%;
     --chart-4: 10 89% 60%;
     --chart-5: 318 76% 56%;
@@ -39,23 +39,21 @@ body {
     --foreground: 210 40% 98%;
     --card: 224 71.4% 4.1%;
     --card-foreground: 210 40% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142.1 76.2% 36.3%;
+    --primary: 145 75% 39%;
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215.4 16.3% 56.9%;
-    --accent: 45 93% 47%;
+    --accent: 38 92% 56%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 142.1 76.2% 36.3%;
-    --chart-1: 142.1 76.2% 36.3%;
-    --chart-2: 45 93% 47%;
+    --ring: 145 75% 39%;
+    --chart-1: 145 75% 39%;
+    --chart-2: 38 92% 56%;
     --chart-3: 217 91% 60%;
     --chart-4: 10 89% 60%;
     --chart-5: 318 76% 56%;

@@ -8,7 +8,7 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { marketPrices } from "@/lib/data";
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from "@/contexts/language-context";
 
@@ -48,8 +48,21 @@ export function MarketChart() {
         <CardDescription>{t('dashboard.marketChartDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-64 w-full">
-            <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
+        <ChartContainer config={chartConfig} className="h-80 w-full">
+            <AreaChart 
+                data={chartData} 
+                margin={{ top: 5, right: 10, left: -10, bottom: 0 }}
+            >
+                <defs>
+                    <linearGradient id="colorWheat" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-Wheat)" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="var(--color-Wheat)" stopOpacity={0.1}/>
+                    </linearGradient>
+                    <linearGradient id="colorCotton" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-Cotton)" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="var(--color-Cotton)" stopOpacity={0.1}/>
+                    </linearGradient>
+                </defs>
                 <CartesianGrid vertical={false} />
                 <XAxis 
                     dataKey="date" 
@@ -62,16 +75,16 @@ export function MarketChart() {
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
+                    tickFormatter={(value) => `₹${value / 1000}k`}
                 />
                 <ChartTooltip
-                    cursor={false}
+                    cursor={true}
                     content={<ChartTooltipContent indicator="dot" />}
                 />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Line dataKey="Wheat" type="monotone" stroke="var(--color-Wheat)" strokeWidth={2} dot={false} />
-                <Line dataKey="Rice (Basmati)" type="monotone" stroke="var(--color-Rice (Basmati))" strokeWidth={2} dot={false} />
-                <Line dataKey="Cotton" type="monotone" stroke="var(--color-Cotton)" strokeWidth={2} dot={false} />
-            </LineChart>
+                <Area dataKey="Wheat" type="monotone" stroke="var(--color-Wheat)" fill="url(#colorWheat)" strokeWidth={2} dot={false} />
+                <Area dataKey="Cotton" type="monotone" stroke="var(--color-Cotton)" fill="url(#colorCotton)" strokeWidth={2} dot={false} />
+            </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>

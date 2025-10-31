@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bot, ScanLine, ShoppingBasket, ArrowRight } from "lucide-react";
+import { Bot, ScanLine, Leaf, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from '@/contexts/language-context';
 
@@ -14,25 +14,25 @@ export function QuickActions() {
             title: t('dashboard.scanCrop'),
             description: t('dashboard.scanCropDesc'),
             href: "/scanner",
-            color: "text-green-500",
-            bgColor: "bg-green-500/10",
+            color: "text-blue-500",
+            bgColor: "bg-blue-500/10",
+        },
+        {
+            icon: Leaf,
+            title: t('dashboard.analyzeSoil'),
+            description: t('dashboard.analyzeSoilDesc'),
+            href: "/soil-analyzer",
+            color: "text-orange-500",
+            bgColor: "bg-orange-500/10",
         },
         {
             icon: Bot,
             title: t('dashboard.askCopilot'),
             description: t('dashboard.askCopilotDesc'),
             href: "/chat",
-            color: "text-blue-500",
-            bgColor: "bg-blue-500/10",
+            color: "text-primary",
+            bgColor: "bg-primary/10",
         },
-        {
-            icon: ShoppingBasket,
-            title: t('dashboard.checkMandi'),
-            description: t('dashboard.checkMandiDesc'),
-            href: "/market",
-            color: "text-orange-500",
-            bgColor: "bg-orange-500/10",
-        }
     ];
 
     return (
@@ -45,9 +45,9 @@ export function QuickActions() {
             <div className="space-y-4">
             {actions.map((action) => (
                 <Link href={action.href} key={action.title} className="block group">
-                    <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors duration-200 group-hover:border-primary/50 group-hover:shadow-lg group-hover:-translate-y-1">
-                        <div className={`p-3 rounded-full ${action.bgColor} transition-colors group-hover:scale-110`}>
-                            <action.icon className={`h-6 w-6 ${action.color} transition-colors group-hover:text-primary`} />
+                    <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors duration-200 group-hover:border-primary/50 group-hover:shadow-sm">
+                        <div className={`p-3 rounded-full ${action.bgColor} transition-transform group-hover:scale-105`}>
+                            <action.icon className={`h-6 w-6 ${action.color}`} />
                         </div>
                         <div className="flex-1">
                             <p className="font-semibold">{action.title}</p>
