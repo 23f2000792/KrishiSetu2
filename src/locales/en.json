@@ -114,7 +114,8 @@
     "inputPlaceholder": "Type your message...",
     "micButton": "Mic",
     "sendButton": "Send",
-    "error": "Sorry, I'm having trouble connecting right now. Please try again later."
+    "error": "Sorry, I'm having trouble connecting right now. Please try again later.",
+    "scannedImageAlt": "Scanned crop image"
   },
   "market": {
     "title": "Mandi Prices",
@@ -151,7 +152,19 @@
     "cameraAccessDeniedTitle": "Camera Access Denied",
     "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings to use this feature.",
     "cameraNotSupportedTitle": "Camera Not Supported",
-    "cameraNotSupportedDesc": "Your browser does not support camera access."
+    "cameraNotSupportedDesc": "Your browser does not support camera access.",
+    "aiAnalysis": "Based on our AI analysis",
+    "askCopilot": "Ask AI Copilot for details",
+    "shareResult": "Share Result",
+    "copilotPrompt": "I have a crop with '{prediction}'. The initial advice was '{recommendations}'. Can you provide more details? I want to know more about the symptoms, causes, and a more detailed, step-by-step treatment plan. Please be very specific.",
+    "recordSavedTitle": "Scan Saved",
+    "recordSavedDesc": "This scan result has been saved to your records.",
+    "shareTitle": "KrishiSetu Scan Result",
+    "shareText": "My crop scan result from KrishiSetu:",
+    "shareErrorTitle": "Could Not Share",
+    "shareErrorDesc": "There was an error trying to share the result.",
+    "copiedToClipboardTitle": "Copied to Clipboard",
+    "copiedToClipboardDesc": "Scan result details have been copied to your clipboard."
   },
   "community": {
     "title": "Community Feed",

@@ -8,6 +8,8 @@ import { CheckCircle, Save, AlertTriangle, Scan, Bot, Share2 } from 'lucide-reac
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/language-context';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 type ScanResultCardProps = {
   result: ScanResult;
@@ -18,11 +20,57 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
     const isHealthy = result.prediction.toLowerCase().includes('healthy');
     const [confidence, setConfidence] = useState(0);
     const { t } = useLanguage();
+    const router = useRouter();
+    const { toast } = useToast();
 
     useEffect(() => {
         const timer = setTimeout(() => setConfidence(Math.round(result.confidence * 100)), 300);
         return () => clearTimeout(timer);
     }, [result.confidence]);
+
+    const handleAskCopilot = () => {
+        const prompt = t('scanner.copilotPrompt')
+            .replace('{prediction}', result.prediction)
+            .replace('{recommendations}', result.recommendedSteps);
+        
+        const encodedPrompt = encodeURIComponent(prompt);
+        const encodedImage = encodeURIComponent(result.imageUrl);
+        router.push(`/chat?prompt=${encodedPrompt}&image=${encodedImage}`);
+    };
+
+    const handleSave = () => {
+        toast({
+            title: t('scanner.recordSavedTitle'),
+            description: t('scanner.recordSavedDesc'),
+        });
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+            title: t('scanner.shareTitle'),
+            text: `${t('scanner.shareText')} ${result.prediction} (${t('scanner.confidence')}: ${confidence}%). ${t('scanner.recommendations')}: ${result.recommendedSteps}`,
+            url: window.location.href,
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                // Fallback for browsers that don't support navigator.share
+                await navigator.clipboard.writeText(shareData.text);
+                toast({
+                    title: t('scanner.copiedToClipboardTitle'),
+                    description: t('scanner.copiedToClipboardDesc'),
+                });
+            }
+        } catch (error) {
+            console.error('Error sharing:', error);
+             toast({
+                variant: 'destructive',
+                title: t('scanner.shareErrorTitle'),
+                description: t('scanner.shareErrorDesc'),
+            });
+        }
+    };
 
   return (
     <Card className="animate-fade-in-up w-full max-w-2xl mx-auto">
@@ -41,7 +89,7 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
                     {isHealthy ? <CheckCircle className="mr-2 h-4 w-4" /> : <AlertTriangle className="mr-2 h-4 w-4" />}
                     {result.prediction}
                 </Badge>
-                <p className='text-sm text-muted-foreground'>Based on our AI analysis</p>
+                <p className='text-sm text-muted-foreground'>{t('scanner.aiAnalysis')}</p>
             </div>
 
             <div>
@@ -60,11 +108,11 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
       </CardContent>
       <CardFooter className="flex-col gap-4">
         <div className='flex flex-col sm:flex-row w-full gap-2'>
-             <Button className="w-full">
+             <Button className="w-full" onClick={handleAskCopilot}>
                 <Bot className="mr-2 h-4 w-4" />
-                Ask AI Copilot for details
+                {t('scanner.askCopilot')}
             </Button>
-            <Button className="w-full">
+            <Button className="w-full" onClick={handleSave}>
                 <Save className="mr-2 h-4 w-4" />
                 {t('scanner.saveToRecords')}
             </Button>
@@ -74,9 +122,9 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
                 <Scan className="mr-2 h-4 w-4" />
                 {t('scanner.scanAnother')}
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" onClick={handleShare}>
                 <Share2 className="mr-2 h-4 w-4" />
-                Share Result
+                {t('scanner.shareResult')}
             </Button>
         </div>
       </CardFooter>

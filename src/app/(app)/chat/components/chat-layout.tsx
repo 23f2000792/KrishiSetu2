@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +20,7 @@ type Message = {
   id: string;
   text: string;
   isUser: boolean;
+  image?: string;
 };
 
 export function ChatLayout() {
@@ -28,6 +31,7 @@ export function ChatLayout() {
   const [loading, setLoading] = useState(false);
   const [quickPrompts, setQuickPrompts] = useState<string[]>([]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchPrompts = async () => {
@@ -47,16 +51,31 @@ export function ChatLayout() {
   }, []);
 
   useEffect(() => {
+    const initialPrompt = searchParams.get('prompt');
+    const initialImage = searchParams.get('image');
+    if (initialPrompt) {
+      handleSend(initialPrompt, initialImage ?? undefined);
+    }
+    // We only want this to run once on mount when the page loads with search params.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
 
-  const handleSend = async (prompt?: string) => {
+  const handleSend = async (prompt?: string, image?: string) => {
     const textToSend = prompt || input;
     if (!textToSend.trim()) return;
 
-    const userMessage: Message = { id: Date.now().toString(), text: textToSend, isUser: true };
+    const userMessage: Message = { 
+        id: Date.now().toString(), 
+        text: textToSend, 
+        isUser: true,
+        image: image 
+    };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -93,6 +112,11 @@ export function ChatLayout() {
                 </Avatar>
               )}
               <div className={cn('max-w-xs md:max-w-md lg:max-w-2xl rounded-lg p-3', message.isUser ? 'bg-primary text-primary-foreground' : 'bg-card border')}>
+                {message.image && (
+                  <div className="relative aspect-video w-full mb-2 rounded-md overflow-hidden border">
+                    <Image src={message.image} alt={t('chat.scannedImageAlt')} fill className="object-contain" />
+                  </div>
+                )}
                 <p className="text-sm whitespace-pre-wrap">{message.text}</p>
               </div>
               {message.isUser && user && (
