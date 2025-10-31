@@ -3,9 +3,9 @@
 /**
  * @fileOverview An AI-powered agri-advisory service for farmers, acting as an orchestrator for a multi-agent system.
  *
- * - aiCopilotAgriAdvisory - A function that provides AI-driven advice for farmers.
- * - AiCopilotAgriAdvisoryInput - The input type for the aiCopilotAgriAdvisory function.
- * - AiCopilotAgriAdvisoryOutput - The return type for the aiCopilotAgriAdvisory function.
+ * - krishiAiAgriAdvisory - A function that provides AI-driven advice for farmers.
+ * - KrishiAiAgriAdvisoryInput - The input type for the krishiAiAgriAdvisory function.
+ * - KrishiAiAgriAdvisoryOutput - The return type for the krishiAiAgriAdvisory function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -17,7 +17,7 @@ import { analyzeSoilCard } from './soil-card-analyzer';
 import { diseaseOutbreakPredictionFlow } from './disease-outbreak-prediction';
 import { analyzeProfitability } from './profit-analyst-flow';
 
-const AiCopilotAgriAdvisoryInputSchema = z.object({
+const KrishiAiAgriAdvisoryInputSchema = z.object({
   query: z
     .string()
     .describe('The question from the farmer about their crops or farm.'),
@@ -28,23 +28,23 @@ const AiCopilotAgriAdvisoryInputSchema = z.object({
     ),
   userId: z.string().describe("The user's unique ID for personalization."),
 });
-export type AiCopilotAgriAdvisoryInput = z.infer<
-  typeof AiCopilotAgriAdvisoryInputSchema
+export type KrishiAiAgriAdvisoryInput = z.infer<
+  typeof KrishiAiAgriAdvisoryInputSchema
 >;
 
-const AiCopilotAgriAdvisoryOutputSchema = z.object({
+const KrishiAiAgriAdvisoryOutputSchema = z.object({
   advice: z
     .string()
     .describe('The AI-powered advice for the farmer, formatted in Markdown.'),
 });
-export type AiCopilotAgriAdvisoryOutput = z.infer<
-  typeof AiCopilotAgriAdvisoryOutputSchema
+export type KrishiAiAgriAdvisoryOutput = z.infer<
+  typeof KrishiAiAgriAdvisoryOutputSchema
 >;
 
-export async function aiCopilotAgriAdvisory(
-  input: AiCopilotAgriAdvisoryInput
-): Promise<AiCopilotAgriAdvisoryOutput> {
-  return aiCopilotAgriAdvisoryFlow(input);
+export async function krishiAiAgriAdvisory(
+  input: KrishiAiAgriAdvisoryInput
+): Promise<KrishiAiAgriAdvisoryOutput> {
+  return krishiAiAgriAdvisoryFlow(input);
 }
 
 
@@ -124,9 +124,9 @@ const financeAgent = ai.defineTool({
 
 
 const prompt = ai.definePrompt({
-  name: 'aiCopilotAgriAdvisoryPrompt',
-  input: {schema: AiCopilotAgriAdvisoryInputSchema},
-  output: {schema: AiCopilotAgriAdvisoryOutputSchema},
+  name: 'krishiAiAgriAdvisoryPrompt',
+  input: {schema: KrishiAiAgriAdvisoryInputSchema},
+  output: {schema: KrishiAiAgriAdvisoryOutputSchema},
   tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, climateAnalystAgent, financeAgent],
   prompt: `You are the lead "Advisory Agent" in a multi-agent collaboration system called "AgriVerse". Your primary role is to synthesize insights from a team of specialist AI agents to provide the most comprehensive and actionable advice to farmers.
 
@@ -157,11 +157,11 @@ Begin your analysis by consulting your agent team.
 `,
 });
 
-const aiCopilotAgriAdvisoryFlow = ai.defineFlow(
+const krishiAiAgriAdvisoryFlow = ai.defineFlow(
   {
-    name: 'aiCopilotAgriAdvisoryFlow',
-    inputSchema: AiCopilotAgriAdvisoryInputSchema,
-    outputSchema: AiCopilotAgriAdvisoryOutputSchema,
+    name: 'krishiAiAgriAdvisoryFlow',
+    inputSchema: KrishiAiAgriAdvisoryInputSchema,
+    outputSchema: KrishiAiAgriAdvisoryOutputSchema,
   },
   async input => {
     const {output} = await prompt(input);

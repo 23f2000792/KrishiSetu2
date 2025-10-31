@@ -34,7 +34,7 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
         return () => clearTimeout(timer);
     }, [result.confidence]);
 
-    const handleAskCopilot = () => {
+    const handleAskKrishiAi = () => {
         const prompt = t('scanner.copilotPrompt')
             .replace('{prediction}', result.prediction)
             .replace('{recommendations}', result.recommendedSteps);
@@ -142,9 +142,9 @@ export function ScanResultCard({ result, onNewScan }: ScanResultCardProps) {
       </CardContent>
       <CardFooter className="flex-col gap-4">
         <div className='flex flex-col sm:flex-row w-full gap-2'>
-             <Button className="w-full" onClick={handleAskCopilot}>
+             <Button className="w-full" onClick={handleAskKrishiAi}>
                 <Bot className="mr-2 h-4 w-4" />
-                {t('scanner.askCopilot')}
+                {t('scanner.askKrishiAi')}
             </Button>
             <Button className="w-full" onClick={handleSave} disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}

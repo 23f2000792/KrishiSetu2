@@ -32,7 +32,7 @@ export function SidebarNav() {
 
   const navItems = [
     { href: '/dashboard', label: t('sidebar.dashboard'), icon: LayoutDashboard },
-    { href: '/chat', label: t('sidebar.aiCopilot'), icon: Bot },
+    { href: '/chat', label: t('sidebar.krishiAi'), icon: Bot },
     { href: '/market', label: t('sidebar.marketPrices'), icon: ShoppingBasket },
     { href: '/growth-forecast', label: t('sidebar.growthForecast'), icon: CalendarRange },
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },

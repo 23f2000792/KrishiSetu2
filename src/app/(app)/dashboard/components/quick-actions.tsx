@@ -27,8 +27,8 @@ export function QuickActions() {
         },
         {
             icon: Bot,
-            title: t('dashboard.askCopilot'),
-            description: t('dashboard.askCopilotDesc'),
+            title: t('dashboard.askKrishiAi'),
+            description: t('dashboard.askKrishiAiDesc'),
             href: "/chat",
             color: "text-primary",
             bgColor: "bg-primary/10",

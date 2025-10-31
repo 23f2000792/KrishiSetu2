@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { aiCopilotAgriAdvisory } from '@/ai/flows/ai-copilot-agri-advisory';
+import { krishiAiAgriAdvisory } from '@/ai/flows/krishiai-agri-advisory';
 import { suggestQuickPrompts } from '@/ai/flows/suggest-quick-prompts';
 import { useLanguage } from '@/contexts/language-context';
 
@@ -133,7 +133,7 @@ export function ChatLayout() {
     setLoading(true);
 
     try {
-      const result = await aiCopilotAgriAdvisory({ 
+      const result = await krishiAiAgriAdvisory({ 
         query: textToSend, 
         language: languageMap[locale],
         userId: user.id,
