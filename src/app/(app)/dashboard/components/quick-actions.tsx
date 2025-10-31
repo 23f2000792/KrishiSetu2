@@ -46,7 +46,7 @@ export function QuickActions() {
             {actions.map((action) => (
                 <Link href={action.href} key={action.title} className="block group">
                     <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors group-hover:border-primary">
-                        <div className={`p-3 rounded-full ${action.bgColor} transition-colors group-hover:bg-primary/20`}>
+                        <div className={`p-3 rounded-lg ${action.bgColor} transition-colors group-hover:bg-primary/20`}>
                             <action.icon className={`h-6 w-6 ${action.color} transition-colors group-hover:text-primary`} />
                         </div>
                         <div className="flex-1">

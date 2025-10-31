@@ -14,7 +14,7 @@ type SummaryCardProps = {
 export default function SummaryCard({ title, value, icon: Icon, details, trend, animationDelay = 0 }: SummaryCardProps) {
   return (
     <Card 
-      className="transform-gpu transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg animate-fade-in-up"
+      className="transform-gpu transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20 animate-fade-in-up"
       style={{ animationDelay: `${animationDelay}ms` }}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
