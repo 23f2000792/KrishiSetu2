@@ -1,13 +1,12 @@
 
 'use client';
 import { PageHeader } from "@/components/page-header"
-import { Droplets, Leaf, Bug, Target } from "lucide-react";
+import { Droplets, Leaf, ShoppingBasket, Target } from "lucide-react";
 import SummaryCard from "./components/summary-card";
 import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
-import { diseaseOutbreakPredictionFlow } from "@/ai/flows/disease-outbreak-prediction";
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
@@ -16,6 +15,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { SoilReport } from "@/lib/types";
 import { useUserCollection } from "@/firebase/firestore/use-user-collection";
 import { CalendarRange } from "lucide-react";
+import { getMarketData } from "@/services/market-service";
 
 
 export default function DashboardPage() {
@@ -23,9 +23,9 @@ export default function DashboardPage() {
     const { user } = useAuth();
     
     // AI State
-    const [outbreakAlert, setOutbreakAlert] = useState<string | null>(null);
     const [yieldPrediction, setYieldPrediction] = useState<string | null>(null);
     const [soilFertility, setSoilFertility] = useState<{value: string, details: string} | null>(null);
+    const [latestPrice, setLatestPrice] = useState<number | null>(null);
 
 
     // Loading State
@@ -67,33 +67,29 @@ export default function DashboardPage() {
             setLoadingAI(true);
             
             try {
-                const [outbreakResult, growthResult] = await Promise.all([
-                     diseaseOutbreakPredictionFlow({
-                        crop: primaryCrop,
-                        region: user.region,
-                        language: languageMap[locale],
-                    }),
+                const [growthResult, marketResult] = await Promise.all([
                     simulateCropGrowth({
                         crop: primaryCrop,
                         region: user.region,
                         language: languageMap[locale],
                         soilReport: latestSoilReport?.aiSummary,
                     }),
+                    getMarketData(primaryCrop, user.region),
                 ]);
 
-                setOutbreakAlert(outbreakResult.alert);
                 if (growthResult?.finalYieldPrediction) {
                     const predictionText = growthResult.finalYieldPrediction.split(':')[1]?.split(' vs.')[0]?.trim() || "N/A";
                     setYieldPrediction(predictionText);
                 } else {
                     setYieldPrediction("N/A");
                 }
-
+                
+                setLatestPrice(marketResult?.latestPrice || null);
 
             } catch (error) {
                 console.error("Failed to get dashboard AI predictions:", error);
-                setOutbreakAlert(t('dashboard.outbreakError'));
                 setYieldPrediction("N/A");
+                setLatestPrice(null);
             } finally {
                 setLoadingAI(false);
             }
@@ -120,16 +116,16 @@ export default function DashboardPage() {
             details: "Optimal moisture levels" 
         },
         { 
-            title: "Predicted Yield",
+            title: t('dashboard.predictedYield'),
             value: yieldPrediction ? `${yieldPrediction}` : "...", 
             icon: Target, 
             details: `${primaryCrop} yield per acre`,
         },
         { 
-            title: t('dashboard.outbreakAlert'), 
-            value: outbreakAlert?.split(' ')[0] || "...", // "High", "No" etc.
-            icon: Bug, 
-            details: outbreakAlert || t('dashboard.loading') 
+            title: t('dashboard.mandiPrice'), 
+            value: latestPrice ? `₹${latestPrice.toLocaleString()}`: "...",
+            icon: ShoppingBasket, 
+            details: `Latest price for ${primaryCrop}`
         },
     ];
     

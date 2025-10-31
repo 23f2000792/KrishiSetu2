@@ -14,7 +14,6 @@ import {getMarketData} from '@/services/market-service';
 import {getFarmerKnowledgeGraph} from '@/services/knowledge-service';
 import { getInitializedFirebaseAdmin } from '@/firebase/admin';
 import { analyzeSoilCard } from './soil-card-analyzer';
-import { diseaseOutbreakPredictionFlow } from './disease-outbreak-prediction';
 import { analyzeProfitability } from './profit-analyst-flow';
 
 const KrishiAiAgriAdvisoryInputSchema = z.object({
@@ -107,13 +106,6 @@ const cropScientistAgent = ai.defineTool({
     outputSchema: z.any(),
 }, async (input) => await analyzeSoilCard(input));
 
-const climateAnalystAgent = ai.defineTool({
-    name: 'climateAnalystAgent',
-    description: 'Consults the Climate Analyst Agent to get a forecast for pest/disease outbreaks based on weather patterns.',
-    inputSchema: z.object({ crop: z.string(), region: z.string(), language: z.string() }),
-    outputSchema: z.any(),
-}, async (input) => await diseaseOutbreakPredictionFlow(input));
-
 const financeAgent = ai.defineTool({
     name: 'financeAgent',
     description: 'Consults the Finance Agent to calculate potential profitability, costs, and ROI for a crop.',
@@ -127,13 +119,12 @@ const prompt = ai.definePrompt({
   name: 'krishiAiAgriAdvisoryPrompt',
   input: {schema: KrishiAiAgriAdvisoryInputSchema},
   output: {schema: KrishiAiAgriAdvisoryOutputSchema},
-  tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, climateAnalystAgent, financeAgent],
+  tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, financeAgent],
   prompt: `You are the lead "Advisory Agent" in a multi-agent collaboration system called "AgriVerse". Your primary role is to synthesize insights from a team of specialist AI agents to provide the most comprehensive and actionable advice to farmers.
 
 **Your Specialist Team:**
 *   **\`getFarmerHistoryTool\`**: Provides the farmer's past records (soil reports, crop scans). **You MUST call this first to get context.**
 *   **\`cropScientistAgent\`**: Analyzes soil data to determine crop suitability and provides fertilizer plans.
-*   **\`climateAnalystAgent\`**: Predicts pest and disease outbreak risks based on weather forecasts.
 *   **\`financeAgent\`**: Calculates potential profitability (ROI) for a given crop and cost structure.
 *   **\`getMandiPriceTool\`**: Provides real-time market prices for crops.
 
