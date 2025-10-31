@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { diagnoseCrop } from '@/ai/flows/crop-disease-nutrient-prediction';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye } from "lucide-react";
 import { CameraView } from "./components/camera-view";
 import { useLanguage } from "@/contexts/language-context";
 
@@ -70,15 +70,23 @@ export default function ScannerPage() {
                     />
                     <div className="flex-grow animate-fade-in-up">
                         {loading ? (
-                            <Card>
+                             <Card>
                                 <CardHeader>
-                                    <Skeleton className="h-6 w-1/2" />
-                                    <Skeleton className="h-4 w-3/4" />
+                                  <Skeleton className="h-8 w-1/2" />
+                                  <Skeleton className="h-4 w-3/4" />
                                 </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <Skeleton className="h-48 w-full" />
-                                    <Skeleton className="h-4 w-1/4" />
-                                    <Skeleton className="h-10 w-full" />
+                                <CardContent className="grid md:grid-cols-2 gap-8">
+                                  <Skeleton className="aspect-video w-full rounded-xl" />
+                                  <div className="space-y-6">
+                                      <div className="space-y-2">
+                                          <Skeleton className="h-6 w-1/4" />
+                                          <Skeleton className="h-10 w-full" />
+                                      </div>
+                                      <div className="space-y-2">
+                                           <Skeleton className="h-6 w-1/3" />
+                                           <Skeleton className="h-24 w-full" />
+                                      </div>
+                                  </div>
                                 </CardContent>
                             </Card>
                         ) : result ? (
@@ -96,17 +104,17 @@ export default function ScannerPage() {
                     </div>
                 </div>
 
-                <Card className="hidden lg:flex lg:flex-col h-full sticky top-24">
+                <Card className="hidden lg:flex lg:flex-col h-full sticky top-24 animate-fade-in-left">
                     <CardHeader>
                         <CardTitle>Past Scans</CardTitle>
                         <CardDescription>Review your previous scan history.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow overflow-hidden">
                         <ScrollArea className="h-[calc(100vh-270px)] pr-4">
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 {pastScans.map(scan => (
-                                    <div key={scan.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
-                                        <div className="relative h-16 w-16 rounded-md overflow-hidden shrink-0">
+                                    <div key={scan.id} className="group flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
+                                        <div className="relative h-16 w-16 rounded-md overflow-hidden shrink-0 border">
                                             <Image src={scan.imageUrl} alt={scan.prediction} fill className="object-cover" />
                                         </div>
                                         <div className="flex-grow">
@@ -115,7 +123,9 @@ export default function ScannerPage() {
                                                 {new Date(scan.createdAt).toLocaleDateString()}
                                             </p>
                                         </div>
-                                        <Button variant="ghost" size="sm" onClick={() => setResult(scan)}>View</Button>
+                                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setResult(scan)}>
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
                                     </div>
                                 ))}
                             </div>

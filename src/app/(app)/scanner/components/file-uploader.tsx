@@ -24,17 +24,21 @@ export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) 
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
   };
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
   };
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault(); // This is necessary to allow dropping
+    e.preventDefault();
+    e.stopPropagation(); 
   };
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       onFileUpload(e.dataTransfer.files[0]);
@@ -44,25 +48,25 @@ export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) 
 
   return (
     <Card 
-        className={`border-2 border-dashed transition-colors duration-300 ${isDragging ? 'border-primary bg-primary/10 scale-105' : 'border-border'}`}
+        className={`border-2 border-dashed transition-all duration-300 transform-gpu ${isDragging ? 'border-primary bg-primary/10 scale-105 shadow-2xl' : 'border-border hover:border-primary/50 hover:shadow-lg'}`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
     >
-      <CardContent className="p-6">
+      <CardContent className="p-6 md:p-12">
         <div className="text-center space-y-4">
-          <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
+          <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit transition-transform duration-300 group-hover:scale-110">
             <Upload className="h-8 w-8 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold font-headline">
+          <h3 className="text-xl md:text-2xl font-headline font-semibold">
             {t('scanner.dragOrUpload')}
           </h3>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm md:text-base">
             {t('scanner.supportedFormats')}
           </p>
-          <div className="flex items-center justify-center gap-4">
-            <Button onClick={() => inputRef.current?.click()}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <Button size="lg" onClick={() => inputRef.current?.click()} className="w-full sm:w-auto">
               {t('scanner.browseFiles')}
             </Button>
             <Input
@@ -72,7 +76,7 @@ export function FileUploader({ onFileUpload, onCameraOpen }: FileUploaderProps) 
               accept="image/png, image/jpeg, image/jpg"
               onChange={handleFileChange}
             />
-            <Button variant="outline" onClick={onCameraOpen}>
+            <Button size="lg" variant="outline" onClick={onCameraOpen} className="w-full sm:w-auto">
               <Camera className="mr-2 h-4 w-4" />
               {t('scanner.useCamera')}
             </Button>
