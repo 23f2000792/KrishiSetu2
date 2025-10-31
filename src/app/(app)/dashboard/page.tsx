@@ -1,7 +1,7 @@
 
 'use client';
 import { PageHeader } from "@/components/page-header"
-import { Droplets, Leaf, ShoppingBasket, Target } from "lucide-react";
+import { Droplets, Leaf, ShoppingBasket, Target, CalendarRange } from "lucide-react";
 import SummaryCard from "./components/summary-card";
 import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
@@ -12,18 +12,16 @@ import Link from "next/link";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { SoilReport } from "@/lib/types";
 import { useUserCollection } from "@/firebase/firestore/use-user-collection";
-import { CalendarRange } from "lucide-react";
 import { getMarketData } from "@/services/market-service";
 
 
 export default function DashboardPage() {
-    const { t, locale } = useLanguage();
+    const { t } = useLanguage();
     const { user } = useAuth();
     
-    // AI State
+    // State
     const [soilFertility, setSoilFertility] = useState<{value: string, details: string} | null>(null);
     const [latestPrice, setLatestPrice] = useState<number | null>(null);
-
 
     // Loading State
     const [loadingMarket, setLoadingMarket] = useState(true);
@@ -32,7 +30,6 @@ export default function DashboardPage() {
 
     const latestSoilReport = useMemo(() => {
         if (!soilReports || soilReports.length === 0) return null;
-        // Sort on the client-side to find the most recent report
         return [...soilReports].sort((a, b) => b.uploadedAt.toDate().getTime() - a.uploadedAt.toDate().getTime())[0];
     }, [soilReports]);
     
@@ -68,7 +65,7 @@ export default function DashboardPage() {
         };
         
         getMarketPrice();
-    }, [user, locale, t, primaryCrop, latestSoilReport]);
+    }, [user, primaryCrop]);
 
     const isLoading = loadingMarket || soilReportsLoading;
 

@@ -45,15 +45,13 @@ function getIconFor(type: 'stage' | 'risk', text: string): React.ElementType {
     return iconMap.default;
 }
 
-export function GrowthTimeline() {
+export function GrowthTimeline({ crop }: { crop: string }) {
     const { locale } = useLanguage();
     const { user } = useAuth();
     const [simulation, setSimulation] = useState<CropGrowthSimulationOutput | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
-
-    const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
 
     const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>('soil_reports');
     
@@ -63,13 +61,14 @@ export function GrowthTimeline() {
     }, [soilReports]);
 
     useEffect(() => {
+        if (!crop) return;
         const runSimulation = async () => {
             if (!user || soilReportsLoading) return;
             setLoading(true);
             setError(null);
             try {
                 const result = await simulateCropGrowth({
-                    crop: primaryCrop,
+                    crop,
                     region: user.region,
                     language: languageMap[locale],
                     soilReport: latestSoilReport?.aiSummary,
@@ -83,7 +82,7 @@ export function GrowthTimeline() {
             }
         };
         runSimulation();
-    }, [user, locale, primaryCrop, soilReportsLoading, latestSoilReport]);
+    }, [user, locale, crop, soilReportsLoading, latestSoilReport]);
 
     if (loading) {
         return (
@@ -113,7 +112,7 @@ export function GrowthTimeline() {
          return (
             <Card>
                 <CardHeader>
-                    <CardTitle>30-Day Growth Forecast: {primaryCrop}</CardTitle>
+                    <CardTitle>30-Day Growth Forecast: {crop}</CardTitle>
                     <CardDescription>An AI-powered simulation of your crop's journey for the next month.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -132,7 +131,7 @@ export function GrowthTimeline() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>30-Day Growth Forecast: {primaryCrop}</CardTitle>
+                <CardTitle>30-Day Growth Forecast: {crop}</CardTitle>
                 <CardDescription>An AI-powered simulation of your crop's journey for the next month.</CardDescription>
             </CardHeader>
             <CardContent>

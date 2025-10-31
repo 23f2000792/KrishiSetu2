@@ -9,6 +9,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 
 const CropGrowthSimulationInputSchema = z.object({
@@ -39,7 +40,7 @@ export async function simulateCropGrowth(input: CropGrowthSimulationInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'cropGrowthSimulationPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: googleAI('gemini-1.5-flash'),
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
