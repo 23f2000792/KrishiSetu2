@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview An AI-powered agri-advisory service for farmers.
+ * @fileOverview An AI-powered agri-advisory service for farmers, acting as an orchestrator for a multi-agent system.
  *
  * - aiCopilotAgriAdvisory - A function that provides AI-driven advice for farmers.
  * - AiCopilotAgriAdvisoryInput - The input type for the aiCopilotAgriAdvisory function.
@@ -13,6 +13,9 @@ import {z} from 'genkit';
 import {getMarketData} from '@/services/market-service';
 import {getFarmerKnowledgeGraph} from '@/services/knowledge-service';
 import { getInitializedFirebaseAdmin } from '@/firebase/admin';
+import { analyzeSoilCard } from './soil-card-analyzer';
+import { diseaseOutbreakPredictionFlow } from './disease-outbreak-prediction';
+import { analyzeProfitability } from './profit-analyst-flow';
 
 const AiCopilotAgriAdvisoryInputSchema = z.object({
   query: z
@@ -44,6 +47,11 @@ export async function aiCopilotAgriAdvisory(
   return aiCopilotAgriAdvisoryFlow(input);
 }
 
+
+// #################################
+// ## MULTI-AGENT SYSTEM TOOLS    ##
+// #################################
+
 const getFarmerHistoryTool = ai.defineTool(
   {
     name: 'getFarmerHistory',
@@ -57,8 +65,6 @@ const getFarmerHistoryTool = ai.defineTool(
     }),
   },
   async ({ userId }) => {
-    // Note: Genkit flows run in a server environment where the Admin SDK is available.
-    // This is an exception to the "client-side only" rule for UI components.
     const { firestore } = getInitializedFirebaseAdmin();
     return await getFarmerKnowledgeGraph(firestore, userId);
   }
@@ -91,32 +97,64 @@ const getMandiPriceTool = ai.defineTool(
   }
 );
 
+
+const cropScientistAgent = ai.defineTool({
+    name: 'cropScientistAgent',
+    description: 'Consults the Crop Scientist Agent to analyze soil health and its impact on crop suitability and performance.',
+    inputSchema: z.object({
+        pH: z.number(), N: z.string(), P: z.string(), K: z.string(), OC: z.number(), EC: z.number(), region: z.string(), language: z.string()
+    }),
+    outputSchema: z.any(),
+}, async (input) => await analyzeSoilCard(input));
+
+const climateAnalystAgent = ai.defineTool({
+    name: 'climateAnalystAgent',
+    description: 'Consults the Climate Analyst Agent to get a forecast for pest/disease outbreaks based on weather patterns.',
+    inputSchema: z.object({ crop: z.string(), region: z.string(), language: z.string() }),
+    outputSchema: z.any(),
+}, async (input) => await diseaseOutbreakPredictionFlow(input));
+
+const financeAgent = ai.defineTool({
+    name: 'financeAgent',
+    description: 'Consults the Finance Agent to calculate potential profitability, costs, and ROI for a crop.',
+    inputSchema: z.object({ crop: z.string(), region: z.string(), actualYield: z.number(), seedCost: z.number(), fertilizerCost: z.number(), pesticideCost: z.number(), laborCost: z.number(), irrigationCost: z.number(), transportCost: z.number(), otherCost: z.number() }),
+    outputSchema: z.any(),
+}, async (input) => await analyzeProfitability(input));
+
+
+
 const prompt = ai.definePrompt({
   name: 'aiCopilotAgriAdvisoryPrompt',
   input: {schema: AiCopilotAgriAdvisoryInputSchema},
   output: {schema: AiCopilotAgriAdvisoryOutputSchema},
-  tools: [getMandiPriceTool, getFarmerHistoryTool],
-  prompt: `You are an expert agronomist and AI-powered agri-advisory service. Your goal is to provide comprehensive, actionable, and personalized advice to farmers.
+  tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, climateAnalystAgent, financeAgent],
+  prompt: `You are the lead "Advisory Agent" in a multi-agent collaboration system called "AgriVerse". Your primary role is to synthesize insights from a team of specialist AI agents to provide the most comprehensive and actionable advice to farmers.
 
-**VERY IMPORTANT**: Before answering, you MUST use the \`getFarmerHistory\` tool with the provided \`userId\` to fetch the farmer's past soil reports and crop scan data. This historical context is CRITICAL for providing accurate, long-term, and personalized advice.
+**Your Specialist Team:**
+*   **\`getFarmerHistoryTool\`**: Provides the farmer's past records (soil reports, crop scans). **You MUST call this first to get context.**
+*   **\`cropScientistAgent\`**: Analyzes soil data to determine crop suitability and provides fertilizer plans.
+*   **\`climateAnalystAgent\`**: Predicts pest and disease outbreak risks based on weather forecasts.
+*   **\`financeAgent\`**: Calculates potential profitability (ROI) for a given crop and cost structure.
+*   **\`getMandiPriceTool\`**: Provides real-time market prices for crops.
 
-When a farmer asks a question:
-1.  **Use History for Context:** Analyze the historical data from \`getFarmerHistory\`.
-    *   Look at past soil reports. If the farmer asks about fertilizer, reference their soil's nutrient levels (e.g., "Your last soil report showed low Nitrogen...").
-    *   Look at past crop scans. If they ask about a disease, check if it has occurred before (e.g., "I see you had issues with Leaf Rust last season as well...").
-    *   Use this memory to avoid giving generic advice. Your value is in personalization.
-2.  **Analyze the Current Query:** Carefully understand the farmer's immediate need.
-3.  **Disease Diagnosis:** If the query describes symptoms, act as an expert diagnostician. Use the historical data to see if it's a recurring problem.
-4.  **Market Prices:** If the query is about crop prices, use the \`getMandiPriceTool\` to provide the latest market rates.
-5.  **General Advice:** For all other questions, provide the most accurate, relevant, and practical advice, always informed by the farmer's history.
+**Your Process:**
+1.  **Analyze the User's Query:** Understand the farmer's core need. Is it about soil health, disease risk, profitability, or a combination?
+2.  **Gather Context:** ALWAYS start by calling \`getFarmerHistoryTool\` to retrieve the farmer's unique historical data. This is mandatory for personalization.
+3.  **Delegate to Specialists:** Based on the query and historical context, decide which specialist agents to consult.
+    *   If the query is about "what to grow" or "fertilizer", use the latest soil report from history and call the \`cropScientistAgent\`.
+    *   If the query is about "risk" or "disease", call the \`climateAnalystAgent\`.
+    *   If the query is about "profit" or "costs", you might need to ask the user for estimated costs and then call the \`financeAgent\`.
+    *   If the query mentions prices, call \`getMandiPriceTool\`.
+4.  **Synthesize and Advise:** Once you have the reports from your specialist agents, do not just present them individually. Your main job is to **synthesize** the information into a single, cohesive, and easy-to-understand recommendation. Cross-reference the insights. For example: "The Climate Analyst predicts a high risk of rust, which your past scans show you are susceptible to. The Finance Agent indicates that while wheat is profitable, the cost of fungicide to mitigate this risk will reduce your ROI by 5%. Therefore, consider a more rust-resistant varietal..."
+5.  **Format the Response:** Present your final, synthesized advice in clear, readable Markdown. Always respond in the user-specified language.
 
-**Response Formatting:**
-*   You MUST respond in the language specified by the user.
-*   Format your response using Markdown for better readability.
+**Farmer's Data:**
+- Language for response: {{{language}}}
+- Farmer Question: {{{query}}}
+- User ID: {{{userId}}}
 
-Language for response: {{{language}}}
-Farmer Question: {{{query}}}
-User ID: {{{userId}}}`,
+Begin your analysis by consulting your agent team.
+`,
 });
 
 const aiCopilotAgriAdvisoryFlow = ai.defineFlow(
