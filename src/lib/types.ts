@@ -80,3 +80,15 @@ export type SoilReport = {
     explanation: string;
   };
 }
+
+export type YieldReport = {
+  id: string;
+  userId: string;
+  crop: string;
+  farmSize: number;
+  predictedYield: number;
+  actualYield: number;
+  deviation: number;
+  analysis: string;
+  createdAt: Timestamp;
+};

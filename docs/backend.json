@@ -233,6 +233,56 @@
         "confidence",
         "createdAt"
       ]
+    },
+    "YieldReport": {
+      "title": "Yield Report",
+      "type": "object",
+      "description": "Represents a post-harvest yield analysis report.",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who created the report."
+        },
+        "crop": {
+          "type": "string",
+          "description": "The crop for which the yield is reported."
+        },
+        "farmSize": {
+          "type": "number",
+          "description": "The size of the farm in acres for this crop."
+        },
+        "predictedYield": {
+          "type": "number",
+          "description": "The AI-predicted yield in quintals per acre."
+        },
+        "actualYield": {
+          "type": "number",
+          "description": "The farmer-reported actual yield in quintals per acre."
+        },
+        "deviation": {
+          "type": "number",
+          "description": "The percentage deviation between actual and predicted yield."
+        },
+        "analysis": {
+          "type": "string",
+          "description": "The AI's analysis of the reasons for the yield deviation."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the report was created."
+        }
+      },
+      "required": [
+        "userId",
+        "crop",
+        "farmSize",
+        "predictedYield",
+        "actualYield",
+        "deviation",
+        "analysis",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -319,6 +369,22 @@
             {
               "name": "scanId",
               "description": "The unique identifier for the scan."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/yield_reports/{reportId}",
+        "definition": {
+          "entityName": "YieldReport",
+          "schema": {
+            "$ref": "#/backend/entities/YieldReport"
+          },
+          "description": "Stores post-harvest yield analysis reports for farmers.",
+          "params": [
+            {
+              "name": "reportId",
+              "description": "The unique identifier for the yield report."
             }
           ]
         }
