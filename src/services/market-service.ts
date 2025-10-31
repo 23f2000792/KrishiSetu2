@@ -13,8 +13,8 @@ export async function getMarketPrice(crop: string, region: string): Promise<numb
 
   const marketData = marketPrices.find(
     (item) =>
-      item.crop.toLowerCase() === normalizedCrop &&
-      item.region.toLowerCase() === normalizedRegion
+      item.crop.toLowerCase().includes(normalizedCrop) &&
+      (item.region.toLowerCase() === normalizedRegion || region === '')
   );
 
   if (marketData && marketData.prices.length > 0) {
@@ -23,7 +23,7 @@ export async function getMarketPrice(crop: string, region: string): Promise<numb
   }
 
   // Fallback: If region-specific price is not found, check for any price for that crop
-  const anyRegionMarketData = marketPrices.find(item => item.crop.toLowerCase() === normalizedCrop);
+  const anyRegionMarketData = marketPrices.find(item => item.crop.toLowerCase().includes(normalizedCrop));
   if (anyRegionMarketData && anyRegionMarketData.prices.length > 0) {
     return anyRegionMarketData.prices[anyRegionMarketData.prices.length - 1].price;
   }
