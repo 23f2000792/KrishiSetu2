@@ -2,6 +2,7 @@
 import { AppShell } from '@/components/layout/app-shell';
 import { useAuth } from '@/contexts/auth-context';
 import { redirect, usePathname } from 'next/navigation';
+import { OnboardingModal } from './components/onboarding-modal';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -22,5 +23,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
   
-  return <AppShell>{children}</AppShell>;
+  return (
+    <AppShell>
+      <OnboardingModal />
+      {children}
+    </AppShell>
+  );
 }

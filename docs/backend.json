@@ -41,6 +41,17 @@
               "type": "boolean"
             }
           }
+        },
+        "farmSize": {
+          "type": "number",
+          "description": "The size of the user's farm in acres."
+        },
+        "crops": {
+          "type": "array",
+          "description": "A list of crops the user is growing.",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
@@ -165,7 +176,7 @@
             "warnings": {
               "type": "array",
               "items": {
-                "type": "string"
+                "string"
               }
             },
             "organicAdvice": {

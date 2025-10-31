@@ -10,15 +10,19 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useLanguage } from '@/contexts/language-context';
 import { Separator } from '@/components/ui/separator';
+import { CropMultiSelect } from '../components/crop-multiselect';
+import { CROP_OPTIONS } from '../components/onboarding-form';
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is too short"),
   email: z.string().email(),
   phone: z.string().min(10, "Invalid phone number"),
   region: z.string(),
+  farmSize: z.coerce.number().min(0, 'Farm size must be positive.'),
+  crops: z.array(z.string()).min(1, 'Please select at least one crop.').max(5, 'You can select up to 5 crops.'),
   prefs: z.object({
     push: z.boolean(),
     voice: z.boolean(),
@@ -36,6 +40,8 @@ export default function ProfilePage() {
       email: user?.email || '',
       phone: user?.phone || '',
       region: user?.region || '',
+      farmSize: user?.farmSize || 0,
+      crops: user?.crops || [],
       prefs: {
         push: user?.prefs.push || false,
         voice: user?.prefs.voice || false,
@@ -117,6 +123,36 @@ export default function ProfilePage() {
 
                 <Separator />
                 
+                <div>
+                    <h3 className="text-lg font-medium mb-4">Farm Details</h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                         <FormField name="farmSize" control={form.control} render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Farm Size (in acres)</FormLabel>
+                                <FormControl><Input type="number" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormField
+                            control={form.control}
+                            name="crops"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Your Crops</FormLabel>
+                                    <CropMultiSelect 
+                                        selected={field.value}
+                                        onChange={field.onChange}
+                                        className="w-full"
+                                    />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                <Separator />
+
                 <div>
                     <h3 className="text-lg font-medium mb-4">{t('profile.preferences')}</h3>
                     <div className="space-y-4">

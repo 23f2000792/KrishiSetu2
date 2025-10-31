@@ -14,6 +14,8 @@ export type User = {
     voice: boolean;
   };
   avatar?: string;
+  farmSize?: number;
+  crops?: string[];
 };
 
 export type PricePoint = { date: string; price: number };

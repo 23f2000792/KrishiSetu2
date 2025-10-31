@@ -29,7 +29,7 @@ export default function DashboardPage() {
             // Outbreak Prediction
             try {
                 const outbreakResult = await diseaseOutbreakPredictionFlow({
-                    crop: 'Wheat', // This would be dynamic in a real app
+                    crop: user.crops?.[0] || 'Wheat',
                     region: user.region,
                     language: languageMap[locale],
                 });
@@ -43,7 +43,7 @@ export default function DashboardPage() {
             setLoadingYield(true);
             try {
                  const growthResult = await simulateCropGrowth({
-                    crop: 'Wheat', // This would be dynamic in a real app
+                    crop: user.crops?.[0] || 'Wheat',
                     region: user.region,
                     language: languageMap[locale],
                     soilReport: { pH: 6.8, N: "Medium", P: "High", K: "Medium", OC: 0.6 },
@@ -56,14 +56,16 @@ export default function DashboardPage() {
                 setLoadingYield(false);
             }
         };
-        getPredictions();
+        if(user?.farmSize) { // Only run if user has been onboarded
+          getPredictions();
+        }
     }, [user, locale, t]);
 
 
     const summaryCards = [
         { title: t('dashboard.soilFertility'), value: "82/100", icon: Leaf, details: t('dashboard.healthy'), trend: "up" as const, change: "+5%" },
         { title: t('dashboard.irrigation'), value: "In 2 days", icon: Droplets, details: t('dashboard.soilMoisture') },
-        { title: t('dashboard.mandiForecast'), value: "+4.3%", icon: LineChart, details: t('dashboard.wheatPrice'), trend: "up" as const },
+        { title: t('dashboard.mandiForecast'), value: "+4.3%", icon: LineChart, details: `${user?.crops?.[0] || 'Wheat'} price`, trend: "up" as const },
         { title: t('dashboard.outbreakAlert'), value: "High Risk", icon: Bug, details: outbreakAlert || t('dashboard.loading') },
     ];
     
@@ -71,7 +73,7 @@ export default function DashboardPage() {
         <div className="pb-16 md:pb-0 animate-fade-in">
             <PageHeader
                 title={`👋 ${t('dashboard.greeting')}, ${user?.name.split(' ')[0]}!`}
-                description={`${user?.region} | Wheat | 4.2 acres`}
+                description={user?.farmSize ? `${user?.region} | ${user.crops?.[0] || 'Crop'} | ${user.farmSize} acres` : user?.region}
             />
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
                 {summaryCards.map((card, index) => (
