@@ -23,6 +23,44 @@ type Message = {
   image?: string;
 };
 
+// Simple markdown to HTML renderer
+function MarkdownRenderer({ content }: { content: string }) {
+  const renderContent = () => {
+    // Replace ### Headings with <h3>
+    let html = content.replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>');
+    
+    // Replace **bold** with <strong>
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Replace numbered lists
+    html = html.replace(/^\s*\d+\.\s(.*)/gm, (match, p1) => `<li>${p1.trim()}</li>`);
+    html = html.replace(/(<li>.*<\/li>)/gs, '<ol class="list-decimal list-inside space-y-1 my-2">$1</ol>');
+     // Handle cases where lists might be merged by removing nested <ol>
+    html = html.replace(/<ol[^>]*>(\s*<li>.*<\/li>\s*)<\/ol>/gs, (match, inner) => {
+        return inner;
+    });
+     html = html.replace(/(<li>.*<\/li>)/gs, '<ol class="list-decimal list-inside space-y-1 my-2">$1</ol>');
+
+
+    // Replace newline characters with <br /> for line breaks, but not inside lists
+    html = html.split('\n').map(line => {
+      if (line.trim().startsWith('<h3') || line.trim().startsWith('<ol')) {
+        return line;
+      }
+      return line + '<br />';
+    }).join('');
+
+    // Clean up extra <br> around lists and headings
+    html = html.replace(/<br \/>(\s*<(h3|ol))/g, '$1');
+    html = html.replace(/(<\/h3>|<\/ol>)(\s*<br \/>)/g, '$1');
+
+    return { __html: html };
+  };
+
+  return <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={renderContent()} />;
+}
+
+
 export function ChatLayout() {
   const { user } = useAuth();
   const { t, locale } = useLanguage();
@@ -134,7 +172,11 @@ export function ChatLayout() {
                     <Image src={message.image} alt={t('chat.scannedImageAlt')} fill className="object-contain" />
                   </div>
                 )}
-                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                {message.isUser ? (
+                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                ) : (
+                  <MarkdownRenderer content={message.text} />
+                )}
               </div>
               {message.isUser && user && (
                 <Avatar className="h-9 w-9">

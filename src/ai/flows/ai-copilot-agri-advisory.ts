@@ -20,7 +20,7 @@ export type AiCopilotAgriAdvisoryInput = z.infer<
 >;
 
 const AiCopilotAgriAdvisoryOutputSchema = z.object({
-  advice: z.string().describe('The AI-powered advice for the farmer.'),
+  advice: z.string().describe('The AI-powered advice for the farmer, formatted in Markdown.'),
 });
 export type AiCopilotAgriAdvisoryOutput = z.infer<
   typeof AiCopilotAgriAdvisoryOutputSchema
@@ -37,6 +37,8 @@ const prompt = ai.definePrompt({
   input: {schema: AiCopilotAgriAdvisoryInputSchema},
   output: {schema: AiCopilotAgriAdvisoryOutputSchema},
   prompt: `You are an AI-powered agri-advisory service. A farmer will ask you a question, and you will provide them with advice in the specified language.
+
+  Format your response using Markdown for better readability. Use headings, lists, and bold text to structure your answer.
 
 Language for response: {{{language}}}
 Farmer Question: {{{query}}}`,
