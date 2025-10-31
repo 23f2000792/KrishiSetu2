@@ -175,7 +175,6 @@ export default function ProfilePage() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="">None</SelectItem>
                                                         {CROP_OPTIONS.map(option => (
                                                             <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                                                         ))}
