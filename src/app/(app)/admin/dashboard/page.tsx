@@ -9,6 +9,7 @@ export default function AdminDashboardPage() {
     const { user } = useAuth();
     const { t } = useLanguage();
 
+    // The layout should already protect this page, but as a safeguard:
     if (user?.role !== 'Admin') {
         return null;
     }

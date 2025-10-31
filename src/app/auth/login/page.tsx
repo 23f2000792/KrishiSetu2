@@ -27,6 +27,7 @@ import { Github, Languages, Tractor } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
 import { demoCredentials } from '@/lib/data';
+import { toast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -46,13 +47,14 @@ export default function LoginPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (values.email === demoCredentials.farmer.email) {
-      login(demoCredentials.farmer.email, 'Farmer');
-    } else if (values.email === demoCredentials.admin.email) {
-      login(demoCredentials.admin.email, 'Admin');
-    } else {
-      form.setError("root", { message: "Invalid credentials for demo." });
-    }
+    // We can't determine role from email/password alone in this demo setup.
+    // The demo buttons are the primary way to log in.
+    // We'll try to log in as a farmer by default if form is used.
+    toast({
+        title: 'Using Demo Login',
+        description: 'For this demo, please use the "Farmer Demo" or "Admin Demo" buttons for specific roles.',
+    });
+    login(values.email, 'Farmer');
   }
 
   const handleDemoLogin = (role: 'Farmer' | 'Admin') => {

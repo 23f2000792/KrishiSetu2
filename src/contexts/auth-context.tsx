@@ -1,64 +1,131 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, UserRole } from '@/lib/types';
-import { users } from '@/lib/data';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import type { User as AuthUser } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { usePathname, useRouter } from 'next/navigation';
+import { signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+
+import { useFirebase } from '@/firebase/provider';
+import type { User, UserRole } from '@/lib/types';
+import { toast } from '@/hooks/use-toast';
+import { users as mockUsers, demoCredentials } from '@/lib/data';
 
 interface AuthContextType {
   user: User | null;
+  authUser: AuthUser | null;
   isAuthenticated: boolean;
   login: (email: string, role: UserRole) => void;
   logout: () => void;
+  signup: (name:string, email: string, password: string, role: UserRole) => void;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { auth, firestore, isUserLoading, user: authUser } = useFirebase();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
+  const fetchUserProfile = useCallback(async (firebaseUser: AuthUser) => {
     try {
-      const storedUser = localStorage.getItem('krishi-user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        const fullUser = users.find(u => u.id === parsedUser.id);
-        if (fullUser) {
-          setUser(fullUser);
-        }
+      const userDocRef = doc(firestore, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        setUser({ id: userDoc.id, ...userDoc.data() } as User);
+      } else {
+        // This case can happen if a user is in auth but not in firestore
+        // You might want to log them out or create a profile
+        console.warn("User profile not found in Firestore for UID:", firebaseUser.uid);
+        setUser(null); 
       }
     } catch (error) {
-      console.error("Failed to parse user from localStorage", error);
-      localStorage.removeItem('krishi-user');
+      console.error("Error fetching user profile:", error);
+      setUser(null);
     }
-    setLoading(false);
-  }, []);
+  }, [firestore]);
   
-  const login = (email: string, role: UserRole) => {
-    const userToLogin = users.find(u => u.email === email && u.role === role);
-    if (userToLogin) {
-      setUser(userToLogin);
-      localStorage.setItem('krishi-user', JSON.stringify({id: userToLogin.id, role: userToLogin.role}));
-      // Redirect based on role
-      if (userToLogin.role === 'Admin') {
-        router.push('/admin/dashboard');
+
+  useEffect(() => {
+    if (!isUserLoading) {
+      if (authUser) {
+        fetchUserProfile(authUser);
       } else {
-        router.push('/dashboard');
+        setUser(null);
       }
-    } else {
-        // This should be handled more gracefully in a real app
-        alert('Invalid demo credentials');
+      setLoading(false);
+    }
+  }, [authUser, isUserLoading, fetchUserProfile]);
+
+  const login = async (email: string, role: UserRole) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, demoCredentials.farmer.password);
+      // Auth state change will be handled by the onAuthStateChanged listener in useFirebase
+      // which will then trigger the useEffect to fetch the user profile.
+       const userDocRef = doc(firestore, 'users', userCredential.user.uid);
+       const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data() as User;
+            if (userData.role === role) {
+                if (role === 'Admin') {
+                    router.push('/admin/dashboard');
+                } else {
+                    router.push('/dashboard');
+                }
+            } else {
+                await signOut(auth);
+                toast({ variant: 'destructive', title: 'Role mismatch', description: 'Please log in with the correct role.' });
+            }
+        }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({ variant: 'destructive', title: 'Login Failed', description: error.message });
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('krishi-user');
-    router.push('/auth/login');
+  const signup = async (name: string, email: string, password: string, role: UserRole) => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const firebaseUser = userCredential.user;
+
+        const newUser: Omit<User, 'id'> = {
+            name,
+            email,
+            role,
+            region: 'N/A',
+            languages: ['English'],
+            phone: '',
+            prefs: { push: true, voice: false },
+            avatar: `https://i.pravatar.cc/150?u=${firebaseUser.uid}`,
+        };
+
+        await setDoc(doc(firestore, "users", firebaseUser.uid), newUser);
+        
+        // setUser will be handled by the auth state listener
+        
+        toast({
+            title: "Account Created",
+            description: "You have been successfully signed up.",
+        });
+
+    } catch (error: any) {
+        console.error("Signup error:", error);
+        toast({ variant: 'destructive', title: 'Signup Failed', description: error.message });
+    }
+  };
+
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      router.push('/auth/login');
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const isAuthenticated = !!user;
@@ -89,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, loading, pathname, router, user]);
 
-  const value = { user, isAuthenticated, login, logout, loading };
+  const value = { user, authUser, isAuthenticated, login, logout, signup, loading };
 
   if (loading) {
     return (
@@ -97,28 +164,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
-  }
-
-  const isAuthPage = pathname.startsWith('/auth');
-  const publicPages = ['/', '/privacy-policy', '/terms-of-service'];
-  const isPublicPage = publicPages.includes(pathname);
-  
-  // Allow access to landing and auth pages
-  if (isPublicPage || isAuthPage) {
-    return (
-      <AuthContext.Provider value={value}>
-        {children}
-      </AuthContext.Provider>
-    );
-  }
-
-  // If not authenticated, show loading spinner while redirecting
-  if (!isAuthenticated) {
-      return (
-        <div className="h-screen w-full flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      );
   }
 
   return (

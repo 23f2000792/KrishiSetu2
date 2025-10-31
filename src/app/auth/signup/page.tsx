@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -25,7 +24,7 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Github, Tractor } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
 
 const formSchema = z.object({
@@ -35,8 +34,7 @@ const formSchema = z.object({
 });
 
 export default function SignupPage() {
-  const router = useRouter();
-  const { toast } = useToast();
+  const { signup } = useAuth();
   const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,12 +47,7 @@ export default function SignupPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-        title: "Account Created (Demo)",
-        description: "In a real app, you would be logged in. Redirecting to login.",
-    });
-    router.push('/auth/login');
+    signup(values.name, values.email, values.password, 'Farmer');
   }
 
   return (

@@ -22,7 +22,7 @@ service cloud.firestore {
         return isOwner(userId) && resource != null;
       }
 
-      allow get: if isSignedIn() && isOwner(userId);
+      allow get: if isSignedIn();
       allow list: if false;
 
       allow create: if isSignedIn() && isOwner(userId);
@@ -39,7 +39,7 @@ service cloud.firestore {
      */
     match /roles_admin/{userId} {
         function isAdmin() {
-            return get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).data.admin == true;
+            return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
         }
 
         //Anyone can check if an admin role exists, but only the backend creates/deletes these roles.
