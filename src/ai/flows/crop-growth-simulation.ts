@@ -40,7 +40,7 @@ export async function simulateCropGrowth(input: CropGrowthSimulationInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'cropGrowthSimulationPrompt',
-  model: 'gemini-1.5-flash-latest',
+  model: 'gemini-1.5-flash',
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
@@ -92,3 +92,4 @@ const cropGrowthSimulationFlow = ai.defineFlow(
     return output;
   }
 );
+
