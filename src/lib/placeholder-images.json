@@ -1,3 +1,94 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "Farmer in a field",
+      "imageUrl": "https://images.unsplash.com/photo-1564071074086-4d0aac31eb4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZmFybWVyJTIwZmllbGR8ZW58MHx8fHwxNzYxODQ0ODk4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer field"
+    },
+    {
+      "id": "avatar1",
+      "description": "User avatar 1",
+      "imageUrl": "https://images.unsplash.com/photo-1715838854648-ea200803934a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cG9ydHJhaXQlMjBtYW58ZW58MHx8fHwxNzYxODQwNzA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait man"
+    },
+    {
+      "id": "avatar2",
+      "description": "User avatar 2",
+      "imageUrl": "https://images.unsplash.com/photo-1542561698-aa34c7ee45cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NjE4NDAyNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "avatar3",
+      "description": "User avatar 3",
+      "imageUrl": "https://images.unsplash.com/photo-1526510747491-58f928ec870f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cG9ydHJhaXQlMjB3b21hbnxlbnwwfHx8fDE3NjE4MzcxMzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait woman"
+    },
+    {
+      "id": "avatar4",
+      "description": "User avatar 4",
+      "imageUrl": "https://images.unsplash.com/photo-1733231291515-19c6b9edf88f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwb3J0cmFpdCUyMGV4cGVydHxlbnwwfHx8fDE3NjE4ODc0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait expert"
+    },
+    {
+      "id": "wheat_yellow",
+      "description": "Yellowing wheat crop",
+      "imageUrl": "https://images.unsplash.com/photo-1562956509-4e2fbef3afcc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3aGVhdCUyMGZpZWxkfGVufDB8fHx8MTc2MTgzMTI1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wheat field"
+    },
+    {
+      "id": "rice_harvest",
+      "description": "Rice harvest",
+      "imageUrl": "https://images.unsplash.com/photo-1658898359527-f799c7784c8e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxyaWNlJTIwcGFkZHl8ZW58MHx8fHwxNzYxODg3NDQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rice paddy"
+    },
+    {
+      "id": "vegetables",
+      "description": "Organic vegetables",
+      "imageUrl": "https://images.unsplash.com/photo-1529313780224-1a12b68bed16?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2ZWdldGFibGUlMjBnYXJkZW58ZW58MHx8fHwxNzYxODIyMDgwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "vegetable garden"
+    },
+    {
+      "id": "leaf_blight",
+      "description": "Corn leaf with blight",
+      "imageUrl": "https://images.unsplash.com/photo-1658717798838-53ea7bbfcd18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwbGFudCUyMGRpc2Vhc2V8ZW58MHx8fHwxNzYxODA3MjY5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plant disease"
+    },
+    {
+      "id": "leaf_rust",
+      "description": "Wheat leaf with rust",
+      "imageUrl": "https://images.unsplash.com/photo-1665569775686-60bde1c7cd84?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsZWFmJTIwcnVzdHxlbnwwfHx8fDE3NjE4ODc0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leaf rust"
+    },
+    {
+      "id": "nutrient_deficiency",
+      "description": "Leaf with nutrient deficiency",
+      "imageUrl": "https://images.unsplash.com/photo-1680058044171-bd15a22972b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx5ZWxsb3clMjBsZWFmfGVufDB8fHx8MTc2MTg4NzQ0NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "yellow leaf"
+    },
+    {
+      "id": "healthy_leaf",
+      "description": "A healthy green leaf",
+      "imageUrl": "https://images.unsplash.com/photo-1533038590840-1cde6e668a91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxncmVlbiUyMGxlYWZ8ZW58MHx8fHwxNzYxODExMzQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "green leaf"
+    },
+    {
+      "id": "feature_copilot",
+      "description": "AI Copilot feature image",
+      "imageUrl": "https://images.unsplash.com/photo-1640884625898-d113eaa279f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyb2JvdCUyMGZhcm18ZW58MHx8fHwxNzYxODg3NDQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "robot farm"
+    },
+    {
+      "id": "feature_market",
+      "description": "Market predictor feature image",
+      "imageUrl": "https://images.unsplash.com/photo-1639825752750-5061ded5503b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtYXJrZXQlMjBjaGFydHxlbnwwfHx8fDE3NjE4ODc0NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "market chart"
+    },
+    {
+      "id": "feature_scanner",
+      "description": "Leaf scanner feature image",
+      "imageUrl": "https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWduaWZ5aW5nJTIwZ2xhc3N8ZW58MHx8fHwxNzYxODYxOTQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "magnifying glass"
+    }
+  ]
 }
