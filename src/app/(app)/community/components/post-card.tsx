@@ -14,6 +14,8 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { CommentThread } from "./comment-thread";
 
 type PostCardProps = {
   post: Post;
@@ -23,6 +25,7 @@ export function PostCard({ post }: PostCardProps) {
   const { firestore } = useFirebase();
   const { toast } = useToast();
   const [isLiking, setIsLiking] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -67,10 +70,6 @@ export function PostCard({ post }: PostCardProps) {
       });
   };
 
-  const handleComment = () => {
-    // Commenting functionality is not yet implemented
-  };
-
   return (
     <Card className="flex flex-col transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
@@ -106,19 +105,28 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between items-center border-t pt-4">
+      <CardFooter className="flex justify-between items-center border-t pt-2">
         <div className="flex gap-2">
             <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground" onClick={handleLike} disabled={isLiking}>
                 {isLiking ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
                 <span>{post.upvotes}</span>
             </Button>
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground" onClick={handleComment}>
-                <MessageCircle className="h-4 w-4" />
-                <span>{post.comments?.length || 0}</span>
-            </Button>
+            <Collapsible open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+                <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground">
+                        <MessageCircle className="h-4 w-4" />
+                        <span>{post.comments?.length || 0}</span>
+                    </Button>
+                </CollapsibleTrigger>
+            </Collapsible>
         </div>
         <Badge variant="secondary">{post.language}</Badge>
       </CardFooter>
+      <CollapsibleContent>
+        <div className="px-6 pb-4">
+            <CommentThread postId={post.id} comments={post.comments} />
+        </div>
+      </CollapsibleContent>
     </Card>
   );
 }

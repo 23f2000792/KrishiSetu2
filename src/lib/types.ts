@@ -29,6 +29,15 @@ export type MarketPrice = {
   forecast: number; // percentage change
 };
 
+export type Comment = {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  comment: string;
+  createdAt: Timestamp;
+};
+
 export type Post = {
   id: string;
   authorId: string;
@@ -38,12 +47,7 @@ export type Post = {
   image?: string;
   language: string;
   upvotes: number;
-  comments: {
-    id: string;
-    authorName: string;
-    authorAvatar?: string;
-    comment: string;
-  }[];
+  comments: Comment[];
   createdAt: Timestamp;
 };
 
