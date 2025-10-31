@@ -31,101 +31,40 @@ export async function planCrop(input: CropPlannerInput): Promise<CropPlannerOutp
   return cropPlannerFlow(input);
 }
 
-
-// Mock tool for long-range weather forecast.
-const getWeatherForecastTool = ai.defineTool(
-    {
-        name: 'getWeatherForecast',
-        description: 'Gets the long-range (3-month) weather forecast for a region.',
-        inputSchema: z.object({ region: z.string() }),
-        outputSchema: z.object({
-            rainfall: z.enum(['Above-Normal', 'Normal', 'Below-Normal']),
-            temperature: z.enum(['Warmer', 'Normal', 'Cooler']),
-        }),
-    },
-    async ({ region }) => {
-        // Mock data. In a real app, this would call a reliable weather API.
-        if (region.toLowerCase() === 'punjab') {
-            return { rainfall: 'Normal', temperature: 'Warmer' };
-        }
-        return { rainfall: 'Normal', temperature: 'Normal' };
-    }
-);
-
-// Gets historical market data for a list of potential crops.
-const getMarketDataTool = ai.defineTool(
-    {
-        name: 'getMarketDataForMultipleCrops',
-        description: 'Get historical market price data for a list of potential crops to analyze profitability.',
-        inputSchema: z.object({
-            crops: z.array(z.string()).describe('A list of crops to get prices for.'),
+// System prompt designed to analyze a complete data package.
+const cropPlannerSystemPrompt = ai.definePrompt({
+    name: 'cropPlannerSystemPrompt',
+    input: {
+        schema: z.object({
+            language: z.string(),
             region: z.string(),
+            soilReportJson: z.string(),
+            marketDataJson: z.string(),
+            weatherForecastJson: z.string(),
         }),
-        outputSchema: z.array(z.object({
-            crop: z.string(),
-            averagePrice: z.number(),
-        })),
     },
-    async ({ crops, region }) => {
-        const results = [];
-        for (const crop of crops) {
-            const data = await getMarketData(crop, region);
-            if (data && data.prices.length > 0) {
-                const averagePrice = data.prices.reduce((acc, p) => acc + p.price, 0) / data.prices.length;
-                results.push({ crop, averagePrice });
-            }
-        }
-        return results;
-    }
-);
+    output: { schema: CropPlannerOutputSchema },
+    prompt: `You are an expert agricultural economist and agronomist advising a farmer in India. Your task is to analyze the provided data package and recommend the single most profitable and suitable crop for the upcoming planting season.
 
-const getFarmerHistoryTool = ai.defineTool(
-  {
-    name: 'getFarmerHistory',
-    description: "Get the farmer's historical data, including past soil reports and crop scans.",
-    inputSchema: z.object({
-      userId: z.string().describe("The user's unique ID."),
-    }),
-    outputSchema: z.object({
-      soilReports: z.array(z.any()).optional(),
-      scans: z.array(z.any()).optional(),
-    }),
-  },
-  async ({ userId }) => {
-    // This is the correct way to initialize and use the admin SDK in a tool.
-    const admin = getInitializedFirebaseAdmin();
-    const data = await getFarmerKnowledgeGraph(admin.firestore, userId);
-    return data;
-  }
-);
+**Data Package:**
+- Farmer's Region: {{{region}}}
+- Latest Soil Report: {{{soilReportJson}}}
+- Long-Range Weather Forecast: {{{weatherForecastJson}}}
+- Historical Market Data for Potential Crops: {{{marketDataJson}}}
 
+**Your Process:**
+1.  **Synthesize & Recommend:**
+    *   Analyze all the provided data: soil suitability (from the report), water requirements vs. rainfall forecast, and market prices/demand.
+    *   Select the **single best crop** from the provided market data options.
+    *   Calculate a simple, compelling ROI comparison against a common baseline crop (like Wheat or Rice). For example, state it like "~24% higher ROI than Wheat." If you cannot calculate a precise ROI, provide a qualitative reason for profitability.
+    *   Provide a concise justification for your choice, explaining *why* it's the best option based on the data you were given (soil, weather, market).
 
-const prompt = ai.definePrompt({
-  name: 'cropPlannerPrompt',
-  input: { schema: CropPlannerInputSchema },
-  output: { schema: CropPlannerOutputSchema },
-  tools: [getFarmerHistoryTool, getWeatherForecastTool, getMarketDataTool],
-  prompt: `You are an expert agricultural economist and agronomist advising a farmer in India. Your task is to recommend the single most profitable and suitable crop for the upcoming planting season.
+**IMPORTANT:** Your entire response must be in the specified language: {{{language}}}
 
-  **Process:**
-  1.  **Farmer History:** You MUST start by using the \`getFarmerHistory\` tool to fetch the farmer's most recent soil report. This is critical for understanding their soil's health (pH, NPK levels).
-  2.  **Weather Forecast:** You MUST use the \`getWeatherForecastTool\` to get the long-range weather outlook for the farmer's region.
-  3.  **Market Analysis:** Based on the region and soil type, identify 3-4 suitable crops. Then, you MUST use the \`getMarketDataForMultipleCrops\` tool to get their recent average market prices to analyze potential profitability.
-  4.  **Synthesize & Recommend:**
-      *   Weigh all the factors: soil suitability, water requirements vs. rainfall forecast, and market prices/demand.
-      *   Select the **single best crop**. If you cannot determine a clear winner (e.g., market data is unavailable), make a logical recommendation based on soil and weather data alone.
-      *   Calculate a simple, compelling ROI comparison. For example, if Mustard is better than Wheat, state it like "~24% higher ROI than Wheat." If you cannot calculate ROI, provide a qualitative reason for your choice.
-      *   Provide a concise justification for your choice, explaining *why* it's the best option based on the data you gathered (soil, weather, market).
-
-  **IMPORTANT:** Your entire response must be in the specified language.
-
-  - User ID: {{{userId}}}
-  - Region: {{{region}}}
-  - Language for response: {{{language}}}
-
-  Generate the crop plan now.
-  `,
+Generate the crop plan now.
+`,
 });
+
 
 const cropPlannerFlow = ai.defineFlow(
   {
@@ -134,7 +73,33 @@ const cropPlannerFlow = ai.defineFlow(
     outputSchema: CropPlannerOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    // STEP 1: Gather all data before calling the AI.
+    const { firestore } = getInitializedFirebaseAdmin();
+
+    // Fetch farmer's history (soil reports, etc.)
+    const farmerHistory = await getFarmerKnowledgeGraph(firestore, input.userId);
+    const latestSoilReport = farmerHistory.soilReports?.[0] || null;
+
+    // Define potential crops based on region (mock for now, could be a service)
+    const potentialCrops = ['Wheat', 'Mustard', 'Soybean', 'Maize'];
+    
+    // Fetch market data for all potential crops
+    const marketDataPromises = potentialCrops.map(crop => getMarketData(crop, input.region));
+    const marketDataResults = await Promise.all(marketDataPromises);
+    const marketDataContext = potentialCrops.map((crop, i) => ({ crop, data: marketDataResults[i] }));
+    
+    // Mock weather forecast
+    const weatherForecast = { rainfall: 'Normal', temperature: 'Warmer' };
+
+    // STEP 2: Call the AI with the complete data package.
+    const { output } = await cropPlannerSystemPrompt({
+        language: input.language,
+        region: input.region,
+        soilReportJson: JSON.stringify(latestSoilReport, null, 2),
+        marketDataJson: JSON.stringify(marketDataContext, null, 2),
+        weatherForecastJson: JSON.stringify(weatherForecast, null, 2),
+    });
+    
     return output!;
   }
 );

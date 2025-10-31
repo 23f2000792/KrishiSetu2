@@ -57,7 +57,10 @@ export default function CropPlannerPage() {
     const [error, setError] = useState<string | null>(null);
 
     const handlePlan = async () => {
-        if (!user) return;
+        if (!user) {
+             setError("You must be logged in to generate a crop plan.");
+            return
+        };
         setLoading(true);
         setResult(null);
         setError(null);
@@ -67,7 +70,7 @@ export default function CropPlannerPage() {
             setResult(plan);
         } catch (e) {
             console.error(e);
-            setError("Failed to generate a crop plan. Please try again later.");
+            setError("Failed to generate a crop plan. The AI model may be temporarily unavailable. Please try again later.");
         } finally {
             setLoading(false);
         }
