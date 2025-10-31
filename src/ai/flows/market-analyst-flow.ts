@@ -12,6 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {getMarketData} from '@/services/market-service';
 import type { PricePoint } from '@/lib/types';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const MarketAnalysisInputSchema = z.object({
   crop: z.string().describe('The crop to analyze (e.g., "Wheat").'),
@@ -57,7 +58,7 @@ const getMarketDataTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'marketAnalystPrompt',
-  model: 'gemini-1.5-pro-latest',
+  model: googleAI.model('gemini-1.5-pro'),
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),

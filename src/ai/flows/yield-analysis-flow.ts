@@ -12,6 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { getFarmerKnowledgeGraph } from '@/services/knowledge-service';
 import { getInitializedFirebaseAdmin } from '@/firebase/admin';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const YieldAnalysisInputSchema = z.object({
   crop: z.string().describe('The crop being analyzed.'),
@@ -55,7 +56,7 @@ const getFarmerHistoryTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'yieldDeviationAnalysisPrompt',
-  model: 'gemini-1.5-pro-latest',
+  model: googleAI.model('gemini-1.5-pro'),
   input: { schema: YieldAnalysisInputSchema },
   output: { schema: YieldAnalysisOutputSchema },
   tools: [getFarmerHistoryTool],
