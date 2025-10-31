@@ -15,6 +15,7 @@ const CropGrowthSimulationInputSchema = z.object({
   crop: z.string().describe('The type of crop being grown (e.g., "Wheat").'),
   region: z.string().describe('The geographical region of the farm (e.g., "Punjab").'),
   soilReport: z.any().optional().describe('The most recent soil analysis report for context.'),
+  previousYield: z.number().optional().describe("The farmer's yield from the previous season for the same crop (in quintals/acre)."),
   language: z.string().describe('The language for the response (e.g., "English", "Hindi").'),
 });
 export type CropGrowthSimulationInput = z.infer<typeof CropGrowthSimulationInputSchema>;
@@ -28,7 +29,7 @@ const WeeklyUpdateSchema = z.object({
 
 const CropGrowthSimulationOutputSchema = z.object({
   timeline: z.array(WeeklyUpdateSchema).describe("A 4-week array representing the 30-day growth forecast."),
-  finalYieldPrediction: z.string().describe("A concluding sentence predicting the potential yield if advice is followed (e.g., 'Following these steps could lead to a yield of 18-20 quintals/acre.')."),
+  finalYieldPrediction: z.string().describe("A concluding sentence predicting the potential yield and comparing it to a baseline. Example: 'Expected: 18.2 quintals/acre vs. Regional Average: 16.9 quintals/acre.'"),
 });
 export type CropGrowthSimulationOutput = z.infer<typeof CropGrowthSimulationOutputSchema>;
 
@@ -45,12 +46,12 @@ const prompt = ai.definePrompt({
   Use your knowledge of agriculture, weather patterns for the given region, and the provided soil data to create a predictive timeline.
 
   **Your Task:**
-  1.  **Analyze Inputs:** Consider the crop type, region, and the provided soil report data.
+  1.  **Analyze Inputs:** Consider the crop type, region, and the provided soil report and previous yield data.
   2.  **Simulate Week-by-Week:** For each of the 4 weeks, provide:
       *   **Growth Stage:** The expected physiological stage of the crop.
       *   **Predicted Risks:** Common risks for that stage and region (e.g., pests, diseases, weather stress). Be specific.
       *   **Recommended Actions:** Key actions the farmer should take (e.g., irrigation, fertilization, pest scouting).
-  3.  **Predict Final Yield:** Conclude with a realistic yield prediction if the farmer follows the plan.
+  3.  **Predict Final Yield:** Conclude with a realistic yield prediction if the farmer follows the plan. **Crucially, compare this prediction to the farmer's previous yield or a regional average.** Format it clearly, for example: "Expected: 18.2 quintals/acre vs. Previous: 16.9 quintals/acre."
   4.  **Language:** The entire response MUST be in the specified language.
 
   **Farmer's Data:**
@@ -58,6 +59,7 @@ const prompt = ai.definePrompt({
   - Region: {{{region}}}
   - Language for response: {{{language}}}
   - Latest Soil Report: {{jsonStringify soilReport}}
+  - Previous Season's Yield: {{{previousYield}}} quintals/acre
 
   Generate the 4-week timeline now.
   `,
