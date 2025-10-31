@@ -22,21 +22,24 @@ export function MobileNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-background border-t z-40">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-background/80 border-t backdrop-blur-sm z-40">
       <nav className="h-full">
         <ul className="flex h-full items-center justify-around">
           {navItems.map((item) => (
-            <li key={item.href}>
+            <li key={item.href} className="relative">
               <Link
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-1 text-muted-foreground transition-colors w-16',
-                  pathname === item.href ? 'text-primary' : 'hover:text-primary'
+                  'flex flex-col items-center gap-1 text-muted-foreground transition-colors w-16 py-2 rounded-lg',
+                  pathname.startsWith(item.href) ? 'text-primary' : 'hover:text-primary'
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-6 w-6" />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
+               {pathname.startsWith(item.href) && (
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
+              )}
             </li>
           ))}
         </ul>

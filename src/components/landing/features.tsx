@@ -42,10 +42,14 @@ export function Features() {
           </p>
         </div>
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature) => {
+          {features.map((feature, index) => {
              const featureImage = PlaceHolderImages.find((p) => p.id === feature.image_id);
             return (
-            <Card key={feature.title} className="text-center transform hover:-translate-y-2 transition-transform duration-300 ease-in-out shadow-lg hover:shadow-xl hover:shadow-primary/20">
+            <Card 
+                key={feature.title} 
+                className="text-center transform-gpu transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20 animate-fade-in-up"
+                style={{ animationDelay: `${index * 150}ms` }}
+            >
               <CardHeader>
                 <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
                     {feature.icon}
@@ -55,12 +59,12 @@ export function Features() {
               <CardContent>
                 <p className="text-muted-foreground">{feature.description}</p>
                  {featureImage && (
-                    <div className="mt-6 aspect-video relative rounded-lg overflow-hidden">
+                    <div className="mt-6 aspect-video relative rounded-lg overflow-hidden border">
                         <Image
                             src={featureImage.imageUrl}
                             alt={featureImage.description}
                             fill
-                            className="object-cover"
+                            className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
                             data-ai-hint={featureImage.imageHint}
                         />
                     </div>
