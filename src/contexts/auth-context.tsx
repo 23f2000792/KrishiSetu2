@@ -66,9 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!loading) {
       const isAuthPage = pathname.startsWith('/auth');
-      const isLandingPage = pathname === '/';
+      const publicPages = ['/', '/privacy-policy', '/terms-of-service'];
+      const isPublicPage = publicPages.includes(pathname);
       
-      if (!isAuthenticated && !isAuthPage && !isLandingPage) {
+      if (!isAuthenticated && !isAuthPage && !isPublicPage) {
         router.push('/auth/login');
       }
       
@@ -99,10 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const isAuthPage = pathname.startsWith('/auth');
-  const isLandingPage = pathname === '/';
+  const publicPages = ['/', '/privacy-policy', '/terms-of-service'];
+  const isPublicPage = publicPages.includes(pathname);
   
   // Allow access to landing and auth pages
-  if (isLandingPage || isAuthPage) {
+  if (isPublicPage || isAuthPage) {
     return (
       <AuthContext.Provider value={value}>
         {children}
