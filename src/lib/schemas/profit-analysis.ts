@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const costInputSchema = {
-  seedCost: z.number().describe('Cost of seeds.'),
-  fertilizerCost: z.number().describe('Cost of fertilizers.'),
-  pesticideCost: z.number().describe('Cost of pesticides/herbicides.'),
-  laborCost: z.number().describe('Cost of labor.'),
-  irrigationCost: z.number().describe('Cost of irrigation (water/electricity).'),
-  transportCost: z.number().describe('Cost of transporting goods to market.'),
-  otherCost: z.number().describe('Any other miscellaneous costs.'),
+  seedCost: z.coerce.number().describe('Cost of seeds.'),
+  fertilizerCost: z.coerce.number().describe('Cost of fertilizers.'),
+  pesticideCost: z.coerce.number().describe('Cost of pesticides/herbicides.'),
+  laborCost: z.coerce.number().describe('Cost of labor.'),
+  irrigationCost: z.coerce.number().describe('Cost of irrigation (water/electricity).'),
+  transportCost: z.coerce.number().describe('Cost of transporting goods to market.'),
+  otherCost: z.coerce.number().describe('Any other miscellaneous costs.'),
 };
 
 export const costInputObject = z.object(costInputSchema);

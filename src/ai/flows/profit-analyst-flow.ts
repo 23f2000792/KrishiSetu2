@@ -15,7 +15,7 @@ import { costInputSchema } from '@/lib/schemas/profit-analysis';
 const ProfitAnalysisInputSchema = z.object({
   crop: z.string().describe('The crop being analyzed.'),
   region: z.string().describe('The region where the crop was sold.'),
-  actualYield: z.number().describe('The total yield produced in quintals.'),
+  actualYield: z.coerce.number().describe('The total yield produced in quintals.'),
   ...costInputSchema,
 });
 export type ProfitAnalysisInput = z.infer<typeof ProfitAnalysisInputSchema>;
