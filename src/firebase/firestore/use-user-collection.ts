@@ -34,11 +34,10 @@ type LimitFn = (limit: number) => QueryConstraint;
  */
 export function useUserCollection<T>(
   collectionName: string,
-  queryFn: QueryFn,
-  orderByFn?: OrderByFn,
-  orderByArgs?: [string, OrderByDirection],
-  limitFn?: LimitFn,
-  limitArgs?: number
+  options?: {
+    orderBy?: [string, OrderByDirection];
+    limit?: number;
+  }
 ): UseCollectionResult<T> {
   const { user } = useAuth();
   const { firestore } = useFirebase();
@@ -49,20 +48,19 @@ export function useUserCollection<T>(
     }
 
     const constraints: QueryConstraint[] = [where('userId', '==', user.id)];
-    if (orderByFn && orderByArgs) {
-        constraints.push(orderByFn(...orderByArgs));
+    if (options?.orderBy) {
+      constraints.push(firestoreQuery.prototype.orderBy.apply(firestoreQuery, options.orderBy));
     }
-    if (limitFn && limitArgs) {
-        constraints.push(limitFn(limitArgs));
+    if (options?.limit) {
+      constraints.push(firestoreQuery.prototype.limit.apply(firestoreQuery, [options.limit]));
     }
     
-    return queryFn(
+    return firestoreQuery(
       collection(firestore, collectionName),
       ...constraints
     );
-  // NOTE: The dependency array must be stable. The functions are stable, and the args should be too.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore, collectionName, orderByArgs, limitArgs]);
+  }, [user, firestore, collectionName, options?.orderBy, options?.limit]);
 
   // The type assertion is safe because useCollection handles null queries.
   return useCollection<T>(userQuery as Query<DocumentData> | null);
