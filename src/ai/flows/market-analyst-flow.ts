@@ -57,7 +57,7 @@ const getMarketDataTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'marketAnalystPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'gemini-1.5-flash',
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
@@ -108,5 +108,6 @@ const marketAnalysisFlow = ai.defineFlow(
     return output!;
   }
 );
+
 
 

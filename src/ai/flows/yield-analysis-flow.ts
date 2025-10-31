@@ -55,7 +55,7 @@ const getFarmerHistoryTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'yieldDeviationAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'gemini-1.5-flash',
   input: { schema: YieldAnalysisInputSchema },
   output: { schema: YieldAnalysisOutputSchema },
   tools: [getFarmerHistoryTool],
