@@ -29,8 +29,8 @@ const SoilAnalysisOutputSchema = z.object({
   fertilityStatus: z.string().describe('A qualitative summary of the soil fertility (e.g., "Good", "Moderate", "Poor").'),
   soilType: z.string().describe('The likely soil type based on the provided data (e.g., "Sandy Loam", "Clay").'),
   recommendedCrops: z.array(z.string()).describe('A list of crops suitable for this soil condition and region.'),
-  fertilizerPlan: z.string().describe('A detailed fertilizer plan including type, dosage, and frequency. Formatted as Markdown.'),
-  organicAdvice: z.string().describe('Actionable suggestions for improving soil health using organic methods. Formatted as Markdown.'),
+  fertilizerPlan: z.string().describe('A detailed fertilizer plan including type, dosage, and frequency. Formatted as a Markdown list.'),
+  organicAdvice: z.string().describe('Actionable suggestions for improving soil health using organic methods. Formatted as a Markdown list.'),
   warnings: z.array(z.string()).describe('Any critical warnings or potential issues (e.g., "High salinity detected").'),
   explanation: z.string().describe('A clear, simple explanation of why these recommendations were made, based on the input data.'),
   efficiencyForecast: z.string().describe("A 1-2 sentence prediction on how the recommended plan will impact soil health over a specific timeframe (e.g., 'Following this plan should increase Organic Carbon by 0.2% in the next 60-90 days.')."),
@@ -70,8 +70,8 @@ const soilAnalysisPrompt = ai.definePrompt({
   2.  **Determine Fertility Status:** Categorize the index into "Poor", "Moderate", or "Good".
   3.  **Identify Soil Type:** Infer the likely soil type based on the data and region.
   4.  **Recommend Crops:** Suggest 3-4 crops that are well-suited to these soil conditions and the specified region.
-  5.  **Create a Fertilizer Plan:** Provide a clear, actionable fertilizer plan. Mention specific fertilizer types (e.g., Urea, DAP, MOP), recommended dosage (in kg/acre), and application timing/frequency. Format this as a Markdown list.
-  6.  **Provide Organic Advice:** Suggest practical, organic methods to improve soil health, especially focusing on improving OC if it is low. Format this as a Markdown list.
+  5.  **Create a Fertilizer Plan:** Provide a clear, actionable fertilizer plan. Mention specific fertilizer types (e.g., Urea, DAP, MOP), recommended dosage (in kg/acre), and application timing/frequency. **IMPORTANT: Format this as a Markdown list.**
+  6.  **Provide Organic Advice:** Suggest practical, organic methods to improve soil health, especially focusing on improving OC if it is low. **IMPORTANT: Format this as a Markdown list.**
   7.  **Identify Warnings:** Note any critical issues, such as very high/low pH, high EC (salinity), or severe nutrient deficiencies.
   8.  **Generate Explanation:** In simple terms, explain *why* you are making these recommendations. For example, "Your soil's pH is slightly acidic, which is why we recommend crops like potatoes. The low Nitrogen level is addressed by the Urea application in the fertilizer plan."
   9.  **Efficiency Forecast:** Based on your recommendations (especially the organic advice), create a simple, tangible forecast. For example, "With consistent compost application as advised, your soil's Organic Carbon could increase by 0.1-0.2% over the next 3-4 months."
