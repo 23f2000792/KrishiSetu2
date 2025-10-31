@@ -118,7 +118,7 @@ const financeAgent = ai.defineTool({
 
 const prompt = ai.definePrompt({
   name: 'krishiAiAgriAdvisoryPrompt',
-  model: googleAI.model('gemini-1.5-flash-latest'),
+  model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: KrishiAiAgriAdvisoryInputSchema},
   output: {schema: KrishiAiAgriAdvisoryOutputSchema},
   tools: [getMandiPriceTool, getFarmerHistoryTool, cropScientistAgent, financeAgent],
