@@ -19,7 +19,6 @@ const profileSchema = z.object({
   email: z.string().email(),
   phone: z.string().min(10, "Invalid phone number"),
   region: z.string(),
-  languages: z.string(),
   prefs: z.object({
     push: z.boolean(),
     voice: z.boolean(),
@@ -37,7 +36,6 @@ export default function ProfilePage() {
       email: user?.email || '',
       phone: user?.phone || '',
       region: user?.region || '',
-      languages: user?.languages.join(', ') || '',
       prefs: {
         push: user?.prefs.push || false,
         voice: user?.prefs.voice || false,
@@ -114,13 +112,6 @@ export default function ProfilePage() {
                       <FormItem>
                         <FormLabel>{t('profile.region')}</FormLabel>
                         <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                    <FormField name="languages" control={form.control} render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>{t('profile.languages')}</FormLabel>
-                        <FormControl><Input {...field} placeholder={t('profile.languagesPlaceholder')} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />

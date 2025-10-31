@@ -6,7 +6,6 @@ export type User = {
   email: string;
   role: UserRole;
   region: string;
-  languages: string[];
   phone: string;
   prefs: {
     push: boolean;

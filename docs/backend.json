@@ -27,13 +27,6 @@
           "type": "string",
           "description": "The user's geographical region."
         },
-        "languages": {
-          "type": "array",
-          "description": "List of languages the user understands.",
-          "items": {
-            "type": "string"
-          }
-        },
         "phone": {
           "type": "string",
           "description": "The user's phone number."
@@ -53,7 +46,6 @@
         "email",
         "role",
         "region",
-        "languages",
         "phone"
       ]
     }

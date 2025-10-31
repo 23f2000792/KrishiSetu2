@@ -87,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     email: creds.email,
                     role: 'Admin',
                     region: 'N/A',
-                    languages: ['English'],
                     phone: '',
                     prefs: { push: true, voice: false },
                 };
@@ -121,7 +120,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email,
             role,
             region,
-            languages: ['English'],
             phone,
             prefs: { push: true, voice: false },
         };
