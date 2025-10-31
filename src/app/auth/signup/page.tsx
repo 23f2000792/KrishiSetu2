@@ -22,8 +22,6 @@ import {
   CardTitle,
   CardFooter
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Github, Tractor } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
 
@@ -31,6 +29,8 @@ const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
+  phone: z.string().min(10, { message: 'Please enter a valid phone number.'}),
+  region: z.string().min(2, { message: 'Please enter your region.' }),
 });
 
 export default function SignupPage() {
@@ -43,11 +43,13 @@ export default function SignupPage() {
       name: '',
       email: '',
       password: '',
+      phone: '',
+      region: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    signup(values.name, values.email, values.password, 'Farmer');
+    signup(values.name, values.email, values.password, 'Farmer', values.phone, values.region);
   }
 
   return (
@@ -100,29 +102,37 @@ export default function SignupPage() {
                 </FormItem>
               )}
             />
+             <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('profile.phone')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="+91-9876543210" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="region"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('profile.region')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Punjab" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="w-full">
               {t('signup.signupButton')}
             </Button>
           </form>
         </Form>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              {t('signup.orSignUpWith')}
-            </span>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline">
-                <Tractor className="mr-2" /> {t('signup.google')}
-            </Button>
-            <Button variant="outline">
-                <Github className="mr-2" /> {t('signup.github')}
-            </Button>
-        </div>
       </CardContent>
       <CardFooter className="text-center text-sm text-muted-foreground justify-center">
           {t('signup.hasAccount')}&nbsp;

@@ -17,7 +17,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => void;
   logout: () => void;
-  signup: (name:string, email: string, password: string, role: UserRole) => void;
+  signup: (name:string, email: string, password: string, role: UserRole, phone: string, region: string) => void;
   loading: boolean;
   handleDemoLogin: (role: 'Admin') => void;
 }
@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
 
-  const signup = async (name: string, email: string, password: string, role: UserRole) => {
+  const signup = async (name: string, email: string, password: string, role: UserRole, phone: string, region: string) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const firebaseUser = userCredential.user;
@@ -114,9 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             name,
             email,
             role,
-            region: 'N/A',
+            region,
             languages: ['English'],
-            phone: '',
+            phone,
             prefs: { push: true, voice: false },
             avatar: `https://i.pravatar.cc/150?u=${firebaseUser.uid}`,
         };
