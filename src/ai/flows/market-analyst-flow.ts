@@ -57,7 +57,7 @@ const getMarketDataTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'marketAnalystPrompt',
-  model: 'gemini-1.5-flash',
+  model: 'gemini-1.5-flash-latest',
   input: { schema: z.object({
     crop: z.string(),
     region: z.string(),
