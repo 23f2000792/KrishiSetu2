@@ -10,7 +10,7 @@ import { toast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { CropMultiSelect } from './crop-multiselect';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const CROP_OPTIONS = [
     { value: "Wheat", label: "Wheat" },
@@ -27,7 +27,16 @@ export const CROP_OPTIONS = [
 
 const formSchema = z.object({
   farmSize: z.coerce.number().min(0.1, 'Please enter a valid farm size.'),
-  crops: z.array(z.string()).min(1, 'Please select at least one crop.').max(5, 'You can select up to 5 crops.'),
+  crop1: z.string().optional(),
+  crop2: z.string().optional(),
+  crop3: z.string().optional(),
+  crop4: z.string().optional(),
+  crop5: z.string().optional(),
+}).refine(data => {
+    return !!data.crop1 || !!data.crop2 || !!data.crop3 || !!data.crop4 || !!data.crop5;
+}, {
+    message: 'Please select at least one crop.',
+    path: ['crop1'], // Arbitrarily assign error to the first crop field
 });
 
 export function OnboardingForm({ onFinished }: { onFinished: () => void }) {
@@ -36,7 +45,7 @@ export function OnboardingForm({ onFinished }: { onFinished: () => void }) {
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: { farmSize: 1, crops: [] },
+        defaultValues: { farmSize: 1 },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -51,10 +60,12 @@ export function OnboardingForm({ onFinished }: { onFinished: () => void }) {
 
         setIsSubmitting(true);
 
+        const crops = [values.crop1, values.crop2, values.crop3, values.crop4, values.crop5].filter(Boolean) as string[];
+
         try {
             await updateUserProfile(user.id, {
                 farmSize: values.farmSize,
-                crops: values.crops,
+                crops: crops,
             });
             toast({
                 title: "Information Saved!",
@@ -89,21 +100,38 @@ export function OnboardingForm({ onFinished }: { onFinished: () => void }) {
                         </FormItem>
                     )}
                 />
-
-                <FormField
-                    control={form.control}
-                    name="crops"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>What crops are you growing? (Select up to 5)</FormLabel>
-                           <CropMultiSelect 
-                                selected={field.value}
-                                onChange={field.onChange}
-                           />
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                
+                <div className="space-y-4">
+                    <FormLabel>What crops are you growing? (Select up to 5)</FormLabel>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <FormField
+                                key={i}
+                                control={form.control}
+                                name={`crop${i}` as 'crop1' | 'crop2' | 'crop3' | 'crop4' | 'crop5'}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs text-muted-foreground">Crop {i}</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select crop" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="">None</SelectItem>
+                                                {CROP_OPTIONS.map(option => (
+                                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
+                    </div>
+                </div>
                 
                 <Button type="submit" disabled={isSubmitting} className="w-full">
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

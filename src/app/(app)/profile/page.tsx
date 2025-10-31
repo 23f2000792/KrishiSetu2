@@ -1,3 +1,4 @@
+
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,8 +14,8 @@ import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useLanguage } from '@/contexts/language-context';
 import { Separator } from '@/components/ui/separator';
-import { CropMultiSelect } from '../components/crop-multiselect';
 import { CROP_OPTIONS } from '../components/onboarding-form';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is too short"),
@@ -22,11 +23,20 @@ const profileSchema = z.object({
   phone: z.string().min(10, "Invalid phone number"),
   region: z.string(),
   farmSize: z.coerce.number().min(0, 'Farm size must be positive.'),
-  crops: z.array(z.string()).min(1, 'Please select at least one crop.').max(5, 'You can select up to 5 crops.'),
+  crop1: z.string().optional(),
+  crop2: z.string().optional(),
+  crop3: z.string().optional(),
+  crop4: z.string().optional(),
+  crop5: z.string().optional(),
   prefs: z.object({
     push: z.boolean(),
     voice: z.boolean(),
   }),
+}).refine(data => {
+    return !!data.crop1 || !!data.crop2 || !!data.crop3 || !!data.crop4 || !!data.crop5;
+}, {
+    message: 'Please select at least one crop.',
+    path: ['crop1'],
 });
 
 export default function ProfilePage() {
@@ -41,7 +51,11 @@ export default function ProfilePage() {
       phone: user?.phone || '',
       region: user?.region || '',
       farmSize: user?.farmSize || 0,
-      crops: user?.crops || [],
+      crop1: user?.crops?.[0] || '',
+      crop2: user?.crops?.[1] || '',
+      crop3: user?.crops?.[2] || '',
+      crop4: user?.crops?.[3] || '',
+      crop5: user?.crops?.[4] || '',
       prefs: {
         push: user?.prefs.push || false,
         voice: user?.prefs.voice || false,
@@ -55,7 +69,17 @@ export default function ProfilePage() {
   
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
     if (!user) return;
-    updateUserProfile(user.id, values);
+    const crops = [values.crop1, values.crop2, values.crop3, values.crop4, values.crop5].filter(Boolean) as string[];
+    const updateData = { ...values, crops };
+    
+    // remove individual crop fields
+    delete (updateData as any).crop1;
+    delete (updateData as any).crop2;
+    delete (updateData as any).crop3;
+    delete (updateData as any).crop4;
+    delete (updateData as any).crop5;
+
+    updateUserProfile(user.id, updateData);
   };
   
   const getInitials = (name: string) => {
@@ -125,7 +149,7 @@ export default function ProfilePage() {
                 
                 <div>
                     <h3 className="text-lg font-medium mb-4">Farm Details</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-6">
                          <FormField name="farmSize" control={form.control} render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Farm Size (in acres)</FormLabel>
@@ -133,21 +157,37 @@ export default function ProfilePage() {
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <FormField
-                            control={form.control}
-                            name="crops"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Your Crops</FormLabel>
-                                    <CropMultiSelect 
-                                        selected={field.value}
-                                        onChange={field.onChange}
-                                        className="w-full"
+                        <div>
+                            <FormLabel>Your Crops</FormLabel>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <FormField
+                                        key={i}
+                                        control={form.control}
+                                        name={`crop${i}` as 'crop1' | 'crop2' | 'crop3' | 'crop4' | 'crop5'}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs text-muted-foreground">Crop {i}</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select crop" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="">None</SelectItem>
+                                                        {CROP_OPTIONS.map(option => (
+                                                            <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
