@@ -14,10 +14,11 @@ import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import { analyzeProfitability, costInputSchema } from '@/ai/flows/profit-analyst-flow';
+import { analyzeProfitability } from '@/ai/flows/profit-analyst-flow';
 import type { ProfitReport } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import { ProfitReportCard } from './components/profit-report-card';
+import { costInputSchema } from '@/lib/schemas/profit-analysis';
 
 const formSchema = z.object({
     crop: z.string({ required_error: 'Please select a crop.' }),
@@ -38,6 +39,7 @@ export default function ProfitabilityDashboardPage() {
         resolver: zodResolver(formSchema),
         defaultValues: { 
             crop: user?.crops?.[0] || '',
+            actualYield: 0,
             seedCost: 0,
             fertilizerCost: 0,
             pesticideCost: 0,

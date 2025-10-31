@@ -10,16 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { getMarketData } from '@/services/market-service';
-
-export const costInputSchema = {
-  seedCost: z.number().describe('Cost of seeds.'),
-  fertilizerCost: z.number().describe('Cost of fertilizers.'),
-  pesticideCost: z.number().describe('Cost of pesticides/herbicides.'),
-  laborCost: z.number().describe('Cost of labor.'),
-  irrigationCost: z.number().describe('Cost of irrigation (water/electricity).'),
-  transportCost: z.number().describe('Cost of transporting goods to market.'),
-  otherCost: z.number().describe('Any other miscellaneous costs.'),
-};
+import { costInputSchema } from '@/lib/schemas/profit-analysis';
 
 const ProfitAnalysisInputSchema = z.object({
   crop: z.string().describe('The crop being analyzed.'),

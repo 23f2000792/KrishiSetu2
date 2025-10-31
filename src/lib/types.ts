@@ -1,4 +1,5 @@
 import type { Timestamp } from 'firebase/firestore';
+import type { CostInput } from './schemas/profit-analysis';
 
 export type UserRole = 'Farmer' | 'Expert' | 'Admin';
 
@@ -98,15 +99,7 @@ export type ProfitReport = {
   userId: string;
   crop: string;
   farmSize: number;
-  costs: {
-    seedCost: number;
-    fertilizerCost: number;
-    pesticideCost: number;
-    laborCost: number;
-    irrigationCost: number;
-    transportCost: number;
-    otherCost: number;
-  };
+  costs: CostInput;
   results: {
     totalCost: number;
     totalRevenue: number;
