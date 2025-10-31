@@ -48,6 +48,56 @@
         "region",
         "phone"
       ]
+    },
+    "Post": {
+      "title": "Post",
+      "type": "object",
+      "description": "Represents a community post made by a user.",
+      "properties": {
+        "authorId": {
+          "type": "string",
+          "description": "The ID of the user who created the post."
+        },
+        "authorName": {
+          "type": "string",
+          "description": "The name of the user who created the post."
+        },
+        "authorAvatar": {
+          "type": "string",
+          "description": "URL to the author's avatar image.",
+          "format": "uri"
+        },
+        "content": {
+          "type": "string",
+          "description": "The text content of the post."
+        },
+        "image": {
+          "type": "string",
+          "description": "URL to an image attached to the post.",
+          "format": "uri"
+        },
+        "language": {
+          "type": "string",
+          "description": "The language of the post."
+        },
+        "upvotes": {
+          "type": "number",
+          "description": "The number of upvotes the post has received."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the post was created."
+        }
+      },
+      "required": [
+        "authorId",
+        "authorName",
+        "content",
+        "language",
+        "upvotes",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -70,6 +120,22 @@
             {
               "name": "userId",
               "description": "The unique identifier of the user, used for path-based ownership."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Stores community posts. Publicly readable but writeable only by the author.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "The unique identifier for the post."
             }
           ]
         }

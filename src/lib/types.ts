@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export type UserRole = 'Farmer' | 'Expert' | 'Admin';
 
 export type User = {
@@ -37,7 +39,7 @@ export type Post = {
     authorAvatar?: string;
     comment: string;
   }[];
-  createdAt: string;
+  createdAt: Timestamp;
 };
 
 export type ScanResult = {

@@ -6,6 +6,7 @@ import { Post } from "@/lib/types";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { formatDistanceToNow } from 'date-fns';
 
 type PostCardProps = {
   post: Post;
@@ -17,17 +18,29 @@ export function PostCard({ post }: PostCardProps) {
     return names.length > 1 ? `${names[0][0]}${names[names.length - 1][0]}` : name.substring(0, 2);
   };
   
+  const getRelativeTime = () => {
+    if (!post.createdAt) return 'Just now';
+    try {
+      const date = post.createdAt.toDate();
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (e) {
+      // Fallback for string dates from mock data
+      return post.createdAt as unknown as string;
+    }
+  };
+
   return (
     <Card className="flex flex-col transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <Avatar>
+              <AvatarImage src={post.authorAvatar} />
               <AvatarFallback>{getInitials(post.authorName)}</AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold">{post.authorName}</p>
-              <p className="text-xs text-muted-foreground">{post.createdAt}</p>
+              <p className="text-xs text-muted-foreground">{getRelativeTime()}</p>
             </div>
           </div>
             <DropdownMenu>
@@ -59,7 +72,7 @@ export function PostCard({ post }: PostCardProps) {
             </Button>
             <Button variant="ghost" size="sm" className="flex items-center gap-2 text-muted-foreground">
                 <MessageCircle className="h-4 w-4" />
-                <span>{post.comments.length}</span>
+                <span>{post.comments?.length || 0}</span>
             </Button>
         </div>
         <Badge variant="secondary">{post.language}</Badge>
