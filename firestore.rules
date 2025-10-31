@@ -30,22 +30,26 @@ service cloud.firestore {
     }
 
     match /soil_reports/{reportId} {
-        allow get, list, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+        allow list: if isSignedIn();
+        allow get, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
         allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
 
     match /scans/{scanId} {
-        allow list, get, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+        allow list: if isSignedIn();
+        allow get, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
         allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
 
     match /yield_reports/{reportId} {
-        allow get, list, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+        allow list: if isSignedIn();
+        allow get, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
         allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
 
     match /profit_reports/{reportId} {
-        allow get, list, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+        allow list: if isSignedIn();
+        allow get, create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
         allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
 
