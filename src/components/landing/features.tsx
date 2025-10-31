@@ -1,31 +1,27 @@
 'use client';
 import { Bot, LineChart, ScanLine } from 'lucide-react';
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useLanguage } from '@/contexts/language-context';
 import { Badge } from '../ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 export function Features() {
   const { t } = useLanguage();
 
   const features = [
     {
-      icon: <ScanLine className="h-8 w-8" />,
+      icon: <ScanLine className="h-8 w-8 text-primary" />,
       title: t('landing.featureScannerTitle'),
       description: t('landing.featureScannerDesc'),
-      image_id: 'feature_scanner',
     },
     {
-      icon: <Bot className="h-8 w-8" />,
+      icon: <Bot className="h-8 w-8 text-primary" />,
       title: t('landing.featureCopilotTitle'),
       description: t('landing.featureCopilotDesc'),
-      image_id: 'feature_copilot',
     },
     {
-      icon: <LineChart className="h-8 w-8" />,
+      icon: <LineChart className="h-8 w-8 text-primary" />,
       title: t('landing.featureMarketTitle'),
       description: t('landing.featureMarketDesc'),
-      image_id: 'feature_market',
     },
   ];
 
@@ -41,36 +37,20 @@ export function Features() {
             {t('landing.featuresSubtitle')}
           </p>
         </div>
-        <div className="mt-20 space-y-24">
-          {features.map((feature, index) => {
-            const featureImage = PlaceHolderImages.find((p) => p.id === feature.image_id);
-            const isReversed = index % 2 !== 0;
-
-            return (
-              <div key={feature.title} className="grid md:grid-cols-2 gap-12 items-center animate-fade-in-up">
-                <div className={`space-y-4 ${isReversed ? 'md:order-2' : ''}`}>
-                    <div className="inline-flex items-center gap-4">
-                        <div className="p-3 bg-primary/10 rounded-lg text-primary">
-                            {feature.icon}
-                        </div>
-                        <h3 className="text-2xl md:text-3xl font-headline font-bold">{feature.title}</h3>
-                    </div>
-                  <p className="text-lg text-muted-foreground">{feature.description}</p>
+        <div className="mt-16 grid md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <Card key={feature.title} className="text-center animate-fade-in-up transform-gpu transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-2" style={{ animationDelay: `${index * 150}ms`}}>
+              <CardHeader className="items-center">
+                <div className="p-4 bg-primary/10 rounded-full w-fit">
+                    {feature.icon}
                 </div>
-                {featureImage && (
-                  <div className={`relative aspect-video rounded-xl overflow-hidden shadow-lg border ${isReversed ? 'md:order-1' : ''}`}>
-                    <Image
-                      src={featureImage.imageUrl}
-                      alt={featureImage.description}
-                      fill
-                      className="object-cover"
-                      data-ai-hint={featureImage.imageHint}
-                    />
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                <CardTitle className="pt-2">{feature.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{feature.description}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
