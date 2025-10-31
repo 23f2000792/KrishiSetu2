@@ -3,8 +3,6 @@ import { PageHeader } from "@/components/page-header"
 import { useAuth } from "@/contexts/auth-context"
 import { UserList } from "./components/user-list";
 import { users } from "@/lib/data";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
 
 export default function AdminPage() {
@@ -29,26 +27,6 @@ export default function AdminPage() {
 
             <div className="grid gap-8">
                 <UserList users={users} />
-                <div className="grid md:grid-cols-2 gap-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('admin.marketFeed')}</CardTitle>
-                            <CardDescription>{t('admin.marketFeedDesc')}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Button>{t('admin.ingestData')}</Button>
-                        </CardContent>
-                    </Card>
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>{t('admin.seedData')}</CardTitle>
-                            <CardDescription>{t('admin.seedDataDesc')}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Button variant="secondary">{t('admin.seedData')}</Button>
-                        </CardContent>
-                    </Card>
-                </div>
             </div>
         </div>
     )
