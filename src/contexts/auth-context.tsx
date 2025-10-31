@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, UserRole } from '@/lib/types';
-import { users, demoCredentials } from '@/lib/data';
+import { users } from '@/lib/data';
 import { usePathname, useRouter } from 'next/navigation';
 
 interface AuthContextType {
@@ -43,7 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (userToLogin) {
       setUser(userToLogin);
       localStorage.setItem('krishi-user', JSON.stringify({id: userToLogin.id, role: userToLogin.role}));
-      router.push('/dashboard');
+      // Redirect based on role
+      if (userToLogin.role === 'Admin') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     } else {
         // This should be handled more gracefully in a real app
         alert('Invalid demo credentials');
@@ -61,14 +66,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!loading) {
       const isAuthPage = pathname.startsWith('/auth');
-      if (!isAuthenticated && !isAuthPage) {
+      const isLandingPage = pathname === '/';
+      
+      if (!isAuthenticated && !isAuthPage && !isLandingPage) {
         router.push('/auth/login');
       }
-      if (isAuthenticated && isAuthPage) {
-        router.push('/dashboard');
+      
+      if (isAuthenticated) {
+        if (isAuthPage) {
+          if (user.role === 'Admin') {
+            router.push('/admin');
+          } else {
+            router.push('/dashboard');
+          }
+        } else if (user.role === 'Admin' && !pathname.startsWith('/admin')) {
+          router.push('/admin');
+        } else if (user.role === 'Farmer' && pathname.startsWith('/admin')) {
+          router.push('/dashboard');
+        }
       }
     }
-  }, [isAuthenticated, loading, pathname, router]);
+  }, [isAuthenticated, loading, pathname, router, user]);
 
   const value = { user, isAuthenticated, login, logout, loading };
 
@@ -80,14 +98,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  // Prevent rendering auth pages if logged in, and app pages if not
   const isAuthPage = pathname.startsWith('/auth');
-  if ( (isAuthenticated && isAuthPage) || (!isAuthenticated && !isAuthPage && pathname !== '/')) {
-     return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+  const isLandingPage = pathname === '/';
+  
+  // Allow access to landing and auth pages
+  if (isLandingPage || isAuthPage) {
+    return (
+      <AuthContext.Provider value={value}>
+        {children}
+      </AuthContext.Provider>
     );
+  }
+
+  // If not authenticated, show loading spinner while redirecting
+  if (!isAuthenticated) {
+      return (
+        <div className="h-screen w-full flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      );
   }
 
   return (
