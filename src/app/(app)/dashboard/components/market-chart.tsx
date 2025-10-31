@@ -37,19 +37,22 @@ export function MarketChart({ crops }: { crops?: string[] }) {
         };
     });
 
-    const chartData = enabledCrops.reduce((acc, crop) => {
-        crop.prices.forEach(pricePoint => {
-            let entry = acc.find(item => item.date === pricePoint.date);
-            if (!entry) {
-                entry = { date: pricePoint.date };
-                acc.push(entry);
-            }
-            (entry as any)[crop.crop] = pricePoint.price;
-        });
-        return acc;
-    }, [] as any[]);
+    const allDates = new Set<string>();
+    enabledCrops.forEach(crop => {
+        crop.prices.forEach(p => allDates.add(p.date));
+    });
 
-    chartData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sortedDates = Array.from(allDates).sort((a,b) => new Date(a).getTime() - new Date(b).getTime());
+
+    const chartData = sortedDates.map(date => {
+        const entry: { [key: string]: any } = { date };
+        enabledCrops.forEach(crop => {
+            const pricePoint = crop.prices.find(p => p.date === date);
+            entry[crop.crop] = pricePoint ? pricePoint.price : null;
+        });
+        return entry;
+    });
+
 
     return { chartData, chartConfig, enabledCrops };
   }, [crops]);
@@ -102,6 +105,7 @@ export function MarketChart({ crops }: { crops?: string[] }) {
                         fill={`url(#color${crop.crop.replace(/[^a-zA-Z0-9]/g, '')})`} 
                         strokeWidth={2} 
                         dot={false}
+                        connectNulls
                     />
                 ))}
             </AreaChart>
