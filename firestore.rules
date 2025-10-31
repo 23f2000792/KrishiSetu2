@@ -16,7 +16,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow get: if isSignedIn();
-      allow list: if false;
+      allow list: if false; // Users should not be able to list all other users.
 
       allow create: if isSignedIn() && isOwner(userId);
       allow update: if isExistingOwner(userId);
@@ -30,6 +30,7 @@ service cloud.firestore {
     }
 
     match /soil_reports {
+      // Allow users to list their own reports via a query like where('userId', '==', request.auth.uid)
       allow list: if isSignedIn();
       
       match /{reportId} {
@@ -40,6 +41,7 @@ service cloud.firestore {
     }
 
     match /scans {
+      // Allow users to list their own scans via a query like where('userId', '==', request.auth.uid)
       allow list: if isSignedIn();
 
       match /{scanId} {
@@ -50,6 +52,7 @@ service cloud.firestore {
     }
 
     match /yield_reports {
+      // Allow users to list their own reports via a query like where('userId', '==', request.auth.uid)
       allow list: if isSignedIn();
 
       match /{reportId} {
@@ -60,6 +63,7 @@ service cloud.firestore {
     }
 
     match /profit_reports {
+      // Allow users to list their own reports via a query like where('userId', '==', request.auth.uid)
       allow list: if isSignedIn();
 
        match /{reportId} {
