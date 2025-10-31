@@ -112,3 +112,5 @@ export type ProfitReport = {
   };
   createdAt: Timestamp;
 };
+
+export type PostHarvestReport = YieldReport & Omit<ProfitReport, 'id' | 'userId' | 'crop' | 'farmSize' | 'createdAt'>;
