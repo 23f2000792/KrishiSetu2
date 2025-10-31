@@ -12,12 +12,16 @@ import { Card, CardContent } from '@/components/ui/card';
 
 export default function MarketPage() {
     const { t } = useLanguage();
-    const { user } = useAuth();
+    const { user, loading: userLoading } = useAuth();
     const [data, setData] = useState<MarketPrice[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            if (userLoading) {
+                return; // Wait for user to be loaded
+            }
+
             if (user && user.crops && user.crops.length > 0) {
                 setLoading(true);
                 const marketData = await getMarketDataForCrops(user.crops, user.region);
@@ -30,7 +34,7 @@ export default function MarketPage() {
         };
 
         fetchData();
-    }, [user]);
+    }, [user, userLoading]);
 
     return (
         <div className="pb-16 md:pb-0 animate-fade-in">
