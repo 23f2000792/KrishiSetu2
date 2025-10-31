@@ -1,7 +1,7 @@
 
 'use client';
 import { PageHeader } from "@/components/page-header"
-import { Bot, Droplets, Leaf, LineChart, Bug, ShoppingCart, Tractor, CalendarRange, Target } from "lucide-react";
+import { Droplets, Leaf, Bug, Target } from "lucide-react";
 import SummaryCard from "./components/summary-card";
 import { MarketChart } from "./components/market-chart";
 import { QuickActions } from "./components/quick-actions";
@@ -14,6 +14,8 @@ import { simulateCropGrowth } from "@/ai/flows/crop-growth-simulation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { SoilReport } from "@/lib/types";
+import { useUserCollection } from "@/firebase/firestore/use-user-collection";
+import { CalendarRange } from "lucide-react";
 
 
 export default function DashboardPage() {
@@ -27,9 +29,11 @@ export default function DashboardPage() {
     // Loading State
     const [loadingAI, setLoadingAI] = useState(true);
 
-    // For now, we will not fetch soil reports to avoid the permission error.
-    const latestSoilReport = null;
-    const soilReportsLoading = false;
+    const { data: soilReports, isLoading: soilReportsLoading } = useUserCollection<SoilReport>(
+        'soil_reports',
+        { orderBy: ['uploadedAt', 'desc'], limit: 1 }
+    );
+    const latestSoilReport = useMemo(() => soilReports?.[0] || null, [soilReports]);
     
     const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
     const primaryCrop = useMemo(() => user?.crops?.[0] || 'Wheat', [user?.crops]);
@@ -70,12 +74,12 @@ export default function DashboardPage() {
             }
         };
         
-        if (user) {
+        if (user && !soilReportsLoading) {
           getPredictions();
         }
-    }, [user, locale, t, primaryCrop, latestSoilReport]);
+    }, [user, locale, t, primaryCrop, latestSoilReport, soilReportsLoading]);
 
-    const isLoading = loadingAI;
+    const isLoading = loadingAI || soilReportsLoading;
 
     const summaryCards = [
         { 
