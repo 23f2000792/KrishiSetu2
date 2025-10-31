@@ -1,12 +1,8 @@
 {
   "builds": [
     {
-      "src": "next.config.ts",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
+      "src": "package.json",
+      "use": "@vercel/next"
     }
-  ],
-  "outputDirectory": null
+  ]
 }
