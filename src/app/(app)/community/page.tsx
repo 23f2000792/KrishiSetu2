@@ -14,36 +14,40 @@ export default function CommunityPage() {
     const { t } = useLanguage();
 
     return (
-        <div className="pb-16 md:pb-0">
+        <div className="pb-16 md:pb-0 animate-fade-in">
             <PageHeader
                 title={t('community.title')}
                 description={t('community.description')}
             >
-                <Button variant="outline">
-                    <Filter className="mr-2 h-4 w-4" />
-                    {t('community.filter')}
-                </Button>
-                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                        <Button>
-                            <FilePlus className="mr-2 h-4 w-4" />
-                            {t('community.createPost')}
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[625px]">
-                        <DialogHeader>
-                            <DialogTitle>{t('community.newPostTitle')}</DialogTitle>
-                            <DialogDescription>
-                                {t('community.newPostDescription')}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <CreatePostForm onPostCreated={() => setOpen(false)} />
-                    </DialogContent>
-                </Dialog>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline">
+                        <Filter className="mr-2 h-4 w-4" />
+                        {t('community.filter')}
+                    </Button>
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <FilePlus className="mr-2 h-4 w-4" />
+                                {t('community.createPost')}
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[625px]">
+                            <DialogHeader>
+                                <DialogTitle>{t('community.newPostTitle')}</DialogTitle>
+                                <DialogDescription>
+                                    {t('community.newPostDescription')}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <CreatePostForm onPostCreated={() => setOpen(false)} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </PageHeader>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {communityPosts.map(post => (
-                    <PostCard key={post.id} post={post} />
+                {communityPosts.map((post, index) => (
+                    <div key={post.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms`}}>
+                        <PostCard post={post} />
+                    </div>
                 ))}
             </div>
         </div>

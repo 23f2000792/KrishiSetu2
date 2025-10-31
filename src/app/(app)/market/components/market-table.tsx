@@ -11,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
   SortingState,
+  ColumnFiltersState,
 } from "@tanstack/react-table"
 import {
   Table,
@@ -33,7 +34,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MarketPrice } from "@/lib/types"
 import { Line, LineChart, ResponsiveContainer } from 'recharts';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 
@@ -41,6 +42,7 @@ import { useLanguage } from '@/contexts/language-context';
 export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
     const [data] = useState<MarketPrice[]>(initialData);
     const [sorting, setSorting] = useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('');
     const { t } = useLanguage();
 
@@ -52,6 +54,7 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
                   <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="pl-2"
                   >
                     {t('market.crop')}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -69,11 +72,13 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
             header: t('market.priceTrend'),
             cell: ({ row }) => {
                 const prices = row.original.prices;
+                const forecast = row.original.forecast;
+                const trendColor = forecast > 0 ? "hsl(var(--chart-1))" : "hsl(var(--destructive))";
                 return (
                     <div className="h-12 w-32">
                         <ResponsiveContainer>
                             <LineChart data={prices}>
-                                <Line type="monotone" dataKey="price" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                                <Line type="monotone" dataKey="price" stroke={trendColor} strokeWidth={2} dot={false} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
@@ -90,15 +95,17 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
         },
         {
             accessorKey: "forecast",
-            header: t('market.forecast'),
+            header: () => <div className="text-right">{t('market.forecast')}</div>,
             cell: ({ row }) => {
                 const forecast = row.getValue("forecast") as number;
                 const isUp = forecast > 0;
                 return (
-                    <Badge variant={isUp ? "default" : "destructive"} className={cn(isUp ? "bg-green-500/80" : "bg-red-500/80", "text-white")}>
-                       {isUp ? <ArrowUp className="mr-1 h-3 w-3" /> : <ArrowDown className="mr-1 h-3 w-3" />}
-                       {forecast}%
-                    </Badge>
+                    <div className="text-right">
+                        <Badge variant={isUp ? "default" : "destructive"} className={cn(isUp ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800", "font-medium")}>
+                        {isUp ? <ArrowUp className="mr-1 h-3 w-3" /> : <ArrowDown className="mr-1 h-3 w-3" />}
+                        {forecast}%
+                        </Badge>
+                    </div>
                 );
             }
         },
@@ -110,10 +117,12 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
         getCoreRowModel: getCoreRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onColumnFiltersChange: setColumnFilters,
         onGlobalFilterChange: setGlobalFilter,
         getFilteredRowModel: getFilteredRowModel(),
         state: {
           sorting,
+          columnFilters,
           globalFilter,
         },
     });
@@ -122,22 +131,25 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
     const regions = Array.from(new Set(initialData.map(d => d.region)));
     
     return (
-        <Card>
+        <Card className="animate-fade-in-up">
             <CardHeader>
-                <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+                <div className="flex flex-col md:flex-row gap-4 justify-between md:items-center">
                     <div>
                         <CardTitle>{t('market.title')}</CardTitle>
                         <CardDescription>{t('market.description')}</CardDescription>
                     </div>
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <Input
-                            placeholder={t('market.filterPlaceholder')}
-                            value={globalFilter ?? ''}
-                            onChange={(event) => setGlobalFilter(event.target.value)}
-                            className="max-w-sm"
-                        />
+                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                        <div className="relative flex-1 md:grow-0">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={t('market.filterPlaceholder')}
+                                value={globalFilter ?? ''}
+                                onChange={(event) => setGlobalFilter(event.target.value)}
+                                className="pl-8 sm:w-[200px] lg:w-[250px]"
+                            />
+                        </div>
                         <Select onValueChange={(value) => table.getColumn('crop')?.setFilterValue(value === 'all' ? '' : value)}>
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="flex-1 md:w-[180px]">
                                 <SelectValue placeholder={t('market.filterCrop')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -146,7 +158,7 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
                             </SelectContent>
                         </Select>
                         <Select onValueChange={(value) => table.getColumn('region')?.setFilterValue(value === 'all' ? '' : value)}>
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="flex-1 md:w-[180px]">
                                 <SelectValue placeholder={t('market.filterRegion')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -182,6 +194,7 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
                                     <TableRow
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}
+                                        className="hover:bg-primary/5"
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>

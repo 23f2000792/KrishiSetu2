@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/language-context";
 export default function MarketPage() {
     const { t } = useLanguage();
     return (
-        <div className="pb-16 md:pb-0">
+        <div className="pb-16 md:pb-0 animate-fade-in">
             <PageHeader
                 title={t('market.title')}
                 description={t('market.description')}

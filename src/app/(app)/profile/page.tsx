@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useLanguage } from '@/contexts/language-context';
+import { Separator } from '@/components/ui/separator';
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is too short"),
@@ -63,97 +64,104 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="pb-16 md:pb-0">
+    <div className="pb-16 md:pb-0 animate-fade-in">
       <PageHeader
         title={t('profile.title')}
         description={t('profile.description')}
       />
-      <Card>
-        <CardHeader>
-            <div className='flex items-center gap-4'>
-                <Avatar className="h-20 w-20">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
-                </Avatar>
-                <div>
-                    <CardTitle className="text-2xl">{user.name}</CardTitle>
-                    <CardDescription>{user.role}</CardDescription>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <Card>
+            <CardHeader>
+                <div className='flex flex-col sm:flex-row items-center gap-6'>
+                    <div className="relative">
+                        <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarFallback className="text-3xl">{getInitials(user.name)}</AvatarFallback>
+                        </Avatar>
+                    </div>
+                    <div className='text-center sm:text-left'>
+                        <CardTitle className="text-3xl font-bold">{user.name}</CardTitle>
+                        <CardDescription className="text-lg text-primary">{user.role}</CardDescription>
+                    </div>
                 </div>
-            </div>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormField name="name" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('profile.fullName')}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField name="email" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('profile.email')}</FormLabel>
-                    <FormControl><Input {...field} disabled /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField name="phone" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('profile.phone')}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField name="region" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('profile.region')}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                 <FormField name="languages" control={form.control} render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>{t('profile.languages')}</FormLabel>
-                    <FormControl><Input {...field} placeholder={t('profile.languagesPlaceholder')} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">{t('profile.personalInfo')}</h3>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField name="name" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('profile.fullName')}</FormLabel>
+                        <FormControl><Input {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField name="email" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('profile.email')}</FormLabel>
+                        <FormControl><Input {...field} disabled /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField name="phone" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('profile.phone')}</FormLabel>
+                        <FormControl><Input {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField name="region" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('profile.region')}</FormLabel>
+                        <FormControl><Input {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField name="languages" control={form.control} render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>{t('profile.languages')}</FormLabel>
+                        <FormControl><Input {...field} placeholder={t('profile.languagesPlaceholder')} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                </div>
 
-              <div className="space-y-4">
-                 <h3 className="text-lg font-medium">{t('profile.preferences')}</h3>
-                 <div className="grid md:grid-cols-2 gap-6">
-                    <FormField name="prefs.push" control={form.control} render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                                <FormLabel>{t('profile.pushNotifications')}</FormLabel>
-                                <FormMessage />
-                            </div>
-                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
-                    <FormField name="prefs.voice" control={form.control} render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                                <FormLabel>{t('profile.voiceIO')}</FormLabel>
-                                <FormMessage />
-                            </div>
-                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
-                 </div>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <Button type="submit">{t('profile.saveChanges')}</Button>
-                <Button variant="destructive" onClick={logout}>{t('profile.logout')}</Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                <Separator />
+                
+                <div>
+                    <h3 className="text-lg font-medium mb-4">{t('profile.preferences')}</h3>
+                    <div className="space-y-4">
+                        <FormField name="prefs.push" control={form.control} render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 hover:bg-secondary/50 transition-colors">
+                                <div className="space-y-0.5">
+                                    <FormLabel>{t('profile.pushNotifications')}</FormLabel>
+                                    <FormMessage />
+                                </div>
+                                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                            </FormItem>
+                        )} />
+                        <FormField name="prefs.voice" control={form.control} render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 hover:bg-secondary/50 transition-colors">
+                                <div className="space-y-0.5">
+                                    <FormLabel>{t('profile.voiceIO')}</FormLabel>
+                                    <FormMessage />
+                                </div>
+                                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                            </FormItem>
+                        )} />
+                    </div>
+                </div>
+            </CardContent>
+          </Card>
+          
+          <div className="flex justify-between items-center">
+            <Button variant="destructive" onClick={logout}>{t('profile.logout')}</Button>
+            <Button type="submit">{t('profile.saveChanges')}</Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

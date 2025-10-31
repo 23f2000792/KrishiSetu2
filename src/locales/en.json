@@ -123,7 +123,7 @@
     "title": "Mandi Prices",
     "description": "Latest market prices and forecasts for your crops.",
     "exportData": "Export Data",
-    "filterPlaceholder": "Filter all crops...",
+    "filterPlaceholder": "Filter crops...",
     "filterCrop": "Filter by crop",
     "allCrops": "All Crops",
     "filterRegion": "Filter by region",
@@ -187,6 +187,7 @@
   "profile": {
     "title": "My Profile",
     "description": "View and manage your personal information and preferences.",
+    "personalInfo": "Personal Information",
     "fullName": "Full Name",
     "email": "Email",
     "phone": "Phone Number",

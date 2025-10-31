@@ -36,7 +36,7 @@ export function QuickActions() {
     ];
 
     return (
-        <Card>
+        <Card className="h-full">
         <CardHeader>
             <CardTitle>{t('dashboard.quickActionsTitle')}</CardTitle>
             <CardDescription>{t('dashboard.quickActionsDescription')}</CardDescription>
@@ -45,8 +45,8 @@ export function QuickActions() {
             <div className="space-y-4">
             {actions.map((action) => (
                 <Link href={action.href} key={action.title} className="block group">
-                    <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors group-hover:border-primary">
-                        <div className={`p-3 rounded-lg ${action.bgColor} transition-colors group-hover:bg-primary/20`}>
+                    <div className="p-4 border rounded-lg flex items-center gap-4 hover:bg-secondary transition-colors duration-200 group-hover:border-primary/50 group-hover:shadow-lg group-hover:-translate-y-1">
+                        <div className={`p-3 rounded-full ${action.bgColor} transition-colors group-hover:scale-110`}>
                             <action.icon className={`h-6 w-6 ${action.color} transition-colors group-hover:text-primary`} />
                         </div>
                         <div className="flex-1">
