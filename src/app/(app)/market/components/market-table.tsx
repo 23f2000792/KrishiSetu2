@@ -46,6 +46,7 @@ import { ArrowDown, ArrowUp, Search, Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { analyzeMarket, MarketAnalysisOutput } from '@/ai/flows/market-analyst-flow';
+import Link from 'next/link';
 
 function AIAnalysisResult({ result }: { result: MarketAnalysisOutput | null }) {
     const { t } = useLanguage();
@@ -136,8 +137,7 @@ function AIAnalysisDialog({ crop, region }: { crop: string; region: string }) {
 }
 
 
-export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
-    const [data] = useState<MarketPrice[]>(initialData);
+export function MarketTable({ data }: { data: MarketPrice[] }) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('');
@@ -233,8 +233,8 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
         },
     });
 
-    const crops = Array.from(new Set(initialData.map(d => d.crop)));
-    const regions = Array.from(new Set(initialData.map(d => d.region)));
+    const crops = Array.from(new Set(data.map(d => d.crop)));
+    const regions = Array.from(new Set(data.map(d => d.region)));
     
     return (
         <Card className="animate-fade-in-up">
@@ -276,49 +276,56 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                        className="hover:bg-primary/5"
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
+                {data.length > 0 ? (
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
                                         ))}
                                     </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                                        {t('market.noResults')}
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={row.getIsSelected() && "selected"}
+                                            className="hover:bg-primary/5"
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                                            {t('market.noResults')}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                ) : (
+                    <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
+                        <p>No crops selected in your profile.</p>
+                        <p className="text-sm">Go to your <Link href="/profile" className="text-primary underline">profile</Link> to add crops and see market data.</p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
