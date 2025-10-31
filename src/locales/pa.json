@@ -24,7 +24,8 @@
     "community": "ਭਾਈਚਾਰਾ",
     "profile": "ਪ੍ਰੋਫਾਈਲ",
     "settings": "ਸੈਟਿੰਗਾਂ",
-    "adminPanel": "ਐਡਮਿਨ ਪੈਨਲ"
+    "adminPanel": "ਐਡਮਿਨ ਪੈਨਲ",
+    "cropPlanner": "ਫਸਲ ਯੋਜਨਾਕਾਰ"
   },
   "mobileNav": {
     "home": "ਘਰ",
@@ -33,7 +34,8 @@
     "scan": "ਸਕੈਨ",
     "soil": "ਮਿੱਟੀ",
     "market": "ਬਾਜ਼ਾਰ",
-    "community": "ਭਾਈਚਾਰਾ"
+    "community": "ਭਾਈਚਾਰਾ",
+    "planner": "ਯੋਜਨਾਕਾਰ"
   },
   "landing": {
     "heroTitle": "ਚੁਸਤ ਖੇਤੀ,\nਰੌਸ਼ਨ ਭਵਿੱਖ",

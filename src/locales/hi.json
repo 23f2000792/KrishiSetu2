@@ -24,7 +24,8 @@
     "community": "समुदाय",
     "profile": "प्रोफ़ाइल",
     "settings": "सेटिंग्स",
-    "adminPanel": "एडमिन पैनल"
+    "adminPanel": "एडमिन पैनल",
+    "cropPlanner": "फसल योजनाकार"
   },
   "mobileNav": {
     "home": "होम",
@@ -33,7 +34,8 @@
     "scan": "स्कैन",
     "soil": "मृदा",
     "market": "बाजार",
-    "community": "समुदाय"
+    "community": "समुदाय",
+    "planner": "योजनाकार"
   },
   "landing": {
     "heroTitle": "स्मार्ट खेती,\nउज्ज्वल भविष्य",

@@ -13,6 +13,7 @@ import {
   Users,
   CalendarRange,
   BarChart,
+  Book,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
@@ -31,6 +32,7 @@ export function SidebarNav() {
     { href: '/chat', label: t('sidebar.aiCopilot'), icon: Bot },
     { href: '/market', label: t('sidebar.marketPrices'), icon: ShoppingBasket },
     { href: '/growth-forecast', label: t('sidebar.growthForecast'), icon: CalendarRange },
+    { href: '/crop-planner', label: 'Crop Planner', icon: Book },
     { href: '/scanner', label: t('sidebar.cropScanner'), icon: ScanLine },
     { href: '/soil-analyzer', label: t('sidebar.soilAnalyzer'), icon: Leaf },
     { href: '/yield-analytics', label: "Yield Analytics", icon: BarChart },

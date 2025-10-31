@@ -10,3 +10,4 @@ import '@/ai/flows/market-analyst-flow.ts';
 import '@/ai/flows/crop-growth-simulation.ts';
 import '@/ai/flows/disease-outbreak-prediction.ts';
 import '@/ai/flows/yield-analysis-flow.ts';
+import '@/ai/flows/crop-planner-flow.ts';

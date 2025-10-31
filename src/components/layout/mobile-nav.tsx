@@ -11,6 +11,7 @@ import {
   Users,
   CalendarRange,
   BarChart,
+  Book,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '../ui/sidebar';
@@ -24,7 +25,7 @@ export function MobileNav() {
   const navItems = [
     { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
     { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
-    { href: '/growth-forecast', label: t('mobileNav.forecast'), icon: CalendarRange },
+    { href: '/crop-planner', label: 'Planner', icon: Book },
     { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
     { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
@@ -47,7 +48,7 @@ export function MobileNav() {
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
                {pathname === item.href && (
-                <div className="absolute -top-1 left-1/2 -translate-x/2 w-8 h-1 bg-primary rounded-full" />
+                <div className="absolute -top-1 left-1/2 -translate-x-2 w-8 h-1 bg-primary rounded-full" />
               )}
             </li>
           ))}

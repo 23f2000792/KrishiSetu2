@@ -24,7 +24,8 @@
     "community": "Community",
     "profile": "Profile",
     "settings": "Settings",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "cropPlanner": "Crop Planner"
   },
   "mobileNav": {
     "home": "Home",
@@ -33,7 +34,8 @@
     "scan": "Scan",
     "soil": "Soil",
     "market": "Market",
-    "community": "Community"
+    "community": "Community",
+    "planner": "Planner"
   },
   "landing": {
     "heroTitle": "Smarter Farming,\nBrighter Future",
