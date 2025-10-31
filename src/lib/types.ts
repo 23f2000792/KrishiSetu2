@@ -16,11 +16,13 @@ export type User = {
   avatar?: string;
 };
 
+export type PricePoint = { date: string; price: number };
+
 export type MarketPrice = {
   id: string;
   crop: string;
   region: string;
-  prices: { date: string; price: number }[];
+  prices: PricePoint[];
   forecast: number; // percentage change
 };
 

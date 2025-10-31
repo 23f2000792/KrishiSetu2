@@ -132,7 +132,17 @@
     "priceTrend": "Price Trend (30 days)",
     "latestPrice": "Latest Price (₹)",
     "forecast": "Forecast",
-    "noResults": "No results."
+    "noResults": "No results.",
+    "getAnalysis": "Get AI Analysis",
+    "aiAnalysisTitle": "AI Market Analysis",
+    "aiAnalysisDesc": "Get an AI-powered forecast and summary for this crop.",
+    "startAnalysis": "Start Analysis",
+    "loadingAnalysis": "Analyzing market data...",
+    "aiError": "Failed to get AI analysis. Please try again.",
+    "aiSummary": "AI Summary",
+    "aiForecast": "7-Day Forecast",
+    "aiRisks": "Potential Risks",
+    "aiOpportunities": "Opportunities"
   },
   "scanner": {
     "title": "Crop Scanner",
@@ -167,7 +177,7 @@
     "copiedToClipboardTitle": "Copied to Clipboard",
     "copiedToClipboardDesc": "Scan result details have been copied to your clipboard."
   },
-    "soil": {
+  "soil": {
     "title": "Soil Analyzer",
     "description": "Upload your soil health card to get an AI-powered analysis.",
     "dragOrUpload": "Drag & Drop or Upload Soil Card",

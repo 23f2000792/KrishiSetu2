@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {getMarketPrice} from '@/services/market-service';
+import {getMarketData} from '@/services/market-service';
 
 const AiCopilotAgriAdvisoryInputSchema = z.object({
   query: z
@@ -57,13 +57,13 @@ const getMandiPriceTool = ai.defineTool(
     outputSchema: z.string(),
   },
   async input => {
-    const price = await getMarketPrice(input.crop, input.region);
-    if (!price) {
+    const data = await getMarketData(input.crop, input.region);
+    if (!data || !data.latestPrice) {
       return `No price data found for ${input.crop} in ${input.region}.`;
     }
     return `The latest price for ${input.crop} in ${
       input.region
-    } is ₹${price.toLocaleString()} per quintal.`;
+    } is ₹${data.latestPrice.toLocaleString()} per quintal.`;
   }
 );
 

@@ -28,15 +28,112 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MarketPrice } from "@/lib/types"
 import { Line, LineChart, ResponsiveContainer } from 'recharts';
-import { ArrowDown, ArrowUp, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, Search, Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
+import { analyzeMarket, MarketAnalysisOutput } from '@/ai/flows/market-analyst-flow';
+
+function AIAnalysisResult({ result }: { result: MarketAnalysisOutput | null }) {
+    const { t } = useLanguage();
+    if (!result) return null;
+
+    return (
+        <div className='space-y-4 mt-4'>
+            <div>
+                <h3 className='font-semibold text-lg'>{t('market.aiSummary')}</h3>
+                <p className='text-sm text-muted-foreground'>{result.summary}</p>
+            </div>
+            <div>
+                <h3 className='font-semibold text-lg'>{t('market.aiForecast')}</h3>
+                <p className='text-sm text-muted-foreground'>{result.forecast}</p>
+            </div>
+             <div>
+                <h3 className='font-semibold text-lg'>{t('market.aiRisks')}</h3>
+                <p className='text-sm text-muted-foreground'>{result.risks}</p>
+            </div>
+             <div>
+                <h3 className='font-semibold text-lg'>{t('market.aiOpportunities')}</h3>
+                <p className='text-sm text-muted-foreground'>{result.opportunities}</p>
+            </div>
+        </div>
+    )
+}
+
+function AIAnalysisDialog({ crop, region }: { crop: string; region: string }) {
+    const { t, locale } = useLanguage();
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [result, setResult] = useState<MarketAnalysisOutput | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const languageMap = { en: 'English', hi: 'Hindi', pa: 'Punjabi' };
+
+
+    const handleAnalysis = async () => {
+        setLoading(true);
+        setError(null);
+        setResult(null);
+        try {
+            const analysis = await analyzeMarket({ crop, region, language: languageMap[locale] });
+            setResult(analysis);
+        } catch (e) {
+            console.error(e);
+            setError(t('market.aiError'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm" onClick={() => {
+                    // Reset on open if already has results
+                    if(result) {
+                        setResult(null);
+                        setError(null);
+                    }
+                }}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    {t('market.getAnalysis')}
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{t('market.aiAnalysisTitle')} - {crop}</DialogTitle>
+                    <DialogDescription>{t('market.aiAnalysisDesc')}</DialogDescription>
+                </DialogHeader>
+                {!result && !loading && !error && (
+                    <Button onClick={handleAnalysis} className='w-full'>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        {t('market.startAnalysis')}
+                    </Button>
+                )}
+                {loading && (
+                    <div className='flex items-center justify-center gap-2 p-8'>
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className='text-muted-foreground'>{t('market.loadingAnalysis')}</span>
+                    </div>
+                )}
+                {error && <p className='text-destructive text-center'>{error}</p>}
+                {result && <AIAnalysisResult result={result} />}
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 
 export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
@@ -109,6 +206,15 @@ export function MarketTable({ initialData }: { initialData: MarketPrice[] }) {
                 );
             }
         },
+        {
+            id: 'actions',
+            header: () => <div className="text-right">{t('admin.actions')}</div>,
+            cell: ({ row }) => (
+                <div className="text-right">
+                    <AIAnalysisDialog crop={row.original.crop} region={row.original.region} />
+                </div>
+            )
+        }
     ];
 
     const table = useReactTable({
