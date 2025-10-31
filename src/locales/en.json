@@ -19,14 +19,14 @@
     "aiCopilot": "AI Copilot",
     "marketPrices": "Market Prices",
     "growthForecast": "Growth Forecast",
+    "satellite": "Satellite",
     "cropScanner": "Crop Scanner",
     "soilAnalyzer": "Soil Analyzer",
     "postHarvest": "Post-Harvest",
     "community": "Community",
     "profile": "Profile",
     "settings": "Settings",
-    "adminPanel": "Admin Panel",
-    "cropPlanner": "Crop Planner"
+    "adminPanel": "Admin Panel"
   },
   "mobileNav": {
     "home": "Home",
@@ -37,7 +37,8 @@
     "market": "Market",
     "community": "Community",
     "planner": "Planner",
-    "profit": "Profit"
+    "profit": "Profit",
+    "satellite": "Satellite"
   },
   "landing": {
     "heroTitle": "Smarter Farming,\nBrighter Future",

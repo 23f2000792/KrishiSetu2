@@ -12,3 +12,4 @@ import '@/ai/flows/crop-growth-simulation.ts';
 import '@/ai/flows/disease-outbreak-prediction.ts';
 import '@/ai/flows/yield-analysis-flow.ts';
 import '@/ai/flows/profit-analyst-flow.ts';
+import '@/ai/flows/satellite-insights-flow.ts';

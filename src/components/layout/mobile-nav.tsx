@@ -13,6 +13,7 @@ import {
   BarChart,
   Book,
   Wallet,
+  Satellite,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '../ui/sidebar';
@@ -27,7 +28,7 @@ export function MobileNav() {
     { href: '/dashboard', label: t('mobileNav.home'), icon: LayoutDashboard },
     { href: '/chat', label: t('mobileNav.copilot'), icon: Bot },
     { href: '/scanner', label: t('mobileNav.scan'), icon: ScanLine },
-    { href: '/market', label: t('mobileNav.market'), icon: ShoppingBasket },
+    { href: '/satellite-insights', label: t('mobileNav.satellite'), icon: Satellite },
     { href: '/community', label: t('mobileNav.community'), icon: Users },
   ];
 
