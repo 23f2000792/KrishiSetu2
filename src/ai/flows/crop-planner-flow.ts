@@ -92,8 +92,9 @@ const getFarmerHistoryTool = ai.defineTool(
     }),
   },
   async ({ userId }) => {
-    const { firestore } = getInitializedFirebaseAdmin();
-    const data = await getFarmerKnowledgeGraph(firestore, userId);
+    // This is the correct way to initialize and use the admin SDK in a tool.
+    const admin = getInitializedFirebaseAdmin();
+    const data = await getFarmerKnowledgeGraph(admin.firestore, userId);
     return data;
   }
 );
