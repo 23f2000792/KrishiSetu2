@@ -46,26 +46,25 @@ export function PostCard({ post }: PostCardProps) {
     if (!firestore) return;
     setIsLiking(true);
     const postRef = doc(firestore, 'posts', post.id);
-    try {
-      await updateDoc(postRef, {
-        upvotes: increment(1)
+    const updateData = { upvotes: increment(1) };
+
+    updateDoc(postRef, updateData)
+      .catch((serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: postRef.path,
+            operation: 'update',
+            requestResourceData: { upvotes: 'increment(1)' }
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not like the post. Please try again."
+        });
+      })
+      .finally(() => {
+        setIsLiking(false);
       });
-    } catch (error) {
-      console.error("Error liking post:", error);
-      const permissionError = new FirestorePermissionError({
-          path: postRef.path,
-          operation: 'update',
-          requestResourceData: { upvotes: 'increment(1)' }
-      });
-      errorEmitter.emit('permission-error', permissionError);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not like the post. Please try again."
-      });
-    } finally {
-      setIsLiking(false);
-    }
   };
 
   const handleComment = () => {
