@@ -26,12 +26,12 @@ const profileSchema = z.object({
 });
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUserProfile } = useAuth();
   const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
+    values: {
       name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
@@ -48,11 +48,8 @@ export default function ProfilePage() {
   }
   
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
-    console.log("Updated profile:", values);
-    toast({
-      title: t('profile.profileUpdated'),
-      description: t('profile.profileUpdatedDesc'),
-    });
+    if (!user) return;
+    updateUserProfile(user.id, values);
   };
   
   const getInitials = (name: string) => {

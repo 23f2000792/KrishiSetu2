@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import type { User as AuthUser } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
@@ -10,6 +10,7 @@ import { useFirebase } from '@/firebase/provider';
 import type { User, UserRole } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 import { demoCredentials } from '@/lib/data';
+import { updateDocumentNonBlocking } from '@/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -18,6 +19,7 @@ interface AuthContextType {
   login: (email: string, password: string) => void;
   logout: () => void;
   signup: (name:string, email: string, password: string, role: UserRole, phone: string, region: string) => void;
+  updateUserProfile: (userId: string, data: Partial<User>) => Promise<void>;
   loading: boolean;
   handleDemoLogin: (role: 'Admin') => void;
 }
@@ -36,7 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userDocRef = doc(firestore, 'users', firebaseUser.uid);
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
-        setUser({ id: userDoc.id, ...userDoc.data() } as User);
+        const userData = { id: userDoc.id, ...userDoc.data() } as User;
+        setUser(userData);
       } else {
         // This case can happen if a user is in auth but not in firestore
         // You might want to log them out or create a profile
@@ -48,6 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
     }
   }, [firestore]);
+
+  const updateUserProfile = async (userId: string, data: Partial<User>) => {
+    const userDocRef = doc(firestore, 'users', userId);
+    updateDocumentNonBlocking(userDocRef, data);
+    // Optimistically update local state
+    setUser(prevUser => prevUser ? { ...prevUser, ...data } : null);
+    toast({
+        title: "Profile Updated",
+        description: "Your changes have been saved successfully.",
+    });
+  };
   
 
   useEffect(() => {
@@ -178,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, loading, pathname, router, user]);
 
-  const value = { user, authUser, isAuthenticated, login, logout, signup, loading, handleDemoLogin };
+  const value = { user, authUser, isAuthenticated, login, logout, signup, loading, handleDemoLogin, updateUserProfile };
 
   if (loading) {
     return (
