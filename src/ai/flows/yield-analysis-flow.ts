@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that analyzes the deviation between predicted and actual crop yield.
@@ -54,7 +55,7 @@ const getFarmerHistoryTool = ai.defineTool(
 
 const prompt = ai.definePrompt({
   name: 'yieldDeviationAnalysisPrompt',
-  model: 'gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: YieldAnalysisInputSchema },
   output: { schema: YieldAnalysisOutputSchema },
   tools: [getFarmerHistoryTool],
