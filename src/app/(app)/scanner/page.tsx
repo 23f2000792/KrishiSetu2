@@ -10,14 +10,13 @@ import { Button } from "@/components/ui/button";
 import { diagnoseCrop } from '@/ai/flows/crop-disease-nutrient-prediction';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Eye, Loader2 } from "lucide-react";
+import { AlertCircle, Eye } from "lucide-react";
 import { CameraView } from "./components/camera-view";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
-import { useFirebase, useMemoFirebase } from "@/firebase";
-import { useCollection } from "@/firebase/firestore/use-collection";
-import { collection, query, where, orderBy, limit } from "firebase/firestore";
+import { useUserCollection } from "@/firebase/firestore/use-user-collection";
 import Image from "next/image";
+import { query, orderBy, limit } from 'firebase/firestore';
 
 export default function ScannerPage() {
     const [result, setResult] = useState<ScanResultType | null>(null);
@@ -26,25 +25,19 @@ export default function ScannerPage() {
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const { t, locale } = useLanguage();
     const { user } = useAuth();
-    const { firestore } = useFirebase();
 
     const languageMap = {
       en: 'English',
       hi: 'Hindi',
       pa: 'Punjabi',
     };
-
-    const pastScansQuery = useMemoFirebase(() => {
-      if (!firestore || !user) return null;
-      return query(
-        collection(firestore, 'scans'),
-        where('userId', '==', user.id),
+    
+    const { data: pastScans, isLoading: scansLoading } = useUserCollection<ScanResultType>(
+        'scans',
+        query,
         orderBy('createdAt', 'desc'),
         limit(10)
-      );
-    }, [firestore, user]);
-
-    const { data: pastScans, isLoading: scansLoading } = useCollection<ScanResultType>(pastScansQuery);
+    );
 
     const toDataURL = (file: File): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -89,11 +82,9 @@ export default function ScannerPage() {
     
     const getScanDate = (scan: ScanResultType) => {
         if (scan.createdAt && typeof scan.createdAt === 'object' && 'toDate' in scan.createdAt) {
-            // It's a Firestore Timestamp
             return (scan.createdAt as any).toDate().toLocaleDateString();
         }
-        // It's a string or something else
-        return new Date(scan.createdAt).toLocaleDateString();
+        return new Date(scan.createdAt as any).toLocaleDateString();
     }
 
 

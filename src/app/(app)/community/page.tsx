@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { FilePlus, Filter, Loader2 } from "lucide-react"
@@ -10,7 +10,8 @@ import { useLanguage } from "@/contexts/language-context";
 import { useCollection } from "@/firebase/firestore/use-collection";
 import { useFirebase } from "@/firebase/provider";
 import { collection, query, orderBy } from 'firebase/firestore';
-import { Post } from "@/lib/types";
+import type { Post } from "@/lib/types";
+import { useMemo } from "react";
 
 export default function CommunityPage() {
     const [open, setOpen] = useState(false);
